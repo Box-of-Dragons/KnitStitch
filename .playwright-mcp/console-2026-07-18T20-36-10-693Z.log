@@ -1,0 +1,4 @@
+[     235ms] [LOG] KnitStichGrid Web - Loaded @ https://www.knitstitch.misssponto.me.uk/assets/main.js:28
+[     339ms] [ERROR] wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': Incorrect response MIME type. Expected 'application/wasm'. @ https://www.knitstitch.misssponto.me.uk/wasm/slvs.js:131
+[     339ms] [ERROR] falling back to ArrayBuffer instantiation @ https://www.knitstitch.misssponto.me.uk/wasm/slvs.js:131
+[     357ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.knitstitch.misssponto.me.uk/favicon.ico:0

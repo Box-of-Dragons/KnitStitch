@@ -84,7 +84,7 @@ function renderPreviewBezier(group, preview, thickness) {
       ctx.beginPath();
       ctx.moveTo(start.x, start.y);
       ctx.bezierCurveTo(control1.x, control1.y, control2.x, control2.y, end.x, end.y);
-      ctx.strokeStrokeShape(shape);
+      ctx.strokeShape(shape);
     },
     stroke: PREVIEW_COLOR,
     strokeWidth: thickness,

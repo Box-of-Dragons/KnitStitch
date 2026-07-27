@@ -325,6 +325,28 @@ npm run build
 
 The e2e tests are the source of truth for whether the system works correctly from a user perspective.
 
+## Git Conventions
+
+This project uses Conventional Commits to drive automatic versioning and changelog generation.
+
+For the full commit message format, version bump rules, and tagging guidance, see the canonical [git-rules.md](../StructuredChaos/docs/git-rules.md) in the StructuredChaos umbrella repo. That file is shared across all Structured Chaos family repos.
+
+### KnitStitch-specific scopes
+
+Common scopes used in this project:
+
+- **sketch** — sketch tools, interactions, models, or rendering
+- **solver** — constraint solver (SolveSpace adapter, feasibility, DOF analysis)
+- **grid** — grid layer, cell fill, or finished size calculation
+- **konva** — Konva stage setup or render layers
+- **ui** — sidebar, workspace switching, or panel controllers
+- **state** — store, persistence, or history
+- **docs** — documentation files
+- **agents** — AGENTS.md or agent-level docs under `docs/agents/`
+- **build** — build tooling, versioning, or changelog generation
+
+This repo uses `style` (not `ui`) for the no-logic-change styling commit type. Scopes are not enforced — use whatever best describes the area of change.
+
 ## VPS Deploy via GitHub Webhook
 
 The VPS auto-deploys when GitHub receives a push to `master`.

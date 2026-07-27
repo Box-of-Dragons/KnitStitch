@@ -97,7 +97,7 @@ function renderBeziers(group, beziers, { triplet, color, thickness, service }) {
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.bezierCurveTo(control1.x, control1.y, control2.x, control2.y, end.x, end.y);
-        ctx.strokeStrokeShape(shape);
+        ctx.strokeShape(shape);
       },
       stroke: bezier.isSelected ? triplet.select : color,
       strokeWidth: bezier.isSelected ? selectedStrokeWidth(thickness) : thickness,
