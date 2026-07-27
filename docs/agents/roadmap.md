@@ -104,7 +104,7 @@ Companion to the human-readable plan in [../roadmap.md](../roadmap.md#solvespace
 ### Fork strategy
 
 We maintain a fork of `solvespace/solvespace` at
-`https://github.com/XanthiaJo/SolverWasm`. Rationale:
+`https://github.com/Box-of-Dragons/SolverWasm`. Rationale:
 
 - SolveSpace master already includes the stateful C API (`src/slvs/lib.cpp`), embind JS bindings (`src/slvs/jslib.cpp`), and a CMake `slvs-wasm` target — no custom bindings or CMake glue needed
 - Forking upstream directly means we can `git merge upstream/master` to pick up solver bug fixes
@@ -117,8 +117,8 @@ The fork's only modification is deleting the stale `cmake/Platform/Emscripten.cm
 
 | Step | Detail |
 |---|---|
-| Fork | `https://github.com/XanthiaJo/SolverWasm` (fork of `solvespace/solvespace`) — already created |
-| Submodule | `git submodule add https://github.com/XanthiaJo/SolverWasm.git vendor/solver-wasm` |
+| Fork | `https://github.com/Box-of-Dragons/SolverWasm` (fork of `solvespace/solvespace`) — already created |
+| Submodule | `git submodule add https://github.com/Box-of-Dragons/SolverWasm.git vendor/solver-wasm` |
 | Submodules | `cd vendor/solver-wasm && git submodule update --init extlib/eigen extlib/mimalloc` (only solver deps, not GUI) |
 | Build script | `scripts/build-slvs.mjs` drives: `emsdk install/activate latest` → `cd vendor/solver-wasm && mkdir build-wasmlib && cd build-wasmlib && emcmake cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_GUI=OFF -DENABLE_CLI=OFF -DENABLE_TESTS=OFF -DENABLE_COVERAGE=OFF -DENABLE_OPENMP=OFF -DFORCE_VENDORED_Eigen3=ON -DENABLE_LTO=ON && cmake --build . --target slvs-wasm` |
 | Artifacts | `slvs.js` + `slvs.wasm` copied to `public/wasm/` |

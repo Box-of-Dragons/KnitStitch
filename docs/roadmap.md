@@ -18,7 +18,7 @@ solver, with lazy WASM loading and e2e coverage for the supported workflows.
 Distributing the compiled solver inside KnitStitch makes the whole app
 GPL-3.0-or-later. KnitStitch has adopted GPL-3.0-or-later accordingly.
 
-- [x] Phase 1 — Fork `solvespace/solvespace` → `XanthiaJo/SolverWasm`, build the `slvs-wasm` target, ship `slvs.js` + `slvs.wasm` as static assets (done: fork at https://github.com/XanthiaJo/SolverWasm, rebuild verified and copied into `public/wasm/`)
+- [x] Phase 1 — Fork `solvespace/solvespace` → `XanthiaJo/SolverWasm`, build the `slvs-wasm` target, ship `slvs.js` + `slvs.wasm` as static assets (done: fork at https://github.com/Box-of-Dragons/SolverWasm, rebuild verified and copied into `public/wasm/`)
 - [x] Phase 2 — Adapter layer translating the sketch model to SolveSpace (real-world units via gauge)
 - [x] Phase 3 — Solver integration with lazy WASM loading
 - [x] Phase 4 — Validate via e2e, make SolveSpace the shipped backend, and remove the old native solver modules

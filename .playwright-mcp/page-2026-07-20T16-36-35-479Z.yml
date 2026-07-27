@@ -1,0 +1,128 @@
+- generic [active] [ref=e1]:
+  - status [ref=e2]:
+    - paragraph [ref=e4]: Loading sketch tools…
+  - generic [ref=e6]:
+    - link "Structured Chaos" [ref=e7] [cursor=pointer]:
+      - /url: https://www.misssponto.me.uk/
+    - link "KnitStitch" [ref=e8] [cursor=pointer]:
+      - /url: /
+  - banner [ref=e9]:
+    - generic [ref=e11]:
+      - heading "KnitStitch" [level=1] [ref=e12]
+      - navigation [ref=e13]:
+        - link "Home" [ref=e15] [cursor=pointer]:
+          - /url: /
+        - link "ReadMe" [ref=e17] [cursor=pointer]:
+          - /url: /readme.html
+        - link "Roadmap" [ref=e19] [cursor=pointer]:
+          - /url: /roadmap.html
+        - link "ChangeLog" [ref=e21] [cursor=pointer]:
+          - /url: /changelog.html
+      - generic "Project links" [ref=e22]:
+        - link "Open the project on GitHub" [ref=e23] [cursor=pointer]:
+          - /url: https://github.com/Box-of-Dragons/KnitStitch
+          - generic [ref=e26]: GitHub
+        - link "Open the project on GitLab" [ref=e27] [cursor=pointer]:
+          - /url: https://gitlab.com/structured-chaos/KnitStitch
+          - generic [ref=e36]: GitLab
+  - generic [ref=e38]:
+    - generic [ref=e40]:
+      - button "✏ Sketch" [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: ✏
+        - generic [ref=e43]: Sketch
+      - button "■ Row Counts" [ref=e44] [cursor=pointer]:
+        - generic [ref=e45]: ■
+        - generic [ref=e46]: Row Counts
+      - button "🖼 Overlay" [ref=e47] [cursor=pointer]:
+        - generic [ref=e48]: 🖼
+        - generic [ref=e49]: Overlay
+      - button "📐 Templates" [ref=e50] [cursor=pointer]:
+        - generic [ref=e51]: 📐
+        - generic [ref=e52]: Templates
+      - button "⚙ Options" [ref=e53] [cursor=pointer]:
+        - generic [ref=e54]: ⚙
+        - generic [ref=e55]: Options
+    - generic [ref=e56]:
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: Draw
+          - generic [ref=e64]:
+            - button "Select" [ref=e65] [cursor=pointer]:
+              - generic [ref=e66]: ⬇
+            - button "Fill" [ref=e68] [cursor=pointer]:
+              - generic [ref=e69]: ▦
+            - button "Anchor" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: ⊕
+            - button "Line" [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: ╱
+            - button "Construction" [ref=e77] [cursor=pointer]:
+              - generic [ref=e78]: ┄
+            - button "Circle" [ref=e80] [cursor=pointer]:
+              - generic [ref=e81]: ○
+            - button "Rectangle" [ref=e83] [cursor=pointer]:
+              - generic [ref=e84]: ▭
+            - button "Bézier" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]: ∿
+        - generic [ref=e90]:
+          - generic [ref=e91]: Constraints
+          - generic [ref=e92]:
+            - button "Dimension" [ref=e93] [cursor=pointer]:
+              - generic [ref=e94]: ↔
+            - button "H/V" [ref=e96] [cursor=pointer]:
+              - generic [ref=e97]: ⊥
+            - button "Coincident" [ref=e99] [cursor=pointer]:
+              - generic [ref=e100]: ●
+            - button "Equal" [ref=e102] [cursor=pointer]:
+              - generic [ref=e103]: ≡
+            - button "Parallel" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]: ∥
+            - button "Perpendicular" [ref=e108] [cursor=pointer]:
+              - generic [ref=e109]: ⌐
+            - button "Midpoint" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: ⊿
+        - generic [ref=e115]:
+          - generic [ref=e116]: Sketch
+          - generic [ref=e117]:
+            - combobox "Line colour" [ref=e118]:
+              - option "Gold" [selected]
+              - option "Red"
+              - option "Orange"
+              - option "Yellow"
+              - option "Green"
+              - option "Teal"
+              - option "Blue"
+              - option "Purple"
+              - option "Pink"
+              - option "Black"
+              - option "Dark grey"
+              - option "Grey"
+              - option "White"
+            - generic "Line thickness" [ref=e119]:
+              - generic [ref=e120]: ━
+              - slider [ref=e121]: "2"
+            - generic "Preview matches line colour" [ref=e122] [cursor=pointer]:
+              - checkbox "Match" [checked] [ref=e123]
+              - generic [ref=e124]: Match
+            - button "Undo" [disabled] [ref=e125]
+            - button "Clear" [disabled] [ref=e127]
+            - button "Delete" [disabled] [ref=e129]
+      - generic [ref=e133]:
+        - button "+" [ref=e134] [cursor=pointer]
+        - generic [ref=e135]: 100%
+        - button "−" [ref=e136] [cursor=pointer]
+        - button "⧉" [ref=e138] [cursor=pointer]
+        - button "↻" [ref=e139] [cursor=pointer]
+        - button "⛶" [ref=e141] [cursor=pointer]
+      - generic [ref=e142]:
+        - generic [ref=e143] [cursor=pointer]:
+          - generic [ref=e144]: Objects
+          - button "▾" [ref=e145]
+        - generic [ref=e146]:
+          - list
+          - generic [ref=e147]:
+            - button "Copy objects" [ref=e148] [cursor=pointer]
+            - button "Export" [ref=e149] [cursor=pointer]
+            - button "Import" [ref=e150] [cursor=pointer]
+      - text: – – – – – – – –
+  - contentinfo [ref=e151]:
+    - generic [ref=e152]: v2.0.0 (4536f67)

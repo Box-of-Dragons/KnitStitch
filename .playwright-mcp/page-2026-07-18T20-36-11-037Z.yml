@@ -1,0 +1,119 @@
+- generic [active] [ref=e1]:
+  - status [ref=e2]:
+    - paragraph [ref=e4]: Loading sketch tools…
+  - generic [ref=e6]:
+    - link "Structured Chaos" [ref=e7] [cursor=pointer]:
+      - /url: https://www.misssponto.me.uk/
+    - link "KnitStitch" [ref=e8] [cursor=pointer]:
+      - /url: /
+  - banner [ref=e9]:
+    - generic [ref=e11]:
+      - heading "KnitStitch" [level=1] [ref=e12]
+      - navigation [ref=e13]:
+        - link "Home" [ref=e15] [cursor=pointer]:
+          - /url: /
+        - link "ReadMe" [ref=e17] [cursor=pointer]:
+          - /url: /readme.html
+        - link "Roadmap" [ref=e19] [cursor=pointer]:
+          - /url: /roadmap.html
+        - link "ChangeLog" [ref=e21] [cursor=pointer]:
+          - /url: /changelog.html
+      - generic "Project links" [ref=e22]:
+        - link "Open the project on GitHub" [ref=e23] [cursor=pointer]:
+          - /url: https://github.com/Box-of-Dragons/KnitStitch
+          - generic [ref=e26]: GitHub
+        - link "Open the project on GitLab" [ref=e27] [cursor=pointer]:
+          - /url: https://gitlab.com/structured-chaos/KnitStitch
+          - generic [ref=e36]: GitLab
+  - generic [ref=e38]:
+    - generic [ref=e40]:
+      - button "✏ Sketch" [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: ✏
+        - generic [ref=e43]: Sketch
+      - button "■ Row Counts" [ref=e44] [cursor=pointer]:
+        - generic [ref=e45]: ■
+        - generic [ref=e46]: Row Counts
+      - button "🖼 Overlay" [ref=e47] [cursor=pointer]:
+        - generic [ref=e48]: 🖼
+        - generic [ref=e49]: Overlay
+      - button "📐 Templates" [ref=e50] [cursor=pointer]:
+        - generic [ref=e51]: 📐
+        - generic [ref=e52]: Templates
+      - button "⚙ Options" [ref=e53] [cursor=pointer]:
+        - generic [ref=e54]: ⚙
+        - generic [ref=e55]: Options
+    - generic [ref=e56]:
+      - generic [ref=e62]:
+        - button "+" [ref=e63] [cursor=pointer]
+        - generic [ref=e64]: 100%
+        - button "−" [ref=e65] [cursor=pointer]
+        - button "⧉" [ref=e67] [cursor=pointer]
+        - button "↻" [ref=e68] [cursor=pointer]
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]: Sketch
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - generic [ref=e75]: "Line colour:"
+                - combobox [ref=e76]:
+                  - option "Gold" [selected]
+                  - option "Red"
+                  - option "Orange"
+                  - option "Yellow"
+                  - option "Green"
+                  - option "Teal"
+                  - option "Blue"
+                  - option "Purple"
+                  - option "Pink"
+                  - option "Black"
+                  - option "Dark grey"
+                  - option "Grey"
+                  - option "White"
+              - generic [ref=e77]:
+                - generic [ref=e78]: "Thickness:"
+                - slider [ref=e80]: "2"
+              - generic [ref=e81]:
+                - checkbox "Preview matches line colour" [checked] [ref=e82]
+                - generic [ref=e83]: Preview matches line colour
+              - generic [ref=e84]:
+                - button "Undo" [disabled] [ref=e85] [cursor=pointer]
+                - button "Clear" [disabled] [ref=e86] [cursor=pointer]
+                - button "Delete" [disabled] [ref=e87] [cursor=pointer]
+              - paragraph [ref=e88]: Click to place points, chain lines. Snap ring = existing point. Right-click or Esc to cancel.
+          - generic [ref=e89]:
+            - generic [ref=e90]: Draw
+            - generic [ref=e91]:
+              - paragraph [ref=e92]: "Shape tools:"
+              - generic [ref=e93]:
+                - button "Select" [ref=e94] [cursor=pointer]
+                - button "Fill" [ref=e95] [cursor=pointer]
+                - button "Anchor" [ref=e96] [cursor=pointer]
+                - button "Line" [ref=e97] [cursor=pointer]
+                - button "Construction" [ref=e98] [cursor=pointer]
+                - button "Circle" [ref=e99] [cursor=pointer]
+                - button "Rectangle" [ref=e100] [cursor=pointer]
+                - button "Triangle" [disabled] [ref=e101] [cursor=pointer]
+              - paragraph [ref=e102]: Basic geometric shapes for sketching.
+          - generic [ref=e103]:
+            - generic [ref=e104]: Constraints
+            - generic [ref=e105]:
+              - paragraph [ref=e106]: "Apply constraint:"
+              - generic [ref=e107]:
+                - button "Dimension" [ref=e108] [cursor=pointer]
+                - button "H/V" [ref=e109] [cursor=pointer]
+                - button "Coincident" [ref=e110] [cursor=pointer]
+                - button "Tangent" [disabled] [ref=e111] [cursor=pointer]
+                - button "Equal" [ref=e112] [cursor=pointer]
+                - button "Parallel" [ref=e113] [cursor=pointer]
+                - button "Perpendicular" [ref=e114] [cursor=pointer]
+                - button "Midpoint" [ref=e115] [cursor=pointer]
+              - paragraph [ref=e116]: Constraints enforce geometric relationships between sketch entities.
+          - generic [ref=e117]:
+            - generic [ref=e118]: Objects
+            - generic [ref=e119]:
+              - list
+              - button "Copy objects" [ref=e120] [cursor=pointer]
+        - text: – – – – – – – –
+  - contentinfo [ref=e121]:
+    - generic [ref=e122]: v2.9.1 (1075cc8)
