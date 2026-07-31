@@ -1,7 +1,7 @@
 # KnitStitch Agent Notes
 
 This file contains the agent guidance for the KnitStitch Grid app.
-KnitStitch is a standalone front-end app (no longer embedded in Craft CMS). Account-backed persistence is planned through a self-hosted Node/TypeScript API using Better Auth.
+KnitStitch is a standalone front-end app. Account-backed persistence is planned through a self-hosted Node/TypeScript API using Better Auth.
 
 ## Scope
 
@@ -38,7 +38,7 @@ database setup, environment variables, and same-origin `/api` proxy here.
 ## Versioning and Changelog
 
 This project uses Conventional Commits to drive automatic versioning and
-changelog generation, ported from the CraftCMS `GenerateBuildInfo.php` script.
+changelog generation, ported from the BoxOfDragons `GenerateBuildInfo.php` script.
 
 - `scripts/generate-build-info.mjs` - Node.js build info generator. Reads git
   tags and conventional commit messages to derive a version. Supports
@@ -51,7 +51,7 @@ changelog generation, ported from the CraftCMS `GenerateBuildInfo.php` script.
   (breaking, feature, fix, docs, refactor, test, chore, other)
 - `public/changelog-v2.html` - generated HTML changelog fragment for the
   changelog page, produced from KnitStitch's own git log
-- `public/changelog-v1.html` - historical changelog from the CraftCMS era,
+- `public/changelog-v1.html` - historical changelog from the Craft CMS era,
   preserved as an HTML fragment for the v1 tab. The going-forward changelog is
   generated from KnitStitch's own git log.
 - `pages/changelog.html` - changelog page with v1/v2 tabs, separated layout
