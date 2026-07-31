@@ -1,412 +1,41 @@
-/* app.css — Standalone styles for the KnitStitch Grid app
-   Extracted from the CraftCMS site.css. Contains the design tokens,
-   base reset/typography, shared components, and the KnitStitch app layout. */
+/* app.css — KnitStitch Grid app overrides and app-specific styles
+ *
+ * Loads AFTER css/shared.css (served from the root Structured Chaos site).
+ * Contains only:
+ *   - Theme color overrides (KnitStitch uses a gold primary, not sage)
+ *   - Layout overrides (scroll-margin-top, .panel border-radius)
+ *   - Body-class active nav state
+ *   - KnitStitch app layout (canvas, ribbon, workspace, floating panels,
+ *     tool ribbon, object list, dimension overlay, color picker,
+ *     small-screen warning, boot loading overlay)
+ *
+ * All tokens, base styles, typography, layout primitives, global bar,
+ * site header, navigation, panels, chips, color pairs, buttons, forms,
+ * lists, gallery, footer, and responsive breakpoints live in
+ * css/shared.css.
+ */
 
 /* ==========================================================================
-   1. Design Tokens
+   1. Theme Overrides
    ========================================================================== */
 :root {
-    --body: #333333;
-    --body-light: #8a8a8a;
-    --body-dark: #111111;
     --primary: #ca9b52;
     --primary-light: #e4c78f;
     --primary-dark: #8b5d1f;
     --secondary: #f7f4ef;
     --secondary-light: #fbf9f5;
     --secondary-dark: #e8e2d8;
-    --tertiary: #ffffff;
     --tertiary-dark: #f2eee8;
-    --border: var(--secondary-dark);
-
-    /* Color pairs */
-    --color-pair-gold-bg: #efe9da;
-    --color-pair-gold-text: var(--primary-dark);
-
-    /* Shadows */
-    --shadow-sm: 0 1px 0 rgba(17, 17, 17, 0.03);
-    --shadow-md: 0 5px 12px rgba(17, 17, 17, 0.08);
     --shadow-lg: 0 14px 28px rgba(26, 19, 9, 0.12);
-
-    /* Project link colours */
-    --github-color: #24292f;
-    --github-hover-bg: #f3f5f7;
-    --github-hover-border: #d0d7de;
-    --gitlab-color: #fc6d26;
-    --gitlab-hover-bg: #fff3ea;
-    --gitlab-hover-border: #f7c6a5;
-
-    /* Typography */
-    --font-body: "Open Sans", sans-serif;
-    --font-heading: "Playfair Display", serif;
-    --font-brand: "Dancing Script", cursive;
-    --type-h1: clamp(30px, 4vw, 42px);
-    --type-h2: 28px;
-    --type-h3: 25px;
-    --type-h4: 18px;
-    --type-h5: 14px;
-    --type-h6: 12px;
-    --type-body: 14px;
-    --type-subtitle: 13px;
-    --type-caption: 12px;
-    --type-button: 12px;
-}
-
-/* ==========================================================================
-   2. Reset & Base
-   ========================================================================== */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-    scroll-behavior: smooth;
 }
 
 [id] {
     scroll-margin-top: 116px;
 }
 
-body {
-    color: var(--body);
-    background: var(--secondary);
-    font-family: var(--font-body);
-    font-size: var(--type-body);
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-a { color: var(--primary); text-decoration: none; }
-a:hover { opacity: 0.85; }
-
-img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-    margin: 1.5em 0;
-}
-
 /* ==========================================================================
-   3. Typography
+   2. Active Nav (body-class driven — header is a shared include)
    ========================================================================== */
-h1, h2, h3, h4, h5, h6 {
-    color: var(--body-dark);
-    font-family: var(--font-body);
-    font-weight: 700;
-    margin-inline: 0;
-}
-
-h1 {
-    margin-block: 0 0.55em;
-    font-size: var(--type-h1);
-    line-height: 1.15;
-    letter-spacing: 0.2px;
-}
-
-h2 {
-    margin-block: 1.5em 0.45em;
-    font-size: var(--type-h2);
-    line-height: 1.2;
-}
-
-h3 {
-    margin-block: 1.25em 0.25em;
-    font-size: var(--type-h3);
-    line-height: 1.3;
-}
-
-h4 {
-    margin-block: 1em 0.35em;
-    font-size: var(--type-h4);
-    line-height: 1.3;
-}
-
-h5 {
-    margin-block: 1em 0.35em;
-    font-size: var(--type-h5);
-    line-height: 1.3;
-}
-
-h6 {
-    margin-block: 1em 0.35em;
-    font-size: var(--type-h6);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-h2:first-child,
-h3:first-child,
-h4:first-child,
-h5:first-child,
-h6:first-child {
-    margin-block-start: 0;
-}
-
-.body {
-    font-size: var(--type-body);
-    line-height: 1.7;
-}
-
-.caption {
-    font-size: var(--type-caption);
-    line-height: 1.4;
-    color: var(--body-light);
-}
-
-p,
-ul,
-ol,
-blockquote,
-pre,
-table {
-    margin: 0 0 1.1em;
-}
-
-ul,
-ol {
-    list-style: none;
-    padding-left: 0;
-    margin: 0.6em 0 0;
-    display: grid;
-    gap: 5px;
-}
-
-ul > li,
-ol > li {
-    position: relative;
-    line-height: 1.6;
-}
-
-ul > li {
-    padding-left: 1.2em;
-}
-
-ol {
-    gap: 12px;
-    counter-reset: step;
-}
-
-ol > li {
-    padding-left: 1.6em;
-    counter-increment: step;
-}
-
-ul > li::before,
-ol > li::before {
-    position: absolute;
-    left: 0;
-    color: var(--primary);
-    font-weight: 600;
-}
-
-ul > li::before {
-    content: "–";
-}
-
-ol > li::before {
-    content: counter(step) ".";
-}
-
-blockquote,
-pre {
-    border-left: 4px solid var(--primary);
-    border-radius: 0 8px 8px 0;
-    background: var(--secondary-light);
-}
-
-blockquote {
-    padding: 0.9em 1.2em;
-}
-
-pre {
-    overflow-x: auto;
-    padding: 1em 1.2em;
-    color: var(--body-dark);
-}
-
-code {
-    padding: 0.18em 0.35em;
-    border-radius: 4px;
-    background: var(--secondary-dark);
-    color: var(--primary-dark);
-    font-size: 0.95em;
-}
-
-pre code {
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
-    color: inherit;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th,
-td {
-    padding: 0.7em 0.8em;
-    border: 1px solid var(--border);
-    text-align: left;
-    vertical-align: top;
-}
-
-/* ==========================================================================
-   4. Layout
-   ========================================================================== */
-.shell {
-    width: 80%;
-    margin: 0 auto;
-}
-
-.page-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 14px;
-    align-items: start;
-}
-
-.page-layout--wide {
-    grid-template-columns: minmax(0, 1fr) 420px;
-    gap: 14px;
-}
-
-.global-bar-row,
-.main-nav,
-.main-nav-item,
-.form-row,
-.checkbox-row,
-.slider-row,
-.ribbon-modes,
-.zoom-control,
-.canvas-content,
-.page-subheader-inner,
-.ribbon-bar,
-.object-list li,
-.color-option,
-.dim-edit-overlay__controls,
-.footer-row {
-    display: flex;
-    align-items: center;
-}
-
-/* ==========================================================================
-   4b. Global Bar (shared between sites)
-   ========================================================================== */
-.global-bar {
-    background: var(--body-dark);
-    position: sticky;
-    top: 0;
-    z-index: 110;
-}
-
-.global-bar-row {
-    gap: 20px;
-    min-height: 36px;
-}
-
-.global-bar-link {
-    color: var(--secondary);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    text-decoration: none;
-    white-space: nowrap;
-    opacity: 0.7;
-    transition: opacity 140ms ease, color 140ms ease;
-}
-
-.global-bar-link:hover {
-    opacity: 1;
-    color: var(--primary-light);
-}
-
-.global-bar-link.active {
-    opacity: 1;
-    color: var(--primary);
-}
-
-.global-bar-link--right {
-    margin-left: auto;
-}
-
-.global-bar-link[aria-disabled="true"] {
-    opacity: 0.4;
-    pointer-events: none;
-}
-
-/* ==========================================================================
-   5. Site Header & Navigation
-   ========================================================================== */
-.site-header {
-    background: var(--tertiary);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 36px;
-    z-index: 100;
-}
-
-.header-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    min-height: 72px;
-    gap: 24px;
-}
-
-.header-row > .brand {
-    justify-self: start;
-}
-
-.brand {
-    margin: 0;
-    align-self: center;
-    color: var(--body-dark);
-    font-family: var(--font-brand);
-    font-size: clamp(30px, 4vw, 48px);
-    line-height: 0.95;
-    white-space: nowrap;
-}
-
-.main-nav {
-    justify-content: center;
-    min-width: 0;
-    gap: 26px;
-    justify-self: center;
-}
-
-.main-nav-item {
-    position: relative;
-}
-
-.main-nav-link,
-.chip,
-.workspace-btn,
-.zoom-btn {
-    display: inline-flex;
-    align-items: center;
-}
-
-.main-nav-link {
-    color: var(--body-dark);
-    font-size: var(--type-h5);
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    min-height: 72px;
-}
-
-.main-nav-link.active {
-    color: var(--primary);
-}
-
-/* Active nav state driven by body class — the header is a shared
-   include so the active link can't be hardcoded in the partial. */
 .page-home .main-nav-link[href="/"],
 .page-readme .main-nav-link[href="/pages/readme.html"],
 .page-roadmap .main-nav-link[href="/pages/roadmap.html"],
@@ -414,225 +43,50 @@ td {
     color: var(--primary);
 }
 
-.header-project-links {
+/* ==========================================================================
+   3. Panel Override
+   ========================================================================== */
+.panel {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   4. KnitStitch App Layout
+   ========================================================================== */
+
+/* Flex layout for app-specific components (shared.css handles the common
+   ones: .global-bar-row, .main-nav, .main-nav-item, .form-row, .checkbox-row,
+   .slider-row, .page-subheader-inner, .footer-row) */
+.ribbon-modes,
+.zoom-control,
+.canvas-content,
+.ribbon-bar,
+.object-list li,
+.color-option,
+.dim-edit-overlay__controls {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-self: end;
 }
 
-.project-link {
+.workspace-btn,
+.zoom-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--tertiary);
-    color: var(--body-dark);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    white-space: nowrap;
-    text-decoration: none;
-    box-shadow: var(--shadow-sm);
-    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
 }
 
-.project-link:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.project-link svg {
-    width: 16px;
-    height: 16px;
-    display: block;
-    fill: currentColor;
-    flex: 0 0 auto;
-}
-
-.project-link--github {
-    color: var(--github-color);
-}
-
-.project-link--gitlab {
-    color: var(--gitlab-color);
-}
-
-.project-link--github:hover {
-    background: var(--github-hover-bg);
-    border-color: var(--github-hover-border);
-}
-
-.project-link--gitlab:hover {
-    background: var(--gitlab-hover-bg);
-    border-color: var(--gitlab-hover-border);
-}
-
-/* ==========================================================================
-   6. Page Sub-header (removed — header nav replaces title panel)
-   ========================================================================== */
-
-/* ==========================================================================
-   7. Buttons
-   ========================================================================== */
-button,
-.button {
-    font-family: inherit;
-    font-size: var(--type-button);
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.button {
-    display: inline-block;
-    padding: 10px 14px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.button-primary {
-    background: var(--primary-dark);
-    color: var(--tertiary);
-    border-color: var(--primary-dark);
-}
-
-.button-primary:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
-.button-sm {
-    padding: 6px 10px;
-    font-size: 11px;
-}
-
-/* ==========================================================================
-   8. Forms
-   ========================================================================== */
-input[type="text"],
-input[type="number"],
-select {
-    padding: 5px 8px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    font-size: 13px;
-    font-family: inherit;
-}
-
-select {
-    min-width: 140px;
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.form-row {
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.form-row label {
-    min-width: 80px;
-    font-size: 13px;
-}
-
-.form-row input[type="text"],
-.form-row input[type="number"] {
-    flex: 1;
-}
-
-.checkbox-row {
-    gap: 6px;
-    margin: 6px 0;
-    font-size: 13px;
-}
-
-.slider-row {
-    gap: 8px;
-}
-
-.slider-row input[type="range"] {
-    flex: 1;
-}
-
-.toggle-group {
-    gap: 4px;
-}
-
-/* ==========================================================================
-   9. Container Sections
-   ========================================================================== */
-.container-sections,
-.changelog-types-sidebar {
-    display: grid;
-    gap: 14px;
-}
-
-/* Bordered card/panel shell (tertiary background) */
-.panel,
-.container-section--headed,
 .ribbon-bar,
 .zoom-control {
     background: var(--tertiary);
     border: 1px solid var(--border);
 }
 
-.container-section--headed {
-    padding: 0;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.floating-panel-body > .container-section--headed + .container-section--headed {
-    margin-top: 14px;
-}
-
-.container-section-header {
-    padding: 6px 14px;
-    font-weight: 600;
-    font-size: 13px;
-    border-bottom: 1px solid var(--border);
-    background: var(--tertiary-dark);
-}
-
-.container-section-body {
-    padding: 14px;
-}
-
-.container-actions,
-.toggle-group {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.container-actions {
-    margin-top: 14px;
-    gap: 10px;
-    align-items: center;
-}
-
-/* ==========================================================================
-   10. KnitStitch App Layout
-   ========================================================================== */
-
 .page-knitstitch,
 .page-knitstitch > .shell,
 #app-container,
 .canvas-area,
 #dim-edit-overlay,
-.boot-loading-overlay,
-.container-section--headed,
-.panel {
+.boot-loading-overlay {
     display: flex;
     flex-direction: column;
 }
@@ -1132,6 +586,10 @@ body.is-canvas-fullscreen > .shell {
     transform: rotate(-90deg);
 }
 
+.floating-panel-body > .container-section--headed + .container-section--headed {
+    margin-top: 14px;
+}
+
 /* Measurement derived-values list */
 .measurement-derived {
     list-style: none;
@@ -1329,78 +787,17 @@ body.is-canvas-fullscreen > .shell {
 }
 
 /* ==========================================================================
-   Site Footer
+   Site Footer additions
    ========================================================================== */
-.site-footer {
-    border-top: 1px solid var(--border);
-    background: var(--tertiary-dark);
-    padding: 22px 0;
-    margin-top: auto;
-}
-
-.footer-row {
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    font-size: 13px;
-}
-
 .footer-finished-size {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.footer-version {
-    margin-left: auto;
-    font-weight: 400;
-    color: var(--body-light);
-}
-
 /* ==========================================================================
-   Changelog Page — Panels, Chips, Lists, Tabs
+   Small-screen warning page
    ========================================================================== */
-
-/* --- Page layout sections (global header / page subheader / main / footer) --- */
-.page-document {
-    min-height: 100vh;
-}
-
-.page-document .site-footer {
-    margin-top: auto;
-}
-
-/* --- Page sub-header (bordered container holding the page title) --- */
-.page-subheader {
-    padding: 32px 0 14px;
-    margin-bottom: 14px;
-    flex-shrink: 0;
-}
-
-.container,
-.page-subheader-inner {
-    background: var(--secondary-light);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-}
-
-.page-subheader-inner {
-    text-align: center;
-    padding: 22px 28px;
-    justify-content: center;
-}
-
-.page-subheader-inner h1 {
-    margin: 0;
-}
-
-/* --- Main content area --- */
-.page-main {
-    margin: 0 auto 60px;
-    flex: 1;
-}
-
-/* --- Small-screen warning page --- */
 .small-screen-warning {
     display: flex;
     align-items: center;
@@ -1439,176 +836,9 @@ body.is-canvas-fullscreen > .shell {
     margin-top: 10px;
 }
 
-/* --- Container (bordered box for main content column) --- */
-.container {
-    min-width: 0;
-    padding: 14px;
-}
-
-/* --- Sticky sidebar --- */
-.sidebar--sticky {
-    position: sticky;
-    top: 129px;
-}
-
-/* --- Changelog sidebar blocks (moved into sidebar via JS) --- */
-.changelog-versions .container-section-body {
-    max-height: 320px;
-    overflow-y: auto;
-}
-
-/* --- Tab bar --- */
-.tab-bar {
-    display: flex;
-    gap: 0;
-    border-bottom: 2px solid var(--border);
-    margin-bottom: 24px;
-}
-
-.tab-btn {
-    padding: 10px 24px;
-    border: none;
-    background: transparent;
-    color: var(--body-light);
-    font-size: var(--type-h5);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    transition: color 140ms ease, border-color 140ms ease;
-}
-
-.tab-btn:hover {
-    color: var(--body-dark);
-}
-
-.tab-btn.active {
-    color: var(--primary-dark);
-    border-bottom-color: var(--primary);
-}
-
-.tab-panel {
-    display: none;
-}
-
-.tab-panel.active {
-    display: block;
-}
-
-/* --- Panels --- */
-.panel {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.panel--padded {
-    padding: 20px 24px;
-    margin-bottom: 16px;
-}
-
-/* --- Chips (color-pair badges) --- */
-.chip {
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.color-pair-gold {
-    background: var(--color-pair-gold-bg);
-    color: var(--color-pair-gold-text);
-}
-
-.color-pair-sage {
-    background: #e3ede4;
-    color: #3a6b42;
-}
-
-.color-pair-sky {
-    background: #dde8f2;
-    color: #2c5f8a;
-}
-
-.color-pair-stone {
-    background: #e8e2d8;
-    color: #6b6356;
-}
-
-.color-pair-plum {
-    background: #e8dde8;
-    color: #6a3d6a;
-}
-
-.color-pair-olive {
-    background: #ece8d8;
-    color: #6b6333;
-}
-
-.color-pair-ink {
-    background: #ddd;
-    color: var(--body-dark);
-}
-
-.color-pair-red {
-    background: #f2dddd;
-    color: #8a2c2c;
-}
-
-/* --- Changelog list --- */
-.list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.list > li {
-    padding-left: 0;
-}
-
-.list > li::before {
-    content: none;
-}
-
-.panel--padded .list > li {
-    padding: 14px 0;
-    border-top: 1px solid var(--border);
-}
-
-.panel--padded .list > li:first-child {
-    border-top: 0;
-    padding-top: 0;
-}
-
-/* --- Changelog / markdown page loading state --- */
-.changelog-loading,
-.md-loading,
-.changelog-error,
-.md-error {
-    text-align: center;
-    padding: 40px;
-    font-size: var(--type-subtitle);
-}
-
-.changelog-loading,
-.md-loading {
-    color: var(--body-light);
-}
-
-.changelog-error,
-.md-error {
-    color: #8a2c2c;
-}
-
-/* --- Boot loading overlay ---
-   Shown from first paint until the SolveSpace WASM solver finishes
-   loading (see index.html and main.js). The spinner uses a
-   transform-only CSS animation so it keeps visibly spinning even while
-   the main thread is busy instantiating the WASM module — most browsers
-   run pure-transform CSS animations on the compositor thread, so it
-   doesn't need main-thread ticks to animate. */
+/* ==========================================================================
+   Boot loading overlay
+   ========================================================================== */
 .boot-loading-overlay {
     position: fixed;
     inset: 0;
