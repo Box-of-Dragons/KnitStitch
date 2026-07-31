@@ -15,7 +15,7 @@ KnitStitch Grid is a Konva.js web conversion of the original KnitStichGrid WPF d
 - Entry point: `index.html` (standalone, no server-side templating)
 - Source: `src/`
 - Built assets: `dist/` (produced by `npm run build`)
-- App styles: `public/css/app.css` (served as a static file, copied to `dist/css/app.css`)
+- App styles: `public/css/app.css` (served as a static file, copied to `dist/css/app.css`) — KnitStitch-specific overrides and app layout only; loads AFTER `css/shared.css` from the root Structured Chaos site
 
 ## Running Locally
 
