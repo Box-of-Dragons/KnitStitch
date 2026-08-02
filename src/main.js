@@ -52,5 +52,18 @@ if (typeof document !== 'undefined') {
     bootOverlay.classList.add('is-hidden');
     bootOverlay.addEventListener('transitionend', () => bootOverlay.remove(), { once: true });
   };
-  sketchService.ensureSolver().finally(hideBootOverlay);
+  const waitForSharedHeaderPaint = () => new Promise((resolve) => {
+    const paintThenResolve = () => requestAnimationFrame(() => requestAnimationFrame(resolve));
+    const hasRenderedHeader = () => document.querySelector('.global-bar') && document.querySelector('.site-header');
+
+    if (hasRenderedHeader()) {
+      paintThenResolve();
+      return;
+    }
+
+    window.addEventListener('knitstitch:shared-header-ready', paintThenResolve, { once: true });
+    setTimeout(paintThenResolve, 1200);
+  });
+
+  waitForSharedHeaderPaint().then(() => sketchService.ensureSolver()).finally(hideBootOverlay);
 }

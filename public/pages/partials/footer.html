@@ -1,18 +1,15 @@
-<footer class="site-footer">
-  <div class="shell footer-row">
-    <div class="footer-finished-size">
-      <span id="finished-width">Width: -- in</span>
-      <span id="finished-height">Height: -- in</span>
-    </div>
-    <div class="footer-version" id="footer-version"></div>
-  </div>
-</footer>
-<script src="/js/buildInfo.js"></script>
+<script>window.SITE_FOOTER = {
+  leftHtml: '<div class="footer-finished-size"><span id="finished-width">Width: -- in</span><span id="finished-height">Height: -- in</span></div>',
+  buildInfoSrc: '/js/buildInfo.js'
+};</script>
+<div id="site-footer"></div>
 <script>
-  (function() {
-    var el = document.getElementById('footer-version');
-    if (el && window.BUILD_INFO) {
-      el.textContent = 'v' + window.BUILD_INFO.version.replace(/^v/, '') + ' (' + window.BUILD_INFO.commit + ')';
-    }
+  (function () {
+    var host = location.hostname;
+    var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
+    var s = document.createElement('script');
+    s.src = (isLocal ? 'http://localhost:4000' : 'https://misssponto.me.uk') + '/js/site-footer.js';
+    s.defer = true;
+    document.head.appendChild(s);
   })();
 </script>
