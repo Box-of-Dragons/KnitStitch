@@ -26,3 +26,6 @@ vite.config.js.timestamp-*.mjs
 
 # Commit message temp files
 .commit-msg.txt
+
+# generated build metadata
+/public/js/buildInfo.js
