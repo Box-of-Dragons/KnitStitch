@@ -1,0 +1,30 @@
+@import "~ui/styles/theme.less";
+
+@itemRadius: 5px;
+@alt-color: @explorer-alt-color;
+
+.titleBar {
+  background: @explorer-titlebar-bg;
+  color: @explorer-titlebar-color;
+  text-transform: uppercase;
+  padding: 3px 5px;
+  pointer-events: auto;
+  flex: 0 0 ;
+  margin-top: 4px;
+}
+
+.scrollableArea {
+  overflow-y: auto;
+  flex: 1 1;
+  pointer-events: auto;
+}
+
+.button {
+  cursor: pointer;
+  &:hover {
+    background-color: @explorer-hover-bg;
+  }
+  &:active {
+    background-color: @explorer-active-bg;
+  }
+}

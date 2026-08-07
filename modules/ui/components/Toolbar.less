@@ -1,0 +1,65 @@
+@import "../styles/theme.less";
+
+.root {
+  background-color: @toolbar-bg;
+  padding: 3px;
+  border-radius: 5px;
+  display: flex;
+  &.flat {
+    border-radius: 0;
+  }
+  align-content: center;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.button {
+  border-radius: 5px;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 10px;
+  padding: 2px 2px;
+  margin: 1px 5px;
+  color: @toolbar-button-color;
+  pointer-events: auto;
+  &:hover {
+    cursor: pointer;
+    background-color: @toolbar-button-hover-bg;
+    color: @toolbar-button-hover-color;
+  }
+
+  &.disabled {
+    color: @font-color-disabled;
+  }
+
+  &.disabled:hover {
+    color: @font-color-suppressed;
+    background-color: @toolbar-button-disabled-hover-bg;
+  }
+}
+
+.small > * {
+  font-size: 16px;
+  padding: 5px 2px;
+}
+
+.medium > * {
+  font-size: 20px;
+  padding: 6px 3px;
+}
+
+.splitter {
+  align-self: stretch;
+  width: 0.5px;
+  background-color: @border-color;
+  opacity: 0.55;
+  margin: 0 1px;
+}
+
+.group {
+  display: flex;
+}
+
+

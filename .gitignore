@@ -1,31 +1,21 @@
-﻿# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Playwright / test artifacts
-test-results/
-test-results-constraints/
-playwright-report/
-playwright/.cache/
-
-# Vitest coverage
-coverage/
-
-# Debug screenshots captured during E2E runs
-test-screenshots/
-screenshots/
-traces/
-
-# Vite config temporary files
-vite.config.js.timestamp-*.mjs
-
-# Environment files (contain webhook secret)
+.DS_Store
+*.class
+/target/
+/out/
+/build/out/
+/.idea/
+*.iml
+*.ipr
+*.iws
+*.blend1
+/web/app/test/viz/**
+/npm-debug.log
+/node_modules
+/dist
+/.vs
+/web/docs/
+pnpm-lock.yaml
 .env
 
-# Commit message temp files
-.commit-msg.txt
-
 # generated build metadata
-/public/js/buildInfo.js
+/web/js/buildInfo.js

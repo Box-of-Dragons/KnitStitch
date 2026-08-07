@@ -1,0 +1,62 @@
+@import "~ui/styles/theme.less";
+
+.emptySelection {
+  font-style: initial;
+  color: @font-color-suppressed;
+}
+
+.entityRef {
+  background-color: @entity-ref-bg;
+  color: @entity-ref-color;
+  border-radius: 2px;
+  border: none;
+  padding: 0 3px;
+  margin: 0 2px 2px 2px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  & .rm {
+    padding-left: 2px;
+    background: none;
+    cursor: pointer;
+    &:hover {
+      color: salmon;
+    }
+    &:active {
+      color: red;
+    }
+  }
+  &:hover .editBtn {
+    display: flex;
+  }
+}
+
+.entityLabel {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.editBtn {
+  display: none;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  padding: 0 2px;
+  background-color: #a9a91a;
+  &:hover {
+    color: #feffcb;
+  }
+  &:active {
+    color: yellow;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}

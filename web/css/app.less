@@ -1,0 +1,316 @@
+@import "~ui/styles/theme.less";
+
+body {
+  overflow: hidden;
+}
+
+html, body {
+  background: @app-bg;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.sans-serif {
+
+}
+
+.helvetica {
+  font-family: 'Helvetica Neue Light', HelveticaNeue-Light, 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.logo {
+  color: @app-logo-color;
+  font-size: 16px;
+  padding: 8px 0 0 10px;
+  cursor: alias;
+  white-space: nowrap;
+}
+
+.logo sup {
+  font-size: 9px;
+  font-style: italic;
+}
+
+.panel {
+  background: @app-panel-bg;
+  border: 0px solid black;
+}
+.b-top { border-top-width: 1px; }
+.b-bot { border-bottom-width: 1px; }
+.b-left { border-left-width: 1px; }
+.b-right { border-right-width: 5px; border-color: @app-panel-border }
+
+.btn:hover {
+  background-color: @app-btn-hover-bg;
+  border-color: @app-btn-hover-border;
+}
+
+.btn {
+  border:1px solid @app-btn-border;
+  background: @app-btn-bg no-repeat center;
+  border-radius: 4px;
+  color: @app-btn-color;
+  vertical-align: top;
+}
+
+.txt-btn {
+}
+
+#dock {
+  color: @app-dock-color;
+}
+
+.dock-btn {
+  padding: 1px 5px 1px 5px;
+  border:0 solid black;
+  background: @app-btn-bg no-repeat center;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 1px 4px 1px 4px;
+}
+
+.dock-btn:hover {
+  background-color: @app-btn-hover-bg;
+}
+
+.dock-btn .txt {
+  padding-left: 5px;
+}
+
+.dock-node {
+  border-bottom: 1px solid black;
+}
+
+.selected {
+  background-color: @app-selected-bg;
+  color: @app-selected-color;
+}
+
+.sbtn {
+  min-width:20px;
+  height:20px;
+  line-height: 1.1;
+  border-color: @app-sbtn-border;
+  padding: 1px 3px;
+  font-size: 14px;
+}
+
+.rbtn {
+  width:37px;
+  height:37px;
+  margin: 2px 6px;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.tbtn {
+  width:31px;
+  height:31px;
+  margin: 2px 2px;
+  font-size: 20px;
+  padding: 0;
+}
+
+
+.tlist {
+  list-style-type: none;
+  padding: 0px;
+  margin:0;
+  color: @app-tlist-color;
+  font-size: 13px;
+}
+
+.tlist li {
+  border-bottom: 1px solid @app-tlist-border;
+  padding: 2px 3px 2px  15px;
+  cursor: pointer;
+}
+
+.tlist li:hover {
+  background: @app-tlist-hover-bg;
+}
+
+.tool-caption {
+  font-weight: bold;
+  color: @app-tool-caption-color;
+  padding: 2px 0 2px 3px;
+  background: @app-tool-caption-bg;
+}
+
+.no-top-border {
+  border-top: 0;
+}
+
+.tool-caption .btn {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 2px;
+}
+
+.tool-caption .fa {
+  font-size: 11px;
+}
+
+.tool-caption .txt {
+  padding-right: 3px;
+}
+
+.tlist .btn {
+  font-size: 11px;
+  border: 0;
+}
+
+.tlist .rm {
+  visibility:hidden;
+  padding: 0 5px 0 5px;
+}
+
+.tlist li:hover .rm {
+  visibility:visible;
+}
+
+.scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: @app-scrollbar-track;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background: @app-scrollbar-thumb;
+}
+
+.scroll::-webkit-scrollbar-thumb:hover {
+  background: @app-scrollbar-thumb-hover;
+}
+
+.sketcher-window {
+  border: 5px solid @app-sketcher-window-border;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.win {
+  position: absolute;
+  min-width: 100px;
+  min-height: 20px;
+  left:100px;
+  top:300px;
+  background: @app-win-bg;
+  border: 5px solid @app-win-border;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.win .content {
+  .sans-serif;
+  color: @app-win-content-color;
+  padding: 7px;
+  height: ~"calc(100% - 19px)"; //escape less processing
+}
+
+.win .tool-caption {
+  cursor: default;
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.8;
+  align-items: center;
+}
+.win .tool-caption .rm {
+  border: 0;
+  border-radius: 0px;
+  color: @app-btn-color;
+  font-size: 16px;
+  padding: 0 5px;
+  margin: -2px 0 -2px 0;
+}
+
+.sep {
+  margin-right: 13px;
+}
+
+
+.pseudo-btn:hover {
+  background-color: @app-pseudo-btn-hover-bg;
+}
+
+.pseudo-btn {
+  background-color: @app-pseudo-btn-bg;
+  color: @app-pseudo-btn-color;
+  width: 18px; text-align: center;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.pseudo-btn a {
+  color: @app-pseudo-btn-color;
+  text-decoration: none;
+}
+
+#layerSelection label {
+  color: @app-dock-color;
+}
+
+#layersList {
+  background-color: @app-layers-bg;
+  margin: 10px;
+}
+
+.tc-ctrl {
+  border-left: 0;
+}
+
+.tc-ctrl input[type=text], .tc-ctrl select {
+  color: @app-dock-color;
+}
+
+#status {
+  .helvetica;
+  color: @app-status-color;
+  font-size: 11px;
+  padding-top: 4px;
+}
+
+#status .coordinates-info {
+  font-style: italic;
+  color:@app-status-color;
+}
+
+.status-item {
+  padding-right: 5px;
+  padding-left: 5px;
+  float: right;
+  color:@app-status-item-color;
+}
+
+#viewer-container .tool-hint {
+  .helvetica;
+  color: @app-tool-hint-color;
+  font-size: 11px;
+  cursor: default;
+  pointer-events: none;
+}
+
+#viewer-container{
+  canvas:focus-visible, canvas:focus, canvas:focus-within {
+    outline-width: 0;
+  }
+}
+
+#top-toolbar:empty {
+  height: 40px;
+}
+
+#right-toolbar:empty {
+  width: 50px;
+}

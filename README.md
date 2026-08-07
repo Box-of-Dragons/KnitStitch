@@ -1,28 +1,79 @@
-# KnitStitch
+JSketcher
+===========
+![JSketcher Logo](./web/img/JSketcher-logo.svg)
 
-I've always been interested in knitting machines, even though I can't knit by hand. I like how the finished products look, but the machines are expensive. 
+JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript.
 
-I came across the open-source 3D-printable knitting machine by [ScarlettSparks/KnittingMachine](https://github.com/ScarlettSparks/KnittingMachine) and decided to build one. This gave me a way to actually produce knitted items without needing manual knitting skills.
+This is the **Structured Chaos** fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher), hosted at [jsketcher.misssponto.me.uk](https://jsketcher.misssponto.me.uk/). It serves the 3D CAD app at `/`; the old standalone `sketcher.html` 2D entry has been removed from this fork.
 
-As I used the machine, I found that the available software tools were either too basic, a paid product or for colourwork generation. I wanted a free tool for designing and generating knitting patterns based on measurements of the finished item and the tension the machine/yarn happens to create.
+The public pages use the shared Structured Chaos chrome (`css/shared.css`, `global-bar.js`, `site-header.js`). See [AGENTS.md](./AGENTS.md) and [docs/maintainer-notes.md](./docs/maintainer-notes.md) for fork-specific conventions and the runtime shape.
 
-KnitStitch is a web-based application for digital knitting design. It's meant to be straightforward to use while still providing the functionality needed to create patterns over different sizes and machines/yarns.
+* [Workbench Dev Guide](./docs/index.md)
+* [Architecture Overview](./docs/architecture.md)
+* [Maintainer Notes](./docs/maintainer-notes.md)
+* [Code Style](./docs/code-style.md)
+* [Roadmap](./docs/roadmap.md)
+* [Changelog](./docs/changelog.md)
 
-This is very much a work in progress with lots of ideas and features to add. If you have any suggestions or want to contribute, please let me know!
+Current Status
+==============
 
-## Deployment
+JSketcher is a parametric 3d modeler employing a 2D constraint solver for sketches and the feature/history metaphor to build models. The 2D constraint solver is completely written in javascript/typescript and is used inside the 3D CAD workflow. Originally developed by xibyte to make models for 3d printing. Today JSketcher provides a rich set of tools for visualizing, selecting/interacting with 3D geometry, tracking and storing model history all built on the foundation of the sketch constraint engine and employing OpenCascade for solid modeling operations. 
 
-The app is hosted on a VPS and deploys automatically when commits land on the `master` branch via a GitHub webhook. A small Node.js webhook server (`scripts/webhook-server.mjs`, kept alive with PM2) verifies the GitHub signature, pulls the latest code, and runs `npm ci` + `npm run build` to produce the static `dist/` directory.
+Major Components and features
+==============
+* Geometric Constraint Solver. This is a most crucial component which allows to solve a system of geometric constraints applied to a sketch. 
+  See below the list of supported constraints.
+* Sketch constraint tools for designing 2d profiles inside the 3D CAD workflow.      
+* 3D Boolean engine. OpenCascade is used to perform booleans on BREP objects.
+* Feature History. Accumulates features builds a 3d model step by step. A compare step is employed to propagate edge/face IDs forward to provide a stable and robust model. 
+* Export to **STL**, **DWG** and **SVG** formats
+* Saving projects in the browser locale storage
+* Repository of dimensions. For example if there is a line length constraint applied, it's not necessary to hardcode some length value. 
+  A dimension with a symbolic name can be created and the constraint can refer to that dimension by name. 
+  Once value of dimension gets changed the sketch is resolved again accordingly to the new dimension values.  
+* 2D measurement tool. Allows adding dimensions on a 2D drawing(Linear, Vertical, Horizontal and Arc/Circle dimension are supported)
+* No any server-side needed. Only client side Javascript and wasm. 
 
-The current application is local-only and does not yet have accounts or
-server-backed pattern storage. The planned account system will add a
-self-hosted Node/TypeScript API using Better Auth, preferably behind the same
-origin under `/api`. See the [roadmap](docs/roadmap.md#accounts-and-saved-patterns)
-for the planned authentication, authorization, and saved-pattern work.
+This modeler is already used for:
 
-## Acknowledgements
+* Designing of 3d models to get them 3d-printed. 3D models are based on parametric 2d sketches. All models can be exported as an STL file and 3d-printed after.     
+* Creating of 2d parametric sketches which could be exported to DWG or SVG format.   
 
-- [Devin](https://devin.ai) by Cognition — AI coding agent used throughout development
-- [Codex](https://openai.com/index/codex/) — AI coding assistance
-- [SolveSpace](https://solvespace.com/) — constraint solver, compiled to WebAssembly for the in-browser sketch constraint system (see `public/wasm/`)
-- [Better Auth](https://www.better-auth.com/) — planned authentication backend for the future account and saved-pattern system (to be implemented)
+Supported Constraints
+=====================
+
+* Coincident
+* Vertical
+* Horizontal
+* Parallel
+* Perpendicular
+* Point to Line Distance
+* Point to Object Distance
+* Entity Equality(radius/length)
+* Tangent
+* Radius
+* Point On Line
+* Point On Arc / Ellipse
+* Point In Middle
+* Angle
+* Symmetry
+* Lock Convexity
+* Fillet Meta Constraint
+
+Get Started With the Code
+=========================
+
+Install node.js
+
+* $ cd \<jsketcher folder\>
+* $ npm install
+* $ npm start
+
+Local development runs on `http://localhost:3001`.
+
+Production is static output from `dist/`, produced by `npm run build` (Grunt). In CloudPanel, create a static site and point the document root at `dist`; do not create a Node app for this frontend.
+
+Contributing
+=========================
+TBC

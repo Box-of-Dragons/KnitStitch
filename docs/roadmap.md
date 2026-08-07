@@ -1,155 +1,118 @@
-# KnitStitch Roadmap
+# JSketcher Roadmap
 
 A high-level feature roadmap organised by area. Checked items are shipped; unchecked items are planned or in progress.
 
-For implementation details, internal notes, and refactoring phases see [agents/roadmap.md](agents/roadmap.md).
-
-_Last updated: 2026-07-18_
+_Last updated: 2026-08-03_
 
 ---
 
-## SolveSpace Solver Migration
+## Shipped — UI Shell and Navigation
 
-Replace the hand-rolled constraint solver with SolveSpace's Newton's-method
-solver compiled to WebAssembly. The SolveSpace backend is now the shipped
-solver, with lazy WASM loading and e2e coverage for the supported workflows.
-
-**Licensing note:** SolveSpace is GPL-3.0-or-later with no linking exception.
-Distributing the compiled solver inside KnitStitch makes the whole app
-GPL-3.0-or-later. KnitStitch has adopted GPL-3.0-or-later accordingly.
-
-- [x] Phase 1 — Fork `solvespace/solvespace` → `XanthiaJo/SolverWasm`, build the `slvs-wasm` target, ship `slvs.js` + `slvs.wasm` as static assets (done: fork at https://github.com/Box-of-Dragons/SolverWasm, rebuild verified and copied into `public/wasm/`)
-- [x] Phase 2 — Adapter layer translating the sketch model to SolveSpace (real-world units via gauge)
-- [x] Phase 3 — Solver integration with lazy WASM loading
-- [x] Phase 4 — Validate via e2e, make SolveSpace the shipped backend, and remove the old native solver modules
-
-See [agents/roadmap.md](agents/roadmap.md) for the full spec.
+- [x] Structured Chaos shared shell (global bar, site header, shared CSS)
+- [x] Changelog page mirroring the KnitStitch and Box of Dragons layout
+- [x] View cube (top-right orientation cube, DOM overlay)
+- [x] Plane highlight grid (Fusion-style floor grid on plane-based face highlight)
+- [x] Origin floor grid
+- [x] Persisted light and dark themes with `localStorage` restore on startup
+- [x] Slate chrome refinements for the view cube and surrounding controls
 
 ---
 
-## Constraint System
+## Shipped — Ribbon Icons
 
-- [x] Coincident constraints
-- [x] Perpendicular constraints
-- [x] Midpoint constraints
-- [x] Equal-length constraints
-- [x] Driven dimensions (locked length values)
-- [x] Global gradient-descent solver
-- [x] BFS-driven dimension enforcement
-- [x] Degrees-of-freedom analysis / under-constrained warning
-- [x] Horizontal/Vertical line constraint
-- [x] Parallel lines constraint
-- [ ] Fixed-angle constraint
-- [ ] Symmetric/mirror constraint
-- [ ] Collinear points constraint
-- [ ] Tangent constraint (for future curves)
-- [ ] Dimension between lines, points or mixed
-- [x] Midpoint of a line constraint (point-on-midpoint and line-line midpoint)
-- [x] SolveSpace WASM solver backend (see SolveSpace Solver Migration above)
+- [x] Modeler ribbon icons replaced with flat `lucide-react` icons
+- [x] Centralized `modelerRibbonIcons` map and `ribbonIcon(id)` helper in `web/app/cad/workbench/modelerRibbonIcon.tsx`
+- [x] Global quick-action icons (Save, STL Export, Theme toggle) using `lucide-react`
+- [x] Sketcher ribbon icons following the same pattern as the modeler ribbon (`sketcherRibbonIcons` map and `sketcherRibbonIcon(id)` helper in `web/app/cad/workbench/sketcherRibbonIcon.tsx`)
 
 ---
 
-## Sketch Tools
+## Planned — Icon Consistency
 
-- [x] Line/polyline drawing
-- [x] Circle drawing
-- [x] Rectangle drawing
-- [x] Bézier curve drawing
-- [x] Select and drag with constraint solving
-- [x] Dimension placement and driven-value editing
-- [x] Constraint creation workflow
-- [x] Anchor points
-- [x] Origin anchor loaded at centre on grid load
-- [x] Object list with selection and deletion
-- [x] Undo/redo history
-- [ ] Clear-template button
-- [x] Construction lines
-- [x] Visual indicator for under/over-constrained points
-- [x] Hot keys for tools
-- [x] Drag lines, not just points
+Make every ribbon, toolbar, and workbench use the same icon family and sizing model so the UI reads as a single product.
+
+- [ ] Audit all workbench toolbars for non-lucide or missing icons
+- [ ] Replace remaining sketcher action `appearance.icon` custom SVGs with lucide equivalents where the ribbon override is not the only consumer
+- [ ] Add ribbon icon overrides for constraint actions (currently commented out in the sketcher toolbar) using lucide icons
+- [ ] Ensure every action that appears in a ribbon has a `ribbonIcon` entry so no fallback text-stub icons render
+- [ ] Document the icon mapping convention in `docs/maintainer-notes.md` so new workbenches follow it by default
+- [ ] Consider a shared `ribbonIcon` helper that falls back across both the modeler and sketcher icon maps for shared actions like `LookAtFace`
 
 ---
 
-## Accounts and Saved Patterns
+## Planned — Action Previews
 
-Use a self-hosted Better Auth backend rather than implementing password and
-session handling in the browser. The static Vite frontend will call a small
-Node/TypeScript API that owns authentication, pattern persistence, and
-authorization. Keep local drafts available, but treat them as browser-local
-rather than account-protected data.
+Improve the visual feedback when a user hovers or activates a modeling action (Extrude, Cut, Revolve, Loft, Sweep, Boolean, etc.) so the expected result is clearer before committing.
 
-- [ ] Choose and document the backend deployment layout (same-origin `/api` routes preferred)
-- [ ] Add a self-hosted Node/TypeScript API with Better Auth and database migrations
-- [ ] Add email/password registration, login, logout, session lookup, email verification, and password reset
-- [ ] Store auth and session secrets only in server environment configuration
-- [ ] Add user-owned saved patterns with server-side ownership checks on every read/write/delete operation
-- [ ] Add frontend account UI and authenticated API client
-- [ ] Add rate limiting, secure cookie/HTTPS configuration, and security event handling
-- [ ] Add e2e coverage for authentication, expired sessions, and cross-user pattern access
-- [ ] Document deployment, backups, email delivery, and account recovery
+- [ ] Show a live preview of the operation result in the 3D viewport while the wizard dialog is open (some operations already preview on parameter change; make this consistent across all)
+- [ ] Add pullable extrusion handles so users can drag extrusion depth directly in the viewport before committing
+- [ ] Add hover tooltips with a short description and icon for every ribbon action
+- [ ] Add visual cursor or mode indicator when a tool is active (e.g. sketch tools show the active tool state)
+- [ ] Improve wizard dialog layout with inline previews of the selected geometry and the projected result
+- [ ] Add preview-on-hover for ribbon buttons showing a small rendered example of the operation (stretch goal)
 
 ---
 
-## Pattern Output
+## Planned — Project Persistence
 
-- [x] Generate row-by-row stitch counts from filled cells
-- [x] Preview knit instructions before export
-- [ ] Export/print instructions
-- [ ] Shareable pattern links
-- [x] Export/Import sketch state
+- [ ] Save projects to the database so signed-in users can access their work across devices and browser sessions
+- [ ] Keep local browser storage as a fallback when database saving is unavailable
 
 ---
 
-## Templates
+## Planned — Touchscreen and Pen Workflow
 
-- [x] Sock template from body measurements
-- [ ] Mitten template
-- [ ] Hat template
-- [ ] Sleeve template
-- [ ] Sweater body template
+- [ ] Improve native touchscreen and pen interaction for sketching, selection, viewport navigation, and command entry
+- [ ] Add touch-friendly UI affordances for common CAD workflows without compromising desktop precision
 
 ---
 
-## UI / Sidebar
+## Planned — Sketch Mode
 
-- [ ] Clear-template button
-- [x] Improved measurement input sidebar
-- [x] Export/import sketch state
-- [x] Multiselect objects in list
-- [x] Delete multiple objects via the list
-- [ ] Clicking an object in the list focuses it on the canvas
-- [ ] Moveable dimension labels (drag to reposition)
-- [ ] Seperate constraints from dimensions in the object list
-- [x] Resizable sidebar panels
+- [ ] Re-enable constraint actions in the sketcher ribbon with lucide icons
+- [ ] Add section labels to the sketcher ribbon matching the `HeadsUpToolbar` section pattern (Views, Create, Modify, Constraints, Measure)
+- [ ] Improve sketch entity selection consistency (see KnitStitch AGENTS notes on entity-based selection)
+- [ ] Add keyboard shortcuts for common sketch tools
 
 ---
 
-## Responsive / Mobile Support
+## Planned — Z-Up Coordinate System
 
-The current editor is designed for larger screens. Small-screen layouts can
-make the canvas and editing controls render incorrectly or become unusable.
+Switch the world up-axis from Y to Z so the convention matches industry-standard CAD tools (Fusion 360, SolidWorks, Onshape, etc.) where Z is up and the ground plane is XY. The viewer is currently Y-up (`camera.up = (0,1,0)`, floor on the XZ plane).
 
-- [x] Show a small-screen warning page when the app is opened on an unsupported phone-sized viewport
-- [ ] Make the editor and its drawing tools usable on phones
-- [ ] Add responsive interaction and e2e coverage for supported mobile layouts
-
----
-
-## Testing
-
-- [x] E2E Playwright tests for sketch constraints and interactions
-- [x] Unit tests for pure geometry, state, and solver helpers
-- [x] Vite-based E2E setup
-- [x] Midpoint constraint creation E2E tests
-- [x] Equal-length constraint creation E2E tests
-- [ ] Zoom/pan unit and E2E tests
-- [ ] `sockMeasurements.js` unit tests
-- [ ] Measurement-driven template generation tests
-- [ ] Template persistence and regenerate-on-hydrate tests
+- [ ] Change the camera up vector to `(0,0,1)` and rework the default view orientation so Z is vertical
+- [ ] Move the origin/floor grid from the XZ plane to the XY plane
+- [ ] Update plane-based face highlight grids (`planeGridView`) to draw on the correct plane for the new convention
+- [ ] Audit sketch plane handling so sketches on the "ground" sit on XY rather than XZ
+- [ ] Update the view cube face labels and default camera angles for the new up-axis
+- [ ] Audit model import/export (STEP, STL, DXF) for up-axis conversion so external files still load correctly
+- [ ] Update maintainer notes and any coordinate-system references in the docs
 
 ---
 
-## Refactoring
+## Planned — Workbench Framework
 
-- [x] dofAnalyzer.js
-- [x] sketchLayer.js
+- [ ] Allow workbench switching from the ribbon (currently hard-coded to `modeler`)
+- [ ] Add a workbench selector dropdown in the quick-action area
+- [ ] Support per-workbench ribbon icon maps without duplicating the helper
+
+---
+
+## Planned — Documentation
+
+- [x] Maintainer notes covering runtime shape, shell, startup, workbenches, actions, UI layout, icons, theme, view cube, plane grid
+- [x] Git scopes reference
+- [x] Theme system documentation
+- [x] Roadmap page linked into the site nav
+- [ ] Architecture overview document (system diagram, bundle startup order, service dependencies)
+- [ ] Feature author guide update covering the ribbon icon pattern
+
+---
+
+## Planned — Build and Deployment
+
+- [x] Webpack build to `dist/` static output
+- [x] Grunt copy pipeline for static `web/` resources into `dist/`
+- [ ] GitHub webhook auto-deploy for the VPS (matching the Structured Chaos family pattern)
+- [ ] PM2 ecosystem config for any server-side process if needed
+- [ ] Automated changelog generation from conventional commits (matching KnitStitch and Box of Dragons)

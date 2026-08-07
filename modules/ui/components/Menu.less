@@ -1,0 +1,66 @@
+@import '../styles/theme.less';
+
+.root {
+  padding: 5px 0;
+}
+
+.item {
+  padding: 5px 6px 5px 5px;
+  cursor: pointer;
+  text-transform: capitalize;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  
+  &:hover {
+    background-color: @menu-hover-bg;
+  }
+  &:active {
+    background-color: @menu-active-bg;
+  }
+
+  &.disabled:hover, &.disbaled:active {
+    background-color: @menu-disabled-hover-bg;
+  }
+
+
+  & .hotKey {
+    color: @font-color-suppressed;
+    font-size: 9px;
+    padding-left: 14px;
+    flex-grow: 1;
+    text-align: right;
+  }
+
+  & .label {
+    padding-left: 5px;
+    padding-right: 3px;
+  }
+}
+
+.separator {
+  border-top: solid 1px @bg-color-8;
+}
+
+.disabled {
+  color: @font-color-suppressed;
+}
+
+.contextMenu {
+  &:hover .contextMenuBtn {
+    color: @menu-context-btn-hover-color;
+  }
+}
+
+.contextMenuBtn {
+  display: inline-block;
+  padding: 2px 3px;
+  color: @menu-context-btn-color;
+  &:hover {
+    color: @menu-context-btn-hover-color;
+  }
+  &:active {
+    color: @menu-context-btn-active-color;
+  }
+}
+

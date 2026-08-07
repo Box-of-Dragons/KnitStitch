@@ -1,0 +1,350 @@
+
+:root {
+  --hue-prim: 214;
+  --saturation: 18%;
+
+  --bg-color-0: hsl(var(--hue-prim), var(--saturation), 7%);
+  --bg-color-1: hsl(var(--hue-prim), var(--saturation), 12%);
+  --bg-color-2: hsl(var(--hue-prim), var(--saturation), 17%);
+  --bg-color-3: hsl(var(--hue-prim), var(--saturation), 23%);
+  --bg-color-4: hsl(var(--hue-prim), var(--saturation), 28%);
+  --bg-color-5: hsl(var(--hue-prim), var(--saturation), 33%);
+  --bg-color-6: hsl(var(--hue-prim), var(--saturation), 38%);
+  --bg-color-7: hsl(var(--hue-prim), var(--saturation), 43%);
+  --bg-color-8: hsl(var(--hue-prim), var(--saturation), 48%);
+  --bg-color-9: hsl(var(--hue-prim), var(--saturation), 53%);
+
+  --bg-base-color: var(--bg-color-1);
+
+  --font-color-empph: #fff;
+  --contrast-on-color: #fff;
+  --contrast-on-light: #000;
+  --font-color: hsl(0, 0%, 90%);
+  --font-color-minor: hsl(0, 0%, 80%);
+  --font-color-suppressed: hsl(0, 0%, 65%);
+  --font-color-disabled: hsl(0, 0%, 55%);
+
+  --border-color: var(--bg-color-6);
+
+  --control-color-number: #2fa1d6;
+  --control-color-text: #9cdaf7;
+  --control-bg: #303030;
+  --control-bg-focus: #173851;
+  --control-border-focus: #326da3;
+  --control-selection-color: white;
+  --control-selection-bg: #2a5d9e;
+
+  --work-area-color: #343945;
+
+  --work-area-control-bar-bg-color: rgba(0, 0, 0, 0.5);
+  --work-area-control-bar-bg-color-active: #555;
+  --work-area-control-bar-font-color: var(--font-color-minor);
+
+  --toolbar-bg: rgba(13, 17, 24, 0.96);
+  --toolbar-button-color: #aeb8c8;
+  --toolbar-button-hover-bg: #263241;
+  --toolbar-button-hover-color: #f5f8fc;
+  --toolbar-button-disabled-hover-bg: #202833;
+
+  --menu-hover-bg: #2d5d83;
+  --menu-active-bg: #1f4260;
+  --menu-disabled-hover-bg: #2b333d;
+  --menu-context-btn-color: rgba(255, 255, 255, 0.2);
+  --menu-context-btn-hover-color: #fff;
+  --menu-context-btn-active-color: #7f0807;
+
+  --widget-bg: rgba(28, 35, 45, 0.96);
+  --widget-color: #edf3fa;
+  --widget-border: #0b1017;
+
+  --symbol-button-color: #fff;
+  --symbol-button-hover-color: #EFEFEF;
+  --symbol-button-active-color: #9cdaf7;
+
+  --color-danger: #a65353;
+  --color-danger-light: #c46d6d;
+  --color-accent: #4f7f76;
+  --color-accent-dark: #3a625b;
+
+  --color-neutral: #66727d;
+  --color-neutral-dark: #4d5760;
+  --color-highlight: #003f5d;
+  --color-highlight-dark: #002a40;
+
+  --color-btn-selected: #285f7a;
+  --button-bg: #263241;
+  --button-color: #e6edf5;
+  --entity-ref-bg: #315d72;
+  --entity-ref-border: #173445;
+  --entity-ref-color: #fff;
+
+  --tree-text: #f2f2f2;
+  --tree-text-muted: rgba(255,255,255,0.55);
+  --tree-chevron: rgba(255,255,255,0.75);
+  --tree-icon: rgba(255,255,255,0.85);
+  --tree-eye: rgba(255,255,255,0.75);
+  --tree-eye-off: rgba(255,255,255,0.25);
+  --tree-row-bg: rgba(255,255,255,0.04);
+  --tree-hover-bg: rgba(255,255,255,0.12);
+  --tree-text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+
+  --history-item-bg: #2f3a46;
+  --history-item-hover-bg: #3e4d5d;
+  --history-item-active-bg: #516579;
+  --history-item-border: #16202b;
+  --history-control-bg: #425d6c;
+  --history-control-hover-bg: #4b7285;
+  --history-control-active-bg: #6aa5ba;
+  --history-disabled-bg: #3d4650;
+  --history-disabled-border: #586472;
+  --history-disabled-color: #8d98a5;
+  --history-opindex-shadow: 0px -1px 0 #000, 0px 1px 0 #000, 1px 0px 0 #000, -1px 0px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  --history-scroller-hover-bg: #BFBFBF;
+  --history-scroller-active-bg: #7e7e7e;
+  --history-root-bg: rgba(0, 0, 0, 0.1);
+  --history-future-border: rgba(255,255,255,0.53);
+  --history-add-color: rgba(255,255,255,0.53);
+  --history-sketch-bg: #3a4a3a;
+  --history-sketch-hover-bg: #4a5e4a;
+  --history-sketch-color: #a8c8a8;
+  --history-separator-bg: rgba(255,255,255,0.2);
+
+  --on-color-highlight: #5A93BBFF;
+  --on-color-highlight-variant-yellow: bisque;
+  --on-color-highlight-variant-pink: hotpink;
+  --on-color-highlight-variant-red: tomato;
+  --on-color-highlight-variant-green: springgreen;
+  --on-color-highlight-variant-blue: aquamarine;
+
+  --app-bg: gray;
+  --app-logo-color: #bbb;
+  --app-panel-bg: #222b36;
+  --app-panel-border: #121923;
+  --app-btn-bg: #303b48;
+  --app-btn-border: #4c5b6b;
+  --app-btn-hover-bg: #3f4d5c;
+  --app-btn-hover-border: #77889a;
+  --app-btn-color: #fff;
+  --app-dock-color: #fff;
+  --app-selected-bg: #1b2733;
+  --app-selected-color: #d4dee9;
+  --app-sbtn-border: #6e7f91;
+  --app-tlist-color: #fff;
+  --app-tlist-border: #465464;
+  --app-tlist-hover-bg: #18222d;
+  --app-tool-caption-color: #fff;
+  --app-tool-caption-bg: #1b2530;
+  --app-scrollbar-track: white;
+  --app-scrollbar-thumb: steelblue;
+  --app-scrollbar-thumb-hover: royalblue;
+  --app-sketcher-window-border: #444444;
+  --app-win-bg: #2b3643;
+  --app-win-border: #151d27;
+  --app-win-content-color: #fff;
+  --app-pseudo-btn-bg: #303b48;
+  --app-pseudo-btn-hover-bg: #3f4d5c;
+  --app-pseudo-btn-color: #fff;
+  --app-layers-bg: #ddd;
+  --app-status-color: #fff;
+  --app-status-item-color: #bbb;
+  --app-tool-hint-color: #000;
+  --app-explorer-header-bg: rgba(45, 56, 68, 0.93);
+  --app-explorer-header-border: #18212c;
+  --app-headsup-splitter: #3b4654;
+  --app-svg-icon-stroke: #fff;
+
+  --explorer-item-bg: rgba(15, 21, 30, 0.72);
+  --explorer-item-border: #0c1118;
+  --explorer-alt-color: #9aa8b8;
+  --explorer-hover-bg: #2d5d83;
+  --explorer-active-bg: #1f4260;
+  --explorer-selected-grad1: #4d7798;
+  --explorer-selected-grad2: #2d5d83;
+  --explorer-highlighted-bg: #2d5d83;
+  --explorer-on-color: #24617a;
+  --explorer-off-color: #3e4854;
+  --explorer-aux-bg: #FDF7E7;
+  --explorer-aux-color: #1a1a1a;
+  --explorer-icon-bg: #303b48;
+  --explorer-titlebar-bg: rgba(11, 16, 23, 0.82);
+  --explorer-titlebar-color: #fff;
+  --contextual-bg: rgba(11, 16, 23, 0.84);
+  --contextual-color: #fff;
+  --sketcher-toolbar-btn-bg: #303b48;
+  --sketcher-toolbar-btn-border: #455464;
+  --sketcher-toolbar-focus: #5f95c8;
+}
+
+@hue-prim: var(--hue-prim);
+@saturation: var(--saturation);
+
+@bg-color-0: var(--bg-color-0);
+@bg-color-1: var(--bg-color-1);
+@bg-color-2: var(--bg-color-2);
+@bg-color-3: var(--bg-color-3);
+@bg-color-4: var(--bg-color-4);
+@bg-color-5: var(--bg-color-5);
+@bg-color-6: var(--bg-color-6);
+@bg-color-7: var(--bg-color-7);
+@bg-color-8: var(--bg-color-8);
+@bg-color-9: var(--bg-color-9);
+
+@bg-base-color: var(--bg-base-color);
+
+@font-color-empph: var(--font-color-empph);
+@contrast-on-color: var(--contrast-on-color);
+@contrast-on-light: var(--contrast-on-light);
+@font-color: var(--font-color);
+@font-color-minor: var(--font-color-minor);
+@font-color-suppressed: var(--font-color-suppressed);
+@font-color-disabled: var(--font-color-disabled);
+
+@border-color: var(--border-color);
+
+@control-color-number: var(--control-color-number);
+@control-color-text: var(--control-color-text);
+@control-bg: var(--control-bg);
+@control-bg-focus: var(--control-bg-focus);
+@control-border-focus: var(--control-border-focus);
+@control-selection-color: var(--control-selection-color);
+@control-selection-bg: var(--control-selection-bg);
+
+@work-area-color: var(--work-area-color);
+
+@work-area-control-bar-bg-color: var(--work-area-control-bar-bg-color);
+@work-area-control-bar-bg-color-active: var(--work-area-control-bar-bg-color-active);
+@work-area-control-bar-font-color: var(--work-area-control-bar-font-color);
+
+@toolbar-bg: var(--toolbar-bg);
+@toolbar-button-color: var(--toolbar-button-color);
+@toolbar-button-hover-bg: var(--toolbar-button-hover-bg);
+@toolbar-button-hover-color: var(--toolbar-button-hover-color);
+@toolbar-button-disabled-hover-bg: var(--toolbar-button-disabled-hover-bg);
+
+@menu-hover-bg: var(--menu-hover-bg);
+@menu-active-bg: var(--menu-active-bg);
+@menu-disabled-hover-bg: var(--menu-disabled-hover-bg);
+@menu-context-btn-color: var(--menu-context-btn-color);
+@menu-context-btn-hover-color: var(--menu-context-btn-hover-color);
+@menu-context-btn-active-color: var(--menu-context-btn-active-color);
+
+@widget-bg: var(--widget-bg);
+@widget-color: var(--widget-color);
+@widget-border: var(--widget-border);
+
+@symbol-button-color: var(--symbol-button-color);
+@symbol-button-hover-color: var(--symbol-button-hover-color);
+@symbol-button-active-color: var(--symbol-button-active-color);
+
+@color-danger: var(--color-danger);
+@color-danger-light: var(--color-danger-light);
+@color-accent: var(--color-accent);
+@color-accent-dark: var(--color-accent-dark);
+
+@color-neutral: var(--color-neutral);
+@color-neutral-dark: var(--color-neutral-dark);
+@color-highlight: var(--color-highlight);
+@color-highlight-dark: var(--color-highlight-dark);
+
+@color-btn-selected: var(--color-btn-selected);
+@button-bg: var(--button-bg);
+@button-color: var(--button-color);
+@entity-ref-bg: var(--entity-ref-bg);
+@entity-ref-border: var(--entity-ref-border);
+@entity-ref-color: var(--entity-ref-color);
+
+@tree-text: var(--tree-text);
+@tree-text-muted: var(--tree-text-muted);
+@tree-chevron: var(--tree-chevron);
+@tree-icon: var(--tree-icon);
+@tree-eye: var(--tree-eye);
+@tree-eye-off: var(--tree-eye-off);
+@tree-row-bg: var(--tree-row-bg);
+@tree-hover-bg: var(--tree-hover-bg);
+@tree-text-shadow: var(--tree-text-shadow);
+
+@history-item-bg: var(--history-item-bg);
+@history-item-hover-bg: var(--history-item-hover-bg);
+@history-item-active-bg: var(--history-item-active-bg);
+@history-item-border: var(--history-item-border);
+@history-control-bg: var(--history-control-bg);
+@history-control-hover-bg: var(--history-control-hover-bg);
+@history-control-active-bg: var(--history-control-active-bg);
+@history-disabled-bg: var(--history-disabled-bg);
+@history-disabled-border: var(--history-disabled-border);
+@history-disabled-color: var(--history-disabled-color);
+@history-opindex-shadow: var(--history-opindex-shadow);
+@history-scroller-hover-bg: var(--history-scroller-hover-bg);
+@history-scroller-active-bg: var(--history-scroller-active-bg);
+@history-root-bg: var(--history-root-bg);
+@history-future-border: var(--history-future-border);
+@history-add-color: var(--history-add-color);
+@history-sketch-bg: var(--history-sketch-bg);
+@history-sketch-hover-bg: var(--history-sketch-hover-bg);
+@history-sketch-color: var(--history-sketch-color);
+@history-separator-bg: var(--history-separator-bg);
+
+@on-color-highlight: var(--on-color-highlight);
+@on-color-highlight-variant-yellow: var(--on-color-highlight-variant-yellow);
+@on-color-highlight-variant-pink: var(--on-color-highlight-variant-pink);
+@on-color-highlight-variant-red: var(--on-color-highlight-variant-red);
+@on-color-highlight-variant-green: var(--on-color-highlight-variant-green);
+@on-color-highlight-variant-blue: var(--on-color-highlight-variant-blue);
+
+@app-bg: var(--app-bg);
+@app-logo-color: var(--app-logo-color);
+@app-panel-bg: var(--app-panel-bg);
+@app-panel-border: var(--app-panel-border);
+@app-btn-bg: var(--app-btn-bg);
+@app-btn-border: var(--app-btn-border);
+@app-btn-hover-bg: var(--app-btn-hover-bg);
+@app-btn-hover-border: var(--app-btn-hover-border);
+@app-btn-color: var(--app-btn-color);
+@app-dock-color: var(--app-dock-color);
+@app-selected-bg: var(--app-selected-bg);
+@app-selected-color: var(--app-selected-color);
+@app-sbtn-border: var(--app-sbtn-border);
+@app-tlist-color: var(--app-tlist-color);
+@app-tlist-border: var(--app-tlist-border);
+@app-tlist-hover-bg: var(--app-tlist-hover-bg);
+@app-tool-caption-color: var(--app-tool-caption-color);
+@app-tool-caption-bg: var(--app-tool-caption-bg);
+@app-scrollbar-track: var(--app-scrollbar-track);
+@app-scrollbar-thumb: var(--app-scrollbar-thumb);
+@app-scrollbar-thumb-hover: var(--app-scrollbar-thumb-hover);
+@app-sketcher-window-border: var(--app-sketcher-window-border);
+@app-win-bg: var(--app-win-bg);
+@app-win-border: var(--app-win-border);
+@app-win-content-color: var(--app-win-content-color);
+@app-pseudo-btn-bg: var(--app-pseudo-btn-bg);
+@app-pseudo-btn-hover-bg: var(--app-pseudo-btn-hover-bg);
+@app-pseudo-btn-color: var(--app-pseudo-btn-color);
+@app-layers-bg: var(--app-layers-bg);
+@app-status-color: var(--app-status-color);
+@app-status-item-color: var(--app-status-item-color);
+@app-tool-hint-color: var(--app-tool-hint-color);
+@app-explorer-header-bg: var(--app-explorer-header-bg);
+@app-explorer-header-border: var(--app-explorer-header-border);
+@app-headsup-splitter: var(--app-headsup-splitter);
+@app-svg-icon-stroke: var(--app-svg-icon-stroke);
+
+@explorer-item-bg: var(--explorer-item-bg);
+@explorer-item-border: var(--explorer-item-border);
+@explorer-alt-color: var(--explorer-alt-color);
+@explorer-hover-bg: var(--explorer-hover-bg);
+@explorer-active-bg: var(--explorer-active-bg);
+@explorer-selected-grad1: var(--explorer-selected-grad1);
+@explorer-selected-grad2: var(--explorer-selected-grad2);
+@explorer-highlighted-bg: var(--explorer-highlighted-bg);
+@explorer-on-color: var(--explorer-on-color);
+@explorer-off-color: var(--explorer-off-color);
+@explorer-aux-bg: var(--explorer-aux-bg);
+@explorer-aux-color: var(--explorer-aux-color);
+@explorer-icon-bg: var(--explorer-icon-bg);
+@explorer-titlebar-bg: var(--explorer-titlebar-bg);
+@explorer-titlebar-color: var(--explorer-titlebar-color);
+@contextual-bg: var(--contextual-bg);
+@contextual-color: var(--contextual-color);
+@sketcher-toolbar-btn-bg: var(--sketcher-toolbar-btn-bg);
+@sketcher-toolbar-btn-border: var(--sketcher-toolbar-btn-border);
+@sketcher-toolbar-focus: var(--sketcher-toolbar-focus);

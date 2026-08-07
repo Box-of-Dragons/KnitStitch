@@ -3,23 +3,23 @@
  *
  * A small Node.js HTTP server that listens for GitHub push events,
  * verifies the HMAC-SHA256 signature, and runs the deploy commands
- * (git fetch + reset, npm ci, npm run build-info, npm run build).
+ * (git fetch + reset, npm ci, grunt build) for the JSketcher static site.
  *
  * No dependencies — uses only Node.js built-ins (http, crypto, child_process).
  *
  * Setup:
  *   1. Set GITHUB_WEBHOOK_SECRET in .env on the VPS
- *   2. Run this server with PM2 or systemd:
- *        pm2 start scripts/webhook-server.mjs --name knitstitch-webhook
+ *   2. Run this server with PM2:
+ *        pm2 start ecosystem.config.cjs
  *        pm2 save
  *        pm2 startup
  *   3. Configure nginx to proxy /webhook to this server:
  *        location /webhook {
- *          proxy_pass http://127.0.0.1:3001;
+ *          proxy_pass http://127.0.0.1:3004;
  *          proxy_set_header X-Forwarded-For $remote_addr;
  *        }
  *   4. In GitHub repo settings → Webhooks → Add webhook:
- *        - Payload URL: https://www.knitstitch.misssponto.me.uk/webhook
+ *        - Payload URL: https://jsketcher.misssponto.me.uk/webhook
  *        - Content type: application/json
  *        - Secret: same value as GITHUB_WEBHOOK_SECRET
  *        - Events: Just the push event
@@ -36,7 +36,7 @@ import { gunzipSync } from 'node:zlib';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
-const PORT = process.env.WEBHOOK_PORT || 3001;
+const PORT = process.env.WEBHOOK_PORT || 3004;
 
 // --- Load .env ---
 function loadEnv() {
@@ -68,11 +68,11 @@ if (SECRET === '') {
 // --- Build PATH with nvm Node.js binaries ---
 function buildPath() {
   const extraPaths = ['/usr/local/bin', '/usr/bin', '/bin', '/usr/local/git/bin', '/opt/git/bin'];
-  const home = process.env.HOME || `/home/${process.env.USER || 'knitstitch'}`;
+  const home = process.env.HOME || `/home/${process.env.USER || 'jsketcher'}`;
   const nvmDir = join(home, '.nvm/versions/node');
   if (existsSync(nvmDir)) {
     for (const entry of readdirSync(nvmDir)) {
-      const nvmBin = join(nvmDir, entry, 'bin');
+      const nvmBin = join(nvmDir, 'entry', 'bin');
       if (existsSync(nvmBin) && statSync(nvmBin).isDirectory()) {
         extraPaths.push(nvmBin);
       }
@@ -90,12 +90,15 @@ function buildPath() {
 const DEPLOY_ENV = { ...process.env, PATH: buildPath() };
 
 // --- Deploy commands ---
+// JSketcher builds static output to dist/ via grunt. nginx serves dist/
+// directly as the document root — no Node app process to reload.
 const DEPLOY_COMMANDS = [
-  ['git', ['fetch', 'origin', 'master']],
-  ['git', ['reset', '--hard', 'origin/master']],
+  ['git', ['fetch', 'origin', 'main']],
+  ['git', ['reset', '--hard', 'origin/main']],
   ['npm', ['ci']],
-  ['npm', ['run', 'build-info']],
-  ['npm', ['run', 'build']],
+  ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=md', '--output=docs/changelog.md']],
+  ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=html', '--output=web/changelog-fragment.html']],
+  ['npx', ['grunt']],
 ];
 
 function runDeploy() {
@@ -109,7 +112,7 @@ function runDeploy() {
         env: DEPLOY_ENV,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
-        timeout: 120000,
+        timeout: 300000,
       });
       if (result.trim()) output.push(result.trim());
     } catch (err) {
@@ -196,15 +199,15 @@ const server = createServer((req, res) => {
       return;
     }
 
-    // Only deploy on master branch
-    if (data.ref !== 'refs/heads/master') {
+    // Only deploy on main branch
+    if (data.ref !== 'refs/heads/main') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'ignored', reason: 'not master branch' }));
+      res.end(JSON.stringify({ status: 'ignored', reason: 'not main branch' }));
       return;
     }
 
     // Run deploy
-    console.log(`[${new Date().toISOString()}] Deploy triggered by push to master`);
+    console.log(`[${new Date().toISOString()}] Deploy triggered by push to main`);
     const result = runDeploy();
     const status = result.status === 'deployed' ? 200 : 500;
     res.writeHead(status, { 'Content-Type': 'application/json' });
@@ -214,6 +217,6 @@ const server = createServer((req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`KnitStitch webhook server listening on 127.0.0.1:${PORT}`);
+  console.log(`JSketcher webhook server listening on 127.0.0.1:${PORT}`);
   console.log(`Repo root: ${REPO_ROOT}`);
 });

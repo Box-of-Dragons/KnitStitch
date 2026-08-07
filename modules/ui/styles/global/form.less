@@ -1,0 +1,83 @@
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+button {
+  padding: 6px 10px;
+  border: 1px solid @border-color;
+  background-color: @button-bg;
+  //font-weight: bold;
+  color: @button-color;
+  white-space: nowrap;
+  border-radius: 1px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &.icon-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 16px;
+      height: 16px;
+      margin: -4px 4px -4px -2px;
+    }
+  }
+  &.compact {
+    padding: 1px 3px;
+  }
+}
+
+button.neutral {
+  .button-behavior(@color-neutral; @color-neutral-dark)
+}
+
+button.accent {
+  .button-behavior(@color-accent; @color-accent-dark)
+}
+
+button.highlight {
+  .button-behavior(@color-highlight; @color-highlight-dark)
+}
+
+button.danger {
+  .button-behavior(@color-danger; @color-danger-light)
+}
+
+button.minor {
+  .button-behavior(@color-neutral; @color-neutral-dark)
+}
+
+//--------------
+
+input, textarea {
+  outline: none;
+  background: @control-bg;
+  border: @control-bg 1px solid;
+  padding: 2px;
+  color: @control-color-text;
+  &::selection {
+    color: @control-selection-color;
+    background: @control-selection-bg;
+
+  }
+  &:focus {
+    border: @control-border-focus 1px solid;
+    background: @control-bg-focus;
+  }
+}
+
+input.number  {
+  border-color: @control-color-number;
+  color: @control-color-number;
+}
+
+input.text  {
+  border-color: @control-color-text;
+  color: @control-color-text;
+}
+

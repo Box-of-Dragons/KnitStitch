@@ -1,0 +1,23 @@
+.root  {
+  //overflow: auto;
+  //position: absolute;
+  //top:0;
+  //left:0;
+  //bottom:80px;
+  //max-width: 300px;
+}
+
+@import "~ui/styles/theme.less";
+
+.root :global(.sectionHeader) {
+  margin: 3px;
+  padding: 2px;
+  background-color: @app-explorer-header-bg;
+  border: @app-explorer-header-border 1px solid;
+  border-radius: 3px;
+  pointer-events: initial;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
