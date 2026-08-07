@@ -30,7 +30,9 @@ function initializeSketcherApplication() {
     // localStorage.setItem(sketchId, sample);
   }
   context.project.loadFromLocalStorage();
-  context.viewer.fit();
+  // Defer fit() so the canvas has its final size after the shared
+  // shell header/footer finish layout.
+  requestAnimationFrame(() => context.viewer.fit());
 
 
   const constraintsView = dock.views['Constraints'];

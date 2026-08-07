@@ -62,6 +62,7 @@ export class Viewer {
   canvasResizeObserver: ResizeObserver = null;
   private sketchFilledCache: Set<string> = null;
   private sketchFilledKey: string = null;
+  private needsRecentre: boolean = false;
 
   constructor(canvas, IO, applicationContext) {
 
@@ -96,7 +97,12 @@ export class Viewer {
     if (typeof ResizeObserver !== 'undefined' && canvas.parentNode) {
       const ro = new ResizeObserver(() => {
         updateCanvasSize();
-        viewer.refresh();
+        if (viewer.needsRecentre) {
+          viewer.needsRecentre = false;
+          viewer.centerOrigin();
+        } else {
+          viewer.refresh();
+        }
       });
       ro.observe(canvas.parentNode);
       this.canvasResizeObserver = ro;
@@ -568,6 +574,11 @@ export class Viewer {
       return true;
     });
     if (count < 2 || !bbox.isValid()) {
+      this.centerOrigin();
+      this.needsRecentre = true;
+      // Clear the re-centre flag after the shared shell finishes loading
+      // so later header collapse/expand doesn't re-center unexpectedly.
+      setTimeout(() => { this.needsRecentre = false; }, 1000);
       return;
     }
 
@@ -575,6 +586,14 @@ export class Viewer {
     this.showBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
     bbox.inc(20 / this.scale);
     this.showBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+  }
+
+  centerOrigin() {
+    this.scale = 1.0;
+    this.translate.x = this.canvas.width / 2;
+    this.translate.y = this.canvas.height / 2;
+    this.needsRecentre = true;
+    this.refresh();
   }
 
   screenToModel2(x, y, out) {
