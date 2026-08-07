@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  ArrowLeftRight,
+  ArrowUpDown,
   BetweenHorizontalEnd,
   BetweenHorizontalStart,
   Circle,
@@ -24,7 +26,7 @@ import {
 } from 'lucide-react';
 
 export function CoincidentConstraintIcon(props) {
-  return <Link2 size={16} strokeWidth={1.8} {...props} />
+  return <Link size={16} strokeWidth={1.8} {...props} />
 }
 
 export function DistancePLConstraintIcon(props) {
@@ -32,7 +34,7 @@ export function DistancePLConstraintIcon(props) {
 }
 
 export function HorizontalConstraintIcon(props) {
-  return <MoveHorizontal size={16} strokeWidth={1.8} {...props} />
+  return <ArrowLeftRight size={16} strokeWidth={1.8} {...props} />
 }
 
 export function ParallelConstraintIcon(props) {
@@ -48,7 +50,7 @@ export function PointOnLineConstraintIcon(props) {
 }
 
 export function VerticalConstraintIcon(props) {
-  return <MoveVertical size={16} strokeWidth={1.8} {...props} />
+  return <ArrowUpDown size={16} strokeWidth={1.8} {...props} />
 }
 
 export function DistanceConstraintIcon(props) {
