@@ -1,11 +1,34 @@
-import constraintGlobalActions from "./actions/constraintGlobalActions";
 import measureActions from "./actions/measureActions";
 import objectToolActions from "./actions/objectToolActions";
 import commonActions from "./actions/commonActions";
 import {insertAfter, removeInPlace} from "gems/iterables";
 import generalToolActions from "./actions/generalToolActions";
 
-export const sketcherRightToolbarConfig = constraintGlobalActions.map(a => a.id);
+export const sketcherRightToolbarConfig = [
+  'CoincidentGlobal',
+  'VerticalGlobal',
+  'HorizontalGlobal',
+  'ParallelGlobal',
+  'PerpendicularGlobal',
+  '-',
+  'DistancePLGlobal',
+  'DistanceGlobal',
+  'EntityEqualityGlobal',
+  '-',
+  'PointOnLineGlobal',
+  'TangentGlobal',
+  'RadiusGlobal',
+  'PointOnCurveGlobal',
+  'PointInMiddleGlobal',
+  'SymmetryGlobal',
+  '-',
+  'AngleBetweenGlobal',
+  'AngleGlobal',
+  '-',
+  'LockGlobal',
+  'FilletGlobal',
+  'MirrorStart',
+];
 
 export const sketcherTopToolbarConfig = [
   ...commonActions.map(a => a.id),
