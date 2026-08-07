@@ -32,47 +32,44 @@ export function KnittingPanel() {
   }
 
   return (
-    <div className="knitting-panel-section" style={{padding: '10px 12px', borderBottom: '1px solid var(--app-panel-border, #d4c9b5)'}}>
-      <div className="tool-caption" style={{marginBottom: '8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--app-tool-caption-color, #5a4a30)'}}>
-        Knitting Grid
+    <div className="dock-node">
+      <div className="tool-caption">
+        <span className="txt">KNITTING GRID</span>
+        <i className="fa fa-th"/>
       </div>
 
-      <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
-        <label style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px'}}>
+      <div className="knitting-panel-body">
+        <label>
           <span>Stitches / 4in</span>
           <input type="number" min="1" max="60" value={stitches}
             onChange={e => setStitches(e.target.value)}
-            onBlur={recalculate}
-            style={{width: '50px', padding: '2px 4px', fontSize: '12px', textAlign: 'right', border: '1px solid var(--app-btn-border, #d4c9b5)', borderRadius: '0', background: 'var(--app-btn-bg, #fff)', color: 'var(--app-btn-color, #4a3a20)'}}/>
+            onBlur={recalculate}/>
         </label>
 
-        <label style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px'}}>
+        <label>
           <span>Rows / 4in</span>
           <input type="number" min="1" max="60" value={rows}
             onChange={e => setRows(e.target.value)}
-            onBlur={recalculate}
-            style={{width: '50px', padding: '2px 4px', fontSize: '12px', textAlign: 'right', border: '1px solid var(--app-btn-border, #d4c9b5)', borderRadius: '0', background: 'var(--app-btn-bg, #fff)', color: 'var(--app-btn-color, #4a3a20)'}}/>
+            onBlur={recalculate}/>
         </label>
 
-        <label style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px'}}>
+        <label>
           <span>Fill %</span>
           <input type="number" min="0" max="100" value={Math.round(threshold * 100)}
-            onChange={onThresholdChange}
-            style={{width: '50px', padding: '2px 4px', fontSize: '12px', textAlign: 'right', border: '1px solid var(--app-btn-border, #d4c9b5)', borderRadius: '0', background: 'var(--app-btn-bg, #fff)', color: 'var(--app-btn-color, #4a3a20)'}}/>
+            onChange={onThresholdChange}/>
         </label>
 
-        <label style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', userSelect: 'none'}}>
+        <label className="knitting-checkbox">
           <input type="checkbox" checked={fillEnabled}
             onChange={e => setFillEnabled(e.target.checked)}/>
           <span>Fill tool (click cells)</span>
         </label>
 
-        <button onClick={clearFill}
-          style={{padding: '4px 8px', fontSize: '11px', cursor: 'pointer', border: '1px solid var(--app-btn-border, #d4c9b5)', borderRadius: '0', background: 'var(--app-btn-bg, #fff)', color: 'var(--app-btn-color, #4a3a20)'}}>
+        <button onClick={clearFill} className="knitting-clear-btn">
           Clear Fill
         </button>
 
-        <div style={{fontSize: '11px', color: 'var(--app-status-color, #5a4a30)', marginTop: '4px'}}>
+        <div className="knitting-finished-size">
           <div>Width: {finishedWidth > 0 ? finishedWidth.toFixed(2) : '--'} in</div>
           <div>Height: {finishedHeight > 0 ? finishedHeight.toFixed(2) : '--'} in</div>
         </div>
