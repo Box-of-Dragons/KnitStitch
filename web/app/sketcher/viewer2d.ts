@@ -19,6 +19,8 @@ import {SketchGenerator} from "./generators/sketchGenerator";
 import {Generator} from "./id-generator";
 import {Matrix3x4} from "math/matrix";
 import {Label} from "sketcher/shapes/label";
+import {collectSegmentsFromLayers, computeFilledCellsFromSketch} from './knitting/closedShapeFill';
+import {toggleCell as toggleCellSet} from './knitting/gridService';
 
 export class Viewer {
 
@@ -57,6 +59,9 @@ export class Viewer {
   customSelectionHandler: any;
   applicationContext: any;
   showGrid: boolean;
+  canvasResizeObserver: ResizeObserver = null;
+  private sketchFilledCache: Set<string> = null;
+  private sketchFilledKey: string = null;
 
   constructor(canvas, IO, applicationContext) {
 
@@ -86,6 +91,17 @@ export class Viewer {
     updateCanvasSize();
     window.addEventListener('resize', this.onWindowResize, false);
 
+    // ResizeObserver: re-fit canvas when the container changes size (e.g.
+    // shared site header collapse/expand changes available height).
+    if (typeof ResizeObserver !== 'undefined' && canvas.parentNode) {
+      const ro = new ResizeObserver(() => {
+        updateCanvasSize();
+        viewer.refresh();
+      });
+      ro.observe(canvas.parentNode);
+      this.canvasResizeObserver = ro;
+    }
+
     this.ctx = this.canvas.getContext("2d");
     this._activeLayer = null;
     this.layers = [
@@ -98,6 +114,21 @@ export class Viewer {
     this.labelLayer = this.createLayer<Label>("_labels", Styles.ANNOTATIONS);
     this.dimLayers = [this.dimLayer, this.annotationLayer, this.labelLayer];
     this.streams.dimScale.attach(() => this.refresh());
+
+    // Knitting state changes trigger repaint + finished size recalculation
+    const k = this.streams.knitting;
+    const onKnittingChange = () => {
+      this.sketchFilledCache = null;
+      this.refresh();
+      this.recalculateFinishedSize();
+    };
+    k.cellWidthPx.attach(onKnittingChange);
+    k.cellHeightPx.attach(onKnittingChange);
+    k.filledCells.attach(() => { this.refresh(); this.recalculateFinishedSize(); });
+    k.fillThreshold.attach(onKnittingChange);
+
+    // Invalidate sketch fill cache when objects change
+    this.streams.objectsUpdate.attach(() => { this.sketchFilledCache = null; this.refresh(); this.recalculateFinishedSize(); });
 
     this._workspace = [this.layers, this.dimLayers];
 
@@ -140,6 +171,10 @@ export class Viewer {
 
   dispose() {
     window.removeEventListener('resize', this.onWindowResize, false);
+    if (this.canvasResizeObserver) {
+      this.canvasResizeObserver.disconnect();
+      this.canvasResizeObserver = null;
+    }
     this.canvas = null;
     this.toolManager.dispose();
     Generator.resetIDGenerator();
@@ -306,57 +341,148 @@ export class Viewer {
     const minY = Math.min(tl.y, br.y);
     const maxY = Math.max(tl.y, br.y);
 
-    const step = this.niceGridStep(50 / this.interactiveScale);
-    const majorStep = step * 5;
+    const cellW = this.streams.knitting.cellWidthPx.value;
+    const cellH = this.streams.knitting.cellHeightPx.value;
+    if (cellW <= 0 || cellH <= 0) return;
+
     const lw = this.unscale; // 1px in model units
+
+    // Compute visible cell range
+    const minCol = Math.floor(minX / cellW);
+    const maxCol = Math.ceil(maxX / cellW);
+    const minRow = Math.floor(minY / cellH);
+    const maxRow = Math.ceil(maxY / cellH);
+
+    // Get filled cells (manual + sketch-derived)
+    const filledCells = this.streams.knitting.filledCells.value;
+    const sketchFilled = this.getSketchFilled(cellW, cellH);
 
     ctx.save();
     ctx.lineWidth = lw;
 
-    // minor lines
+    // Fill cells first (so grid lines draw on top)
+    const fillStyle = getComputedStyle(this.canvas).getPropertyValue('--color-accent') || '#ca9b52';
+    ctx.fillStyle = fillStyle.trim() || '#ca9b52';
+    for (let r = minRow; r <= maxRow; r++) {
+      for (let c = minCol; c <= maxCol; c++) {
+        const key = `${r},${c}`;
+        if (filledCells.has(key) || sketchFilled.has(key)) {
+          ctx.fillRect(c * cellW, r * cellH, cellW, cellH);
+        }
+      }
+    }
+
+    // Draw all grid lines as a single path
     ctx.beginPath();
-    const startX = Math.ceil(minX / step) * step;
-    for (let x = startX; x <= maxX; x += step) {
-      ctx.moveTo(x, minY);
-      ctx.lineTo(x, maxY);
+    for (let c = minCol; c <= maxCol; c++) {
+      const x = c * cellW;
+      ctx.moveTo(x, minRow * cellH);
+      ctx.lineTo(x, maxRow * cellH);
     }
-    const startY = Math.ceil(minY / step) * step;
-    for (let y = startY; y <= maxY; y += step) {
-      ctx.moveTo(minX, y);
-      ctx.lineTo(maxX, y);
+    for (let r = minRow; r <= maxRow; r++) {
+      const y = r * cellH;
+      ctx.moveTo(minCol * cellW, y);
+      ctx.lineTo(maxCol * cellW, y);
     }
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.stroke();
 
-    // major lines
+    // Draw the origin row and column with a bolder line
     ctx.beginPath();
-    const startMajorX = Math.ceil(minX / majorStep) * majorStep;
-    for (let x = startMajorX; x <= maxX; x += majorStep) {
-      ctx.moveTo(x, minY);
-      ctx.lineTo(x, maxY);
+    if (minCol <= 0 && maxCol >= 0) {
+      ctx.moveTo(0, minRow * cellH);
+      ctx.lineTo(0, maxRow * cellH);
     }
-    const startMajorY = Math.ceil(minY / majorStep) * majorStep;
-    for (let y = startMajorY; y <= maxY; y += majorStep) {
-      ctx.moveTo(minX, y);
-      ctx.lineTo(maxX, y);
+    if (minRow <= 0 && maxRow >= 0) {
+      ctx.moveTo(minCol * cellW, 0);
+      ctx.lineTo(maxCol * cellW, 0);
     }
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = lw * 1.5;
     ctx.stroke();
+
     ctx.restore();
   }
 
-  niceGridStep(rawStep: number): number {
-    if (!isFinite(rawStep) || rawStep <= 0) {
-      return 10;
+  /**
+   * Returns cached sketch-derived filled cells, recomputing only when
+   * sketch objects have changed since the last call.
+   */
+  getSketchFilled(cellW: number, cellH: number): Set<string> {
+    const allSegs = collectSegmentsFromLayers(this.layers);
+    const fillThreshold = this.streams.knitting.fillThreshold.value;
+
+    // Cache key based on segment count + endpoint fingerprint
+    let key = `threshold:${fillThreshold}`;
+    if (allSegs.length > 0) {
+      let h = allSegs.length;
+      for (const l of allSegs) {
+        h = h * 31 + (Math.round(l.start.x) + Math.round(l.start.y) * 7 + Math.round(l.end.x) * 13 + Math.round(l.end.y) * 17);
+      }
+      key = String(h);
     }
-    const pow = Math.pow(10, Math.floor(Math.log10(rawStep)));
-    const norm = rawStep / pow;
-    let nice;
-    if (norm < 1.5) nice = 1;
-    else if (norm < 3) nice = 2;
-    else if (norm < 7) nice = 5;
-    else nice = 10;
-    return nice * pow;
+
+    if (this.sketchFilledKey !== key || this.sketchFilledCache === null) {
+      this.sketchFilledCache = computeFilledCellsFromSketch(allSegs, cellW, cellH, fillThreshold);
+      this.sketchFilledKey = key;
+    }
+    return this.sketchFilledCache;
+  }
+
+  /**
+   * Toggle the fill state of the grid cell at the given screen coordinates.
+   * Only active when cellFillEnabled is true.
+   */
+  toggleCellAtScreenPos(screenX: number, screenY: number) {
+    if (!this.streams.knitting.cellFillEnabled.value) return;
+    const model = this._screenToModel(screenX, screenY);
+    const cellW = this.streams.knitting.cellWidthPx.value;
+    const cellH = this.streams.knitting.cellHeightPx.value;
+    const c = Math.floor(model.x / cellW);
+    const r = Math.floor(model.y / cellH);
+    const updated = toggleCellSet(this.streams.knitting.filledCells.value, r, c);
+    this.streams.knitting.filledCells.set(updated);
+    this.sketchFilledCache = null; // force refresh
+    this.refresh();
+  }
+
+  /**
+   * Recalculate finished dimensions from filled cells + gauge settings.
+   */
+  recalculateFinishedSize() {
+    const k = this.streams.knitting;
+    const cellW = k.cellWidthPx.value;
+    const cellH = k.cellHeightPx.value;
+    const filledCells = k.filledCells.value;
+    const sketchFilled = this.getSketchFilled(cellW, cellH);
+
+    const all = new Set(filledCells);
+    if (sketchFilled) {
+      for (const key of sketchFilled) all.add(key);
+    }
+
+    if (all.size === 0) {
+      k.finishedWidth.set(0);
+      k.finishedHeight.set(0);
+      return;
+    }
+
+    let minRow = Infinity, minCol = Infinity, maxRow = -Infinity, maxCol = -Infinity;
+    for (const key of all) {
+      const [r, c] = key.split(',').map(Number);
+      if (r < minRow) minRow = r;
+      if (c < minCol) minCol = c;
+      if (r > maxRow) maxRow = r;
+      if (c > maxCol) maxCol = c;
+    }
+
+    const stitchCount = maxCol - minCol + 1;
+    const rowCount = maxRow - minRow + 1;
+    const stitchesPerInch = k.stitchesPer4Inches.value / 4.0;
+    const rowsPerInch = k.rowsPer4Inches.value / 4.0;
+
+    k.finishedWidth.set(stitchesPerInch > 0 ? Math.round(stitchCount / stitchesPerInch * 100) / 100 : 0);
+    k.finishedHeight.set(rowsPerInch > 0 ? Math.round(rowCount / rowsPerInch * 100) / 100 : 0);
   }
 
   __drawWorkspace(ctx, workspace, pipeline) {

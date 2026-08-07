@@ -11,6 +11,15 @@ export class BasePanTool extends Tool {
   
   mousedown(e) {
     if (e.button === 0) {
+      // Knitting cell fill mode: toggle cell on empty-space click
+      if (this.viewer.streams && this.viewer.streams.knitting &&
+          this.viewer.streams.knitting.cellFillEnabled.value) {
+        const picked = this.viewer.pick(e);
+        if (picked.length === 0) {
+          this.viewer.toggleCellAtScreenPos(e.offsetX, e.offsetY);
+          return;
+        }
+      }
       const picked = this.viewer.pick(e);
       let i;
       if (picked.length > 0) {
