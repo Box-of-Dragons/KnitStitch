@@ -32,24 +32,27 @@ body.page-knitstitch-sketcher #sketcher-app {
 // ---------------------------------------------------------------------------
 
 body.page-knitstitch-sketcher {
-  --primary: #8b5d1f;
-  --primary-light: #b8893f;
-  --primary-dark: #5a3d10;
-  --secondary: #faf6f0;
-  --secondary-light: #fdfbf7;
-  --secondary-dark: #e8dcc6;
-  --tertiary: #f2eee8;
+  --primary: #ca9b52;
+  --primary-light: #e4c78f;
+  --primary-dark: #8b5d1f;
+  --secondary: #f7f4ef;
+  --secondary-light: #fbf9f5;
+  --secondary-dark: #e8e2d8;
+  --border: #e8e2d8;
+  --color-pair-gold-text: #8b5d1f;
   --tertiary-dark: #f2eee8;
-  --body: #2e2418;
-  --body-light: #6b5a40;
-  --body-dark: #1a1408;
-  --border: #d4c9b5;
-  --shadow-sm: 0 1px 0 rgba(26, 19, 9, 0.04);
-  --shadow-md: 0 5px 12px rgba(26, 19, 9, 0.08);
   --shadow-lg: 0 14px 28px rgba(26, 19, 9, 0.12);
   --font-brand: "Dancing Script", cursive;
   --font-body: "Open Sans", sans-serif;
   --font-heading: "Playfair Display", serif;
+}
+
+// Prevent JSketcher theme's a:hover from overriding shared shell project-link colors
+body.page-knitstitch-sketcher .project-link--github:hover {
+  color: var(--github-color);
+}
+body.page-knitstitch-sketcher .project-link--gitlab:hover {
+  color: var(--gitlab-color);
 }
 
 .sans-serif {
