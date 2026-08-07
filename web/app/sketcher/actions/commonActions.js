@@ -1,5 +1,4 @@
-import {MdZoomOutMap} from "react-icons/md";
-import {AiOutlineCopy, AiOutlineExport, AiOutlineFile, AiOutlineFolderOpen, AiOutlineSave} from "react-icons/ai";
+import {Copy, Expand, File, FileUp, FolderOpen, Save} from "lucide-react";
 import {NoIcon} from "../icons/NoIcon";
 
 export default [
@@ -9,7 +8,7 @@ export default [
     shortName: 'New',
     kind: 'Common',
     description: 'Create new sketch',
-    icon: AiOutlineFile,
+    icon: File,
 
     invoke: (ctx) => {
       ctx.project.newSketch();
@@ -21,7 +20,7 @@ export default [
     shortName: 'Clone',
     kind: 'Common',
     description: 'Clone sketch',
-    icon: AiOutlineCopy,
+    icon: Copy,
 
     invoke: (ctx, e) => {
       ctx.project.cloneSketch();
@@ -33,7 +32,7 @@ export default [
     shortName: 'Open',
     kind: 'Common',
     description: 'Open sketch',
-    icon: AiOutlineFolderOpen,
+    icon: FolderOpen,
 
     invoke: (ctx, e) => {
       ctx.ui.$sketchManagerRequest.next({
@@ -48,7 +47,7 @@ export default [
     shortName: 'Save',
     kind: 'Common',
     description: 'Save sketch',
-    icon: AiOutlineSave,
+    icon: Save,
 
     invoke: (ctx) => {
       const sketchData = ctx.viewer.io.serializeSketch();
@@ -62,7 +61,7 @@ export default [
     shortName: 'Export',
     kind: 'Common',
     description: 'Export sketch to other formats',
-    icon: AiOutlineExport,
+    icon: FileUp,
 
     invoke: (ctx, e) => {
       ctx.ui.$exportDialogRequest.next({
@@ -77,7 +76,7 @@ export default [
     shortName: 'Fit',
     kind: 'Common',
     description: 'Fit Sketch On Screen',
-    icon: MdZoomOutMap,
+    icon: Expand,
 
     invoke: (ctx) => {
       ctx.viewer.toolManager.releaseControl();

@@ -1,6 +1,6 @@
 import {IO} from "../io";
 import React from "react";
-import {AiOutlineExport} from "react-icons/ai";
+import {FileUp} from "lucide-react";
 
 
 export default [
@@ -9,7 +9,7 @@ export default [
     shortName: 'Export to SVG',
     kind: 'Export',
     description: 'Export sketch to SVG',
-    icon: AiOutlineExport,
+    icon: FileUp,
 
     invoke: (ctx) => {
       IO.exportTextData(ctx.viewer.io.svgExport(), ctx.project.getSketchId() + ".svg");
@@ -21,7 +21,7 @@ export default [
     shortName: 'Export to DXF',
     kind: 'Export',
     description: 'Export sketch to DXF',
-    icon: AiOutlineExport,
+    icon: FileUp,
 
     invoke: (ctx) => {
       IO.exportTextData(ctx.viewer.io.dxfExport(), ctx.project.getSketchId() + ".dxf");

@@ -1,5 +1,4 @@
-import {BiPencil} from "react-icons/bi";
-import {BsTextareaT} from "react-icons/bs";
+import {Pencil, Type} from "lucide-react";
 import {Label} from "sketcher/shapes/label";
 import {isConstraintAnnotation} from "sketcher/constr/constraintAnnotation";
 import {editConstraint} from "sketcher/actions/constraintActions";
@@ -11,7 +10,7 @@ export default [
     shortName: 'Add Label',
     kind: 'Misc',
     description: 'Add Label',
-    icon: BsTextareaT,
+    icon: Type,
     selectionMatcher: {
       selector: 'function',
       match: (selection) => true
@@ -44,7 +43,7 @@ export default [
     shortName: 'Edit Constraint',
     kind: 'Misc',
     description: 'Edit the constraint the annotation refers to',
-    icon: BiPencil,
+    icon: Pencil,
     selectionMatcher: {
       selector: 'function',
       match: (selection) => isConstraintAnnotation(selection[0])

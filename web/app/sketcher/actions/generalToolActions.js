@@ -1,6 +1,5 @@
 import {ReferencePointTool} from "../tools/origin";
-import {IoIosHand} from "react-icons/io";
-import {GiCrosshair} from "react-icons/gi";
+import {Crosshair, Hand} from "lucide-react";
 
 export default [
   {
@@ -8,7 +7,7 @@ export default [
     shortName: 'Pan',
     kind: 'Tool',
     description: 'Pan mode',
-    icon: IoIosHand,
+    icon: Hand,
 
     invoke: (ctx) => {
       ctx.viewer.toolManager.releaseControl();
@@ -21,7 +20,7 @@ export default [
     shortName: 'Set Origin',
     kind: 'Tool',
     description: 'Sets reference point for commands',
-    icon: GiCrosshair,
+    icon: Crosshair,
     command: 'origin',
     invoke: (ctx) => {
       ctx.viewer.toolManager.takeControl(new ReferencePointTool(ctx.viewer));
