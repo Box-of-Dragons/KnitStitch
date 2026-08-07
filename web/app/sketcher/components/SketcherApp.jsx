@@ -17,6 +17,7 @@ import {SketcherDimensionView} from "./SketcherDimensionsView";
 import {SketcherTerminal} from "./TerminalView";
 
 import {SketcherAppContext} from './SketcherAppContext';
+import {KnittingPanel} from './KnittingPanel';
 
 export {SketcherAppContext};
 
@@ -25,6 +26,10 @@ export function SketcherApp({applicationContext}) {
     <StreamsContext.Provider value={applicationContext}>
       <Scope><ToastContainer /></Scope>
       <Scope><RightSideControls /></Scope>
+      {ReactDOM.createPortal(
+        <Scope><KnittingPanel /></Scope>,
+        document.getElementById('knitting-panel')
+      )}
       {ReactDOM.createPortal(
         <Scope><ConstraintList /></Scope>,
         document.getElementById('constraint-list')
@@ -38,7 +43,7 @@ export function SketcherApp({applicationContext}) {
         document.getElementById('dimension-view')
       )}
       {ReactDOM.createPortal(
-        <Scope><SketcherToolbar actions={sketcherRightToolbarConfig}/></Scope>,
+        <Scope><SketcherToolbar actions={sketcherRightToolbarConfig} horizontal compact/></Scope>,
         document.getElementById('right-toolbar')
       )}
       {ReactDOM.createPortal(
