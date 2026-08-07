@@ -12,6 +12,46 @@ html, body {
   margin: 0;
 }
 
+// When the shared shell (global bar + site header + footer) is present,
+// the body becomes a flex column so the sketcher fills the space between
+// the header and footer, and auto-adjusts when the header collapses.
+body.page-knitstitch-sketcher {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body.page-knitstitch-sketcher #sketcher-app {
+  flex: 1;
+  min-height: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Amber theme overrides for the shared Structured Chaos shell
+// (global bar, site header, site footer)
+// ---------------------------------------------------------------------------
+
+body.page-knitstitch-sketcher {
+  --primary: #8b5d1f;
+  --primary-light: #b8893f;
+  --primary-dark: #5a3d10;
+  --secondary: #faf6f0;
+  --secondary-light: #fdfbf7;
+  --secondary-dark: #e8dcc6;
+  --tertiary: #f2eee8;
+  --tertiary-dark: #f2eee8;
+  --body: #2e2418;
+  --body-light: #6b5a40;
+  --body-dark: #1a1408;
+  --border: #d4c9b5;
+  --shadow-sm: 0 1px 0 rgba(26, 19, 9, 0.04);
+  --shadow-md: 0 5px 12px rgba(26, 19, 9, 0.08);
+  --shadow-lg: 0 14px 28px rgba(26, 19, 9, 0.12);
+  --font-brand: "Dancing Script", cursive;
+  --font-body: "Open Sans", sans-serif;
+  --font-heading: "Playfair Display", serif;
+}
+
 .sans-serif {
 
 }
@@ -36,11 +76,25 @@ html, body {
 .panel {
   background: @app-panel-bg;
   border: 0px solid black;
+  border-radius: 0;
 }
-.b-top { border-top-width: 1px; }
+.b-top { border-top-width: 0; }
 .b-bot { border-bottom-width: 1px; }
-.b-left { border-left-width: 1px; }
+.b-left { border-left-width: 0; }
 .b-right { border-right-width: 5px; border-color: @app-panel-border }
+
+// Override shared.css rounded corners — sketcher UI is square
+.win,
+.btn,
+.tool-caption,
+.button-group,
+.status-item,
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  border-radius: 0 !important;
+}
 
 .btn:hover {
   background-color: @app-btn-hover-bg;
@@ -50,7 +104,7 @@ html, body {
 .btn {
   border:1px solid @app-btn-border;
   background: @app-btn-bg no-repeat center;
-  border-radius: 4px;
+  border-radius: 0;
   color: @app-btn-color;
   vertical-align: top;
 }
@@ -66,7 +120,7 @@ html, body {
   padding: 1px 5px 1px 5px;
   border:0 solid black;
   background: @app-btn-bg no-repeat center;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   margin: 1px 4px 1px 4px;
 }
@@ -313,4 +367,297 @@ html, body {
 
 #right-toolbar:empty {
   width: 50px;
+}
+
+// ---------------------------------------------------------------------------
+// KnitStitch amber theme overrides (2D sketcher only)
+//
+// app.less is only imported by web/app/sketcher.js, so these CSS variable
+// overrides apply exclusively to the standalone 2D sketcher page. The 3D CAD
+// app (web/app/index.js → WebApplication.jsx) loads ui/styles/global/index.less
+// directly and never imports this file, so its theme is untouched.
+//
+// Amber palette: #ca9b52 (primary), #e4c78f (light), #8b5d1f (dark)
+//
+// Tonal tiers (light theme, inspired by KnitStitch's layered approach):
+//   canvas:    #fbf9f5  (lightest warm white — the drawing area)
+//   app-bg:    #f7f4ef  (base background behind panels)
+//   panels:    #f2eee8  (dock, toolbars, status bar — distinct from canvas)
+//   captions:  #e8dcc6  (section headers — darker amber-cream)
+//   buttons:   #ffffff  (white — stands out from panels)
+//   selected:  #efe9da  (gold-tinted selection background)
+//   borders:   #d4c9b5  (visible but subtle)
+//   accent:    #ca9b52  (amber — active/selected accent)
+// ---------------------------------------------------------------------------
+
+body {
+  --hue-prim: 37;
+  --saturation: 30%;
+
+  --control-color-number: #ca9b52;
+  --control-color-text: #e4c78f;
+  --control-bg: #2a2520;
+  --control-bg-focus: #3d2810;
+  --control-border-focus: #ca9b52;
+  --control-selection-bg: #8b5d1f;
+
+  --work-area-color: #1a1408;
+
+  --toolbar-bg: rgba(26, 20, 12, 0.96);
+  --toolbar-button-color: #c8b898;
+  --toolbar-button-hover-bg: #3a2f1a;
+  --toolbar-button-hover-color: #fcf5ed;
+  --toolbar-button-disabled-hover-bg: #2a2218;
+
+  --menu-hover-bg: #a67c2a;
+  --menu-active-bg: #8b5d1f;
+  --menu-disabled-hover-bg: #2a2218;
+
+  --widget-bg: rgba(35, 28, 18, 0.96);
+  --widget-color: #faedf3;
+  --widget-border: #1a1408;
+
+  --symbol-button-active-color: #e4c78f;
+
+  --color-accent: #ca9b52;
+  --color-accent-dark: #8b5d1f;
+
+  --color-neutral: #807060;
+  --color-neutral-dark: #5c4a2a;
+  --color-highlight: #5c3d15;
+  --color-highlight-dark: #3d2810;
+
+  --color-btn-selected: #a67c2a;
+  --button-bg: #3a2f1a;
+  --button-color: #f5ede0;
+  --entity-ref-bg: #5c3d15;
+  --entity-ref-border: #3d2810;
+
+  --tree-hover-bg: rgba(202,155,82,0.18);
+
+  --history-item-bg: #2f2820;
+  --history-item-hover-bg: #3e3320;
+  --history-item-active-bg: #514530;
+  --history-item-border: #1a1408;
+  --history-control-bg: #6b4d20;
+  --history-control-hover-bg: #8b6d2a;
+  --history-control-active-bg: #ca9b52;
+  --history-sketch-bg: #3a2f1a;
+  --history-sketch-hover-bg: #4a3a20;
+  --history-sketch-color: #e4c78f;
+
+  --on-color-highlight: rgba(202,155,82,0.9);
+
+  --app-logo-color: #c8b898;
+  --app-panel-bg: #2a2218;
+  --app-panel-border: #1a1408;
+  --app-btn-bg: #3a2f1a;
+  --app-btn-border: #5c4a2a;
+  --app-btn-hover-bg: #4a3a20;
+  --app-btn-hover-border: #b89860;
+  --app-selected-bg: #3d2810;
+  --app-selected-color: #e4c78f;
+  --app-sbtn-border: #8b6d2a;
+  --app-tlist-border: #4a3a20;
+  --app-tlist-hover-bg: #2a2218;
+  --app-tool-caption-bg: #1a1408;
+  --app-scrollbar-thumb: #8b5d1f;
+  --app-scrollbar-thumb-hover: #ca9b52;
+  --app-win-bg: #352a18;
+  --app-win-border: #1a1408;
+  --app-pseudo-btn-bg: #3a2f1a;
+  --app-pseudo-btn-hover-bg: #4a3a20;
+  --app-status-item-color: #c8b898;
+  --app-explorer-header-bg: rgba(45, 35, 20, 0.93);
+  --app-explorer-header-border: #1a1408;
+  --app-headsup-splitter: #4a3a20;
+
+  --explorer-item-bg: rgba(20, 15, 8, 0.72);
+  --explorer-item-border: #120c06;
+  --explorer-alt-color: #b89860;
+  --explorer-hover-bg: #a67c2a;
+  --explorer-active-bg: #8b5d1f;
+  --explorer-selected-grad1: #ca9b52;
+  --explorer-selected-grad2: #8b5d1f;
+  --explorer-highlighted-bg: #a67c2a;
+  --explorer-on-color: #8b5d1f;
+  --explorer-off-color: #4a3a20;
+  --explorer-icon-bg: #3a2f1a;
+  --explorer-titlebar-bg: rgba(15, 10, 5, 0.82);
+  --contextual-bg: rgba(15, 10, 5, 0.84);
+  --sketcher-toolbar-btn-bg: #3a2f1a;
+  --sketcher-toolbar-btn-border: #5c4a2a;
+  --sketcher-toolbar-focus: #ca9b52;
+}
+
+body.theme-light {
+  --hue-prim: 37;
+  --saturation: 42%;
+
+  --control-color-number: #8b5d1f;
+  --control-color-text: #4a3010;
+  --control-bg: #ffffff;
+  --control-bg-focus: #fbf9f5;
+  --control-border-focus: #ca9b52;
+  --control-selection-bg: #a67c2a;
+
+  --work-area-color: #ffffff;
+
+  --work-area-control-bar-bg-color: rgba(242, 238, 232, 0.88);
+  --work-area-control-bar-bg-color-active: #e8dcc6;
+
+  --toolbar-bg: rgba(232, 220, 198, 0.96);
+  --toolbar-button-color: #3e3420;
+  --toolbar-button-hover-bg: #fbf9f5;
+  --toolbar-button-hover-color: #2e2418;
+  --toolbar-button-disabled-hover-bg: #f0e8d8;
+
+  --menu-hover-bg: #a67c2a;
+  --menu-active-bg: #8b5d1f;
+  --menu-disabled-hover-bg: #f7f4ef;
+
+  --widget-bg: rgba(255, 255, 255, 0.96);
+  --widget-color: #2e2418;
+  --widget-border: #d4c9b5;
+
+  --symbol-button-color: #2e2418;
+  --symbol-button-hover-color: #1a1408;
+  --symbol-button-active-color: #a67c2a;
+
+  --color-accent: #ca9b52;
+  --color-accent-dark: #8b5d1f;
+
+  --color-neutral: #b8a080;
+  --color-neutral-dark: #8b5d1f;
+  --color-highlight: #f5ede0;
+  --color-highlight-dark: #e4c78f;
+
+  --color-btn-selected: #efe9da;
+  --button-bg: #ffffff;
+  --button-color: #2e2418;
+  --entity-ref-bg: #f5ede0;
+  --entity-ref-border: #e4c78f;
+  --entity-ref-color: #4a3010;
+
+  --tree-text: #2e2418;
+  --tree-text-muted: rgba(46, 36, 24, 0.56);
+  --tree-chevron: rgba(46, 36, 24, 0.68);
+  --tree-icon: rgba(46, 36, 24, 0.76);
+  --tree-eye: rgba(46, 36, 24, 0.66);
+  --tree-eye-off: rgba(46, 36, 24, 0.28);
+  --tree-row-bg: rgba(139, 93, 31, 0.04);
+  --tree-hover-bg: rgba(202, 155, 82, 0.18);
+
+  --history-item-bg: #f5ede0;
+  --history-item-hover-bg: #ede0cc;
+  --history-item-active-bg: #e4c78f;
+  --history-item-border: #d4c9b5;
+  --history-control-bg: #e8dcc6;
+  --history-control-hover-bg: #e4c78f;
+  --history-control-active-bg: #d4b888;
+  --history-disabled-bg: #f7f4ef;
+  --history-disabled-border: #e8dcc6;
+  --history-disabled-color: #b8a080;
+  --history-scroller-hover-bg: #ede0cc;
+  --history-scroller-active-bg: #d4c9b5;
+  --history-root-bg: rgba(139, 93, 31, 0.04);
+  --history-sketch-bg: #f0e8d8;
+  --history-sketch-hover-bg: #ede0cc;
+  --history-sketch-color: #6b4513;
+
+  --on-color-highlight: rgba(202, 155, 82, 0.38);
+
+  --app-bg: #f7f4ef;
+  --app-logo-color: #8b5d1f;
+  --app-panel-bg: #f2eee8;
+  --app-panel-border: #d4c9b5;
+  --app-btn-bg: #ffffff;
+  --app-btn-border: #d4c9b5;
+  --app-btn-hover-bg: #fbf9f5;
+  --app-btn-hover-border: #e4c78f;
+  --app-btn-color: #2e2418;
+  --app-dock-color: #2e2418;
+  --app-selected-bg: #efe9da;
+  --app-selected-color: #4a3010;
+  --app-sbtn-border: #e4c78f;
+  --app-tlist-color: #2e2418;
+  --app-tlist-border: #e8dcc6;
+  --app-tlist-hover-bg: #f5ede0;
+  --app-tool-caption-color: #3e3420;
+  --app-tool-caption-bg: #e8dcc6;
+  --app-scrollbar-track: #f2eee8;
+  --app-scrollbar-thumb: #d4b888;
+  --app-scrollbar-thumb-hover: #ca9b52;
+  --app-win-bg: #ffffff;
+  --app-win-border: #d4c9b5;
+  --app-win-content-color: #2e2418;
+  --app-pseudo-btn-bg: #f5ede0;
+  --app-pseudo-btn-hover-bg: #ede0cc;
+  --app-pseudo-btn-color: #2e2418;
+  --app-layers-bg: #fbf9f5;
+  --app-status-color: #3e3420;
+  --app-status-item-color: #6b4513;
+  --app-tool-hint-color: #2e2418;
+  --app-explorer-header-bg: rgba(232, 220, 198, 0.94);
+  --app-explorer-header-border: #d4c9b5;
+  --app-headsup-splitter: #e8dcc6;
+  --app-svg-icon-stroke: #4a3a20;
+
+  --explorer-item-bg: rgba(255, 255, 255, 0.88);
+  --explorer-item-border: #d4c9b5;
+  --explorer-alt-color: #b8a080;
+  --explorer-hover-bg: #a67c2a;
+  --explorer-active-bg: #8b5d1f;
+  --explorer-selected-grad1: #e4c78f;
+  --explorer-selected-grad2: #ca9b52;
+  --explorer-highlighted-bg: #a67c2a;
+  --explorer-on-color: #e4c78f;
+  --explorer-off-color: #e8dcc6;
+  --explorer-icon-bg: #f0e8d8;
+  --explorer-titlebar-bg: rgba(247, 244, 239, 0.9);
+  --explorer-titlebar-color: #2e2418;
+  --contextual-bg: rgba(255, 255, 255, 0.9);
+  --contextual-color: #2e2418;
+  --sketcher-toolbar-btn-bg: #ffffff;
+  --sketcher-toolbar-btn-border: #d4c9b5;
+  --sketcher-toolbar-focus: #ca9b52;
+}
+
+// ---------------------------------------------------------------------------
+// Depth: shadows and borders to separate panels from canvas (light theme)
+// ---------------------------------------------------------------------------
+
+body.theme-light .panel {
+  box-shadow: 0 1px 3px rgba(26, 19, 9, 0.06);
+}
+
+body.theme-light .tool-caption {
+  box-shadow: 0 1px 2px rgba(26, 19, 9, 0.04);
+}
+
+body.theme-light .sketcher-window,
+body.theme-light .win {
+  box-shadow: 0 4px 16px rgba(26, 19, 9, 0.12);
+}
+
+body.theme-light .btn:hover {
+  box-shadow: 0 1px 2px rgba(26, 19, 9, 0.08);
+}
+
+body.theme-light .selected {
+  font-weight: 600;
+}
+
+// ---------------------------------------------------------------------------
+// Top ribbon — darker than side panels for visual hierarchy
+// ---------------------------------------------------------------------------
+
+body.theme-light .panel.b-bot {
+  background: #e8dcc6;
+  border-bottom: 1px solid #d4c9b5;
+}
+
+body.theme-light .panel.b-bot .logo {
+  color: #4a3010;
+  font-weight: 700;
 }

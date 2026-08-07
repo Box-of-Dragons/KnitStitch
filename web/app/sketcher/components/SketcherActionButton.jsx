@@ -15,7 +15,9 @@ export function SketcherActionButton({actionId, text=false}) {
   const Icon = action.icon;
 
   return <button onClick={e => action.invoke(ctx, e)} title={action.description} className={`action-kind-${action.kind} ${text ? 'icon-button' : ''}`}>
-    {Icon && <Icon />} {(text || !Icon) && action.shortName}
+    {Icon && <Icon />}
+    {Icon && <div className="tool-label">{action.shortName}</div>}
+    {!Icon && action.shortName}
   </button>;
 
 }

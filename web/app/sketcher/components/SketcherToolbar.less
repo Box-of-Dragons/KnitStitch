@@ -2,7 +2,6 @@
 @import "~ui/styles/mixins.less";
 
 @focus-color: @sketcher-toolbar-focus;
-@focus-color-secondary: rgba(3, 102, 214, .3);
 @separator: 15px;
 
 .root {
@@ -23,7 +22,7 @@
 
   &.horizontal {
     button {
-      margin: 4px 2px;
+      margin: 1px 5px;
     }
     .separator {
       width: @separator;
@@ -31,31 +30,56 @@
   }
 
   button {
-
-    background: @sketcher-toolbar-btn-bg;
-    border: 1px solid @sketcher-toolbar-btn-border;
+    background: transparent !important;
+    border: none !important;
+    color: @toolbar-button-color;
     outline: none;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 10px !important;
+    font-family: var(--font-body, "Open Sans", sans-serif) !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    padding: 2px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: @toolbar-button-hover-bg !important;
+      color: @toolbar-button-hover-color;
+    }
+
     &:focus {
-      border-color: @focus-color;
-      box-shadow: 0 0 0 2px @focus-color-secondary;
       outline: none;
     }
     .button-behavior(@color-neutral; @color-neutral-dark);
+  }
 
-    padding: 1px;
-    flex-basis: 36px;
-    display: flex;
+  .tool-label {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.2;
+    margin-top: 1px;
   }
 
   svg {
-    width: 34px;
-    height: 34px;
+    width: 24px;
+    height: 24px;
+  }
+
+  &.vertical svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.5;
   }
 
   &.compact svg {
-    width: 28px;
-    height: 28px;
-    transform: scale(0.9);
+    width: 20px;
+    height: 20px;
   }
 
   :global(.action-kind-Common) {
