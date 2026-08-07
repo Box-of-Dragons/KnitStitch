@@ -17,7 +17,7 @@ export default [
 
   {
     id: 'MeasureDistance',
-    shortName: 'Measure Distance',
+    shortName: 'Distance',
     kind: 'Tool',
     description: 'Measure distance between two points',
     icon: MeasureFreeToolIcon,
@@ -31,7 +31,7 @@ export default [
 
   {
     id: 'MeasureHDistance',
-    shortName: 'Measure Horizontal Distance',
+    shortName: 'Horiz. Dist.',
     kind: 'Tool',
     description: 'Measure horizontal distance between two points',
     icon: MeasureHorizontalToolIcon,
@@ -44,7 +44,7 @@ export default [
 
   {
     id: 'MeasureVDistance',
-    shortName: 'Measure Vertical Distance',
+    shortName: 'Vert. Dist.',
     kind: 'Tool',
     description: 'Measure vertical distance between two points',
     icon: MeasureVerticalToolIcon,
@@ -57,7 +57,7 @@ export default [
 
   {
     id: 'MeasureCircle',
-    shortName: 'Measure Circle',
+    shortName: 'Circle',
     kind: 'Tool',
     description: 'Measure circle diameter',
     icon: MeasureCircleToolIcon,
@@ -70,7 +70,7 @@ export default [
 
   {
     id: 'MeasureAngleBetween',
-    shortName: 'Measure Angle Between',
+    shortName: 'Angle',
     kind: 'Tool',
     description: 'Measure angle between',
     icon: MeasureAngleBetweenAngle,

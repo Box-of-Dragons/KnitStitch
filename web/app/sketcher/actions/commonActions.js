@@ -75,7 +75,7 @@ export default [
     id: 'Fit',
     shortName: 'Fit',
     kind: 'Common',
-    description: 'Fit Sketch On Screen',
+    description: 'Fit sketch on screen',
     icon: Expand,
 
     invoke: (ctx) => {
@@ -88,9 +88,9 @@ export default [
 
   {
     id: 'ToggleTerminal',
-    shortName: 'Toggle Terminal',
+    shortName: 'Terminal',
     kind: 'Common',
-    description: 'Open/Close Terminal Window',
+    description: 'Open/close terminal window',
     icon: NoIcon,
 
     invoke: (ctx) => {

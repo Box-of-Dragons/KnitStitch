@@ -7,9 +7,9 @@ export default [
 
   {
     id: 'AddObjectLabel',
-    shortName: 'Add Label',
+    shortName: 'Label',
     kind: 'Misc',
-    description: 'Add Label',
+    description: 'Add label',
     icon: Type,
     selectionMatcher: {
       selector: 'function',

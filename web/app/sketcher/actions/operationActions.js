@@ -10,7 +10,7 @@ export default [
     id: 'Mirror',
     shortName: 'Mirror',
     kind: 'Generator',
-    description: 'Mirror Objects',
+    description: 'Mirror objects',
     icon: FlipHorizontal,
 
     wizard: MirrorGeneratorSchema.params,

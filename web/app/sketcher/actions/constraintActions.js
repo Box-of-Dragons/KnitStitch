@@ -34,7 +34,7 @@ export default [
     id: 'Coincident',
     shortName: 'Coincident',
     kind: 'Constraint',
-    description: 'Point Coincident',
+    description: 'Point coincident',
     icon: CoincidentConstraintIcon,
     selectionMatcher: {
       selector: 'matchAll',
@@ -59,7 +59,7 @@ export default [
     id: 'Tangent',
     shortName: 'Tangent',
     kind: 'Constraint',
-    description: 'Tangent Between Line And Circle',
+    description: 'Tangent between line and circle',
     icon: TangentConstraintIcon,
     selectionMatcher: {
       selector: 'matchSequence',
@@ -96,7 +96,7 @@ export default [
     id: 'EqualRadius',
     shortName: 'Equal Radius',
     kind: 'Constraint',
-    description: 'Equal Radius Between Two Circle',
+    description: 'Equal radius between two circles',
     icon: EqualConstraintIcon,
     selectionMatcher: {
       selector: 'matchAll',
@@ -121,7 +121,7 @@ export default [
     id: 'EqualLength',
     shortName: 'Equal Length',
     kind: 'Constraint',
-    description: 'Equal Length Between Two Segments',
+    description: 'Equal length between two segments',
     icon: EqualConstraintIcon,
     selectionMatcher: {
       selector: 'matchAll',
@@ -141,9 +141,9 @@ export default [
 
   {
     id: 'PointOnLine',
-    shortName: 'Point On Line',
+    shortName: 'On Line',
     kind: 'Constraint',
-    description: 'Point On Line',
+    description: 'Point on line',
     icon: PointOnLineConstraintIcon,
     selectionMatcher: {
       selector: 'matchSequence',
@@ -169,9 +169,9 @@ export default [
 
   {
     id: 'PointOnCircle',
-    shortName: 'Point On Circle',
+    shortName: 'On Circle',
     kind: 'Constraint',
-    description: 'Point On Circle',
+    description: 'Point on circle',
     icon: PointOnCurveConstraintIcon,
     selectionMatcher: {
       selector: 'matchSequence',
@@ -197,9 +197,9 @@ export default [
 
   {
     id: 'PointOnCurve',
-    shortName: 'Point On Curve',
+    shortName: 'On Curve',
     kind: 'Constraint',
-    description: 'Point On Curve',
+    description: 'Point on curve',
     icon: PointOnCurveConstraintIcon,
     selectionMatcher: {
       selector: 'matchSequence',
@@ -225,9 +225,9 @@ export default [
 
   {
     id: 'PointInMiddle',
-    shortName: 'Middle Point',
+    shortName: 'Midpoint',
     kind: 'Constraint',
-    description: 'Point In The Middle',
+    description: 'Point in the middle',
     icon: PointInMiddleConstraintIcon,
     selectionMatcher: {
       selector: 'matchSequence',
@@ -361,7 +361,7 @@ export default [
     id: 'AngleBetween',
     shortName: 'Angle Between',
     kind: 'Constraint',
-    description: 'Angle Between Lines',
+    description: 'Angle between lines',
     icon: AngleBetweenConstraintIcon,
 
     selectionMatcher: {
@@ -448,7 +448,7 @@ export default [
     id: 'Length',
     shortName: 'Length',
     kind: 'Constraint',
-    description: 'Segment Length',
+    description: 'Segment length',
     icon: DistanceConstraintIcon,
 
     selectionMatcher: {
@@ -478,9 +478,9 @@ export default [
 
   {
     id: 'RadiusLength',
-    shortName: 'Radius Length',
+    shortName: 'Radius',
     kind: 'Constraint',
-    description: 'Radius Length',
+    description: 'Radius length',
     icon: RadiusConstraintIcon,
 
     selectionMatcher: {
@@ -510,9 +510,9 @@ export default [
 
   {
     id: 'DistancePL',
-    shortName: 'Point to Line Distance',
+    shortName: 'Dist PL',
     kind: 'Constraint',
-    description: 'Distance between Point and Line',
+    description: 'Distance between point and line',
     icon: DistancePLConstraintIcon,
 
     selectionMatcher: {
@@ -547,9 +547,9 @@ export default [
 
   {
     id: 'DistancePP',
-    shortName: 'Two Point Distance',
+    shortName: 'Dist PP',
     kind: 'Constraint',
-    description: 'Distance between two Points',
+    description: 'Distance between two points',
     icon: DistanceConstraintIcon,
 
     selectionMatcher: {
@@ -579,9 +579,9 @@ export default [
 
   {
     id: 'Lock',
-    shortName: 'Lock Point',
+    shortName: 'Lock',
     kind: 'Constraint',
-    description: 'Lock Point',
+    description: 'Lock point',
     icon: LockConstraintIcon,
 
     selectionMatcher: {
@@ -609,7 +609,7 @@ export default [
     id: 'Fillet',
     shortName: 'Fillet',
     kind: 'Tool',
-    description: 'Make a Fillet',
+    description: 'Make a fillet',
     icon: FilletConstraintIcon,
 
     selectionMatcher: {

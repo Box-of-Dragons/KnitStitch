@@ -6,7 +6,7 @@ import {FileUp} from "lucide-react";
 export default [
   {
     id: 'ExportSVG',
-    shortName: 'Export to SVG',
+    shortName: 'Export SVG',
     kind: 'Export',
     description: 'Export sketch to SVG',
     icon: FileUp,
@@ -18,7 +18,7 @@ export default [
 
   {
     id: 'ExportDXF',
-    shortName: 'Export to DXF',
+    shortName: 'Export DXF',
     kind: 'Export',
     description: 'Export sketch to DXF',
     icon: FileUp,
