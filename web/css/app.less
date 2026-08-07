@@ -246,6 +246,30 @@ textarea {
   background: @app-tool-caption-bg;
 }
 
+// Accordion dock sections — click caption to collapse/expand body
+.dock-node.collapsed > *:not(.tool-caption) {
+  display: none;
+}
+
+.accordion-caption {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.accordion-caret {
+  font-size: 11px;
+  width: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 .no-top-border {
   border-top: 0;
 }

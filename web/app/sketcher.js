@@ -68,7 +68,7 @@ function initNonReactUIParts(context) {
 
   const dockEl = document.getElementById('dock');
   const bottomButtonGroup = document.querySelector('#status .button-group');
-  const dock = new Dock(dockEl, bottomButtonGroup, AppDockViews);
+  const dock = new Dock(dockEl, AppDockViews);
   dock.show('Constraints');
 
   const resizeHelper = new ResizeHelper(true);

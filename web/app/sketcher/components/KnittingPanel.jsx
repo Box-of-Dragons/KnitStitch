@@ -12,6 +12,7 @@ export function KnittingPanel() {
   const [fillEnabled, setFillEnabled] = useStreamState(k.cellFillEnabled);
   const [finishedWidth] = useStreamState(k.finishedWidth);
   const [finishedHeight] = useStreamState(k.finishedHeight);
+  const [collapsed, setCollapsed] = useState(false);
 
   function recalculate() {
     const s = Number(stitches) || 20;
@@ -32,10 +33,10 @@ export function KnittingPanel() {
   }
 
   return (
-    <div className="dock-node">
-      <div className="tool-caption">
+    <div className={'dock-node' + (collapsed ? ' collapsed' : '')}>
+      <div className="tool-caption accordion-caption" onClick={() => setCollapsed(c => !c)}>
+        <i className={'fa accordion-caret ' + (collapsed ? 'fa-caret-right' : 'fa-caret-down')}/>
         <span className="txt">KNITTING GRID</span>
-        <i className="fa fa-th"/>
       </div>
 
       <div className="knitting-panel-body">
