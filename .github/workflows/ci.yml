@@ -125,7 +125,7 @@ jobs:
             }
 
       - name: Merge dev into master
-        if: github.ref == 'refs/heads/dev' && steps.plan.outputs.should_release == 'true'
+        if: github.ref == 'refs/heads/dev'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
