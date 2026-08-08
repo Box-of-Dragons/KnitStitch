@@ -6,6 +6,16 @@
  * to identify fork-only commits by patch ID, so it works even when the fork
  * has rebased or rewritten history relative to upstream.
  *
+ * Versioning is release-based when semver tags exist:
+ *   - find the latest reachable release tag (vMAJOR.MINOR.PATCH)
+ *   - inspect the commits since that tag
+ *   - bump once by the highest Conventional Commit signal in the batch
+ *   - write that release version to docs/changelog.md and web/js/buildInfo.js
+ *
+ * If the repository has no semver release tags yet, the script falls back
+ * to the legacy commit-based numbering so the current display stays stable
+ * during the migration to release tags.
+ *
  * Usage:
  *   node scripts/generate-changelog.mjs
  *   node scripts/generate-changelog.mjs --root=. --output=docs/changelog.md
@@ -180,6 +190,82 @@ function cleanCommitDescription(subject, body) {
   return null;
 }
 
+function parseSemverTag(tag) {
+  const match = /^v(\d+)\.(\d+)\.(\d+)$/.exec(tag.trim());
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function compareSemver(a, b) {
+  for (let i = 0; i < 3; i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return 0;
+}
+
+function formatSemver(version) {
+  return `v${version[0]}.${version[1]}.${version[2]}`;
+}
+
+function bumpSemver(version, bumpType) {
+  switch (bumpType) {
+    case 'major':
+      return [version[0] + 1, 0, 0];
+    case 'minor':
+      return [version[0], version[1] + 1, 0];
+    case 'patch':
+      return [version[0], version[1], version[2] + 1];
+    default:
+      return version.slice();
+  }
+}
+
+function getCommitBump(subject) {
+  if (/BREAKING CHANGE|!:/i.test(subject)) return 'major';
+  if (/^feat(\([^)]+\))?:/i.test(subject)) return 'minor';
+  if (/^fix(\([^)]+\))?:/i.test(subject)) return 'patch';
+  return 'none';
+}
+
+function findLatestReleaseTag(root, headRef) {
+  const output = git(root, 'tag', '--merged', headRef, '--list', 'v*');
+  const tags = [];
+  for (const line of output.split('\n')) {
+    const tag = line.trim();
+    if (tag === '') continue;
+    const version = parseSemverTag(tag);
+    if (!version) continue;
+    tags.push({ tag, version });
+  }
+  if (tags.length === 0) return null;
+  tags.sort((a, b) => compareSemver(b.version, a.version));
+  return tags[0];
+}
+
+function refExists(root, ref) {
+  try {
+    execFileSync('git', ['-C', root, 'rev-parse', '--verify', '--quiet', `${ref}^{commit}`], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isAncestor(root, ancestorRef, descendantRef) {
+  try {
+    execFileSync('git', ['-C', root, 'merge-base', '--is-ancestor', ancestorRef, descendantRef], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // --- Main ---
 
 const args = parseArgs(process.argv);
@@ -190,23 +276,36 @@ const outputPath = args.output
   : resolve(root, format === 'html' ? 'web/changelog-fragment.html' : 'docs/changelog.md');
 const upstreamRef = args.upstream || 'upstream/main';
 const headRef = args.head || 'HEAD';
-
-// Find fork-only commits using git cherry (compares patch IDs)
-let cherryOutput;
-try {
-  cherryOutput = git(root, 'cherry', upstreamRef, headRef);
-} catch (e) {
-  console.error(`Could not run 'git cherry ${upstreamRef} ${headRef}'.`);
-  console.error(`Make sure the upstream remote exists: git remote add upstream https://github.com/xibyte/jsketcher.git`);
-  console.error(`Then: git fetch upstream`);
-  process.exit(1);
-}
+const latestReleaseTag = findLatestReleaseTag(root, headRef);
+const compareRef = [upstreamRef, 'origin/main', 'origin/master', 'main', 'master', 'gitlab/master'].find((ref) => refExists(root, ref));
 
 const forkCommitShas = [];
-for (const line of cherryOutput.split('\n')) {
-  const trimmed = line.trim();
-  if (trimmed.startsWith('+ ')) {
-    forkCommitShas.push(trimmed.slice(2));
+if (compareRef) {
+  // Find fork-only commits using git cherry (compares patch IDs)
+  let cherryOutput;
+  try {
+    cherryOutput = git(root, 'cherry', compareRef, headRef);
+  } catch (e) {
+    console.error(`Could not run 'git cherry ${compareRef} ${headRef}'.`);
+    process.exit(1);
+  }
+
+  for (const line of cherryOutput.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('+ ')) {
+      forkCommitShas.push(trimmed.slice(2));
+    }
+  }
+} else {
+  if (latestReleaseTag) {
+    console.error('No upstream or main comparison ref found; falling back to all commits on HEAD.');
+  }
+  const logOutput = git(root, 'rev-list', '--reverse', headRef);
+  for (const line of logOutput.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed !== '') {
+      forkCommitShas.push(trimmed);
+    }
   }
 }
 
@@ -233,19 +332,6 @@ for (const record of logOutput.split('\x1e')) {
   });
 }
 
-// --- Version computation ---
-// Walk fork commits oldest-first, starting from the v0.1.0 baseline tag.
-// The tag points at the first fork commit; each subsequent commit bumps
-// the version per conventional commit rules (feat=minor, fix=patch,
-// BREAKING=major, everything else=revision increment).
-
-function getCommitType(subject) {
-  if (/BREAKING CHANGE|!:/i.test(subject)) return 'major';
-  if (/^feat(\([^)]+\))?:/i.test(subject)) return 'minor';
-  if (/^fix(\([^)]+\))?:/i.test(subject)) return 'patch';
-  return 'none';
-}
-
 function formatVersion(version, revision = 0) {
   if (revision > 0) {
     return `v${version[0]}.${version[1]}.${version[2]}.${revision}`;
@@ -253,21 +339,6 @@ function formatVersion(version, revision = 0) {
   return `v${version[0]}.${version[1]}.${version[2]}`;
 }
 
-// Find the baseline tag (v0.1.0) and which commit it points to
-let baselineVersion = [0, 1, 0, 0];
-let baselineSha = null;
-try {
-  const tagSha = git(root, 'rev-list', '-n', '1', 'v0.1.0').trim();
-  baselineSha = tagSha;
-} catch (e) {
-  // v0.1.0 tag not found — start from 0.0.0 and let the first commit set it
-  baselineVersion = [0, 0, 0, 0];
-}
-
-let resolvedVersion = baselineVersion.slice();
-let revision = 0;
-
-// If the baseline tag exists, the commit it points to IS v0.1.0 — don't bump it
 const changeGroups = {
   breaking: [],
   feature: [],
@@ -280,50 +351,111 @@ const changeGroups = {
   other: [],
 };
 
-for (const commit of forkCommits) {
-  const { sha, date, subject, body } = commit;
+let currentVersion;
+let releaseCommitCount = 0;
+let snapshotCommitLabel = 'fork commits';
 
-  // If this is the baseline commit, it's already v0.1.0 — don't bump
-  if (baselineSha && sha === baselineSha) {
-    resolvedVersion = baselineVersion.slice();
-    revision = 0;
-  } else {
-    const commitType = getCommitType(subject);
-    switch (commitType) {
-      case 'major':
-        resolvedVersion = [resolvedVersion[0] + 1, 0, 0, 0];
-        revision = 0;
-        break;
-      case 'minor':
-        resolvedVersion = [resolvedVersion[0], resolvedVersion[1] + 1, 0, 0];
-        revision = 0;
-        break;
-      case 'patch':
-        resolvedVersion = [resolvedVersion[0], resolvedVersion[1], resolvedVersion[2] + 1, 0];
-        revision = 0;
-        break;
-      default:
-        revision++;
-        break;
+if (latestReleaseTag) {
+  const latestReleaseSha = git(root, 'rev-list', '-n', '1', latestReleaseTag.tag).trim();
+  const releaseCommits = forkCommits.filter((commit) => commit.sha !== latestReleaseSha && isAncestor(root, latestReleaseSha, commit.sha));
+  let bumpType = 'none';
+
+  for (const commit of releaseCommits) {
+    const commitBump = getCommitBump(commit.subject);
+    if (commitBump === 'major') {
+      bumpType = 'major';
+      break;
+    }
+    if (commitBump === 'minor' && bumpType !== 'major') {
+      bumpType = 'minor';
+    } else if (commitBump === 'patch' && bumpType === 'none') {
+      bumpType = 'patch';
     }
   }
 
-  const group = getChangelogGroup(subject);
-  changeGroups[group].push({
-    version: formatVersion(resolvedVersion, revision),
-    sha: sha.slice(0, 8),
-    date,
-    subject: humanizeCommitSubject(subject),
-    description: cleanCommitDescription(subject, body),
-  });
-}
+  const bumpedVersion = bumpSemver(latestReleaseTag.version, bumpType);
+  currentVersion = formatSemver(bumpedVersion);
+  releaseCommitCount = releaseCommits.length;
+  snapshotCommitLabel = 'release commits';
 
-const currentVersion = formatVersion(resolvedVersion, revision);
+  for (const commit of releaseCommits) {
+    const { sha, date, subject, body } = commit;
+    const group = getChangelogGroup(subject);
+    changeGroups[group].push({
+      version: currentVersion,
+      sha: sha.slice(0, 8),
+      date,
+      subject: humanizeCommitSubject(subject),
+      description: cleanCommitDescription(subject, body),
+    });
+  }
+} else {
+  // Legacy fallback for repositories that have not been bootstrapped with
+  // release tags yet. This preserves the current version display while the
+  // release-tag workflow is being introduced.
+  // Walk fork commits oldest-first, starting from the v0.1.0 baseline tag.
+  // The tag points at the first fork commit; each subsequent commit bumps
+  // the version per conventional commit rules (feat=minor, fix=patch,
+  // BREAKING=major, everything else=revision increment).
+  let baselineVersion = [0, 1, 0, 0];
+  let baselineSha = null;
+  if (refExists(root, 'v0.1.0')) {
+    const tagSha = git(root, 'rev-list', '-n', '1', 'v0.1.0').trim();
+    baselineSha = tagSha;
+  } else {
+    // v0.1.0 tag not found — start from 0.0.0 and let the first commit set it
+    baselineVersion = [0, 0, 0, 0];
+  }
+
+  let resolvedVersion = baselineVersion.slice();
+  let revision = 0;
+
+  for (const commit of forkCommits) {
+    const { sha, date, subject, body } = commit;
+
+    // If this is the baseline commit, it's already v0.1.0 — don't bump
+    if (baselineSha && sha === baselineSha) {
+      resolvedVersion = baselineVersion.slice();
+      revision = 0;
+    } else {
+      const commitType = getCommitBump(subject);
+      switch (commitType) {
+        case 'major':
+          resolvedVersion = [resolvedVersion[0] + 1, 0, 0, 0];
+          revision = 0;
+          break;
+        case 'minor':
+          resolvedVersion = [resolvedVersion[0], resolvedVersion[1] + 1, 0, 0];
+          revision = 0;
+          break;
+        case 'patch':
+          resolvedVersion = [resolvedVersion[0], resolvedVersion[1], resolvedVersion[2] + 1, 0];
+          revision = 0;
+          break;
+        default:
+          revision++;
+          break;
+      }
+    }
+
+    const group = getChangelogGroup(subject);
+    changeGroups[group].push({
+      version: formatVersion(resolvedVersion, revision),
+      sha: sha.slice(0, 8),
+      date,
+      subject: humanizeCommitSubject(subject),
+      description: cleanCommitDescription(subject, body),
+    });
+  }
+
+  currentVersion = formatVersion(resolvedVersion, revision);
+  releaseCommitCount = forkCommitShas.length;
+}
 
 // Total commit count and HEAD info (for the snapshot line)
 const commitCount = parseInt(git(root, 'rev-list', '--count', headRef).trim(), 10);
 const shortSha = git(root, 'rev-parse', '--short', headRef).trim();
-const forkCommitCount = forkCommitShas.length;
+const forkCommitCount = releaseCommitCount;
 
 const groupLabels = {
   breaking: 'Breaking Changes',
@@ -420,7 +552,7 @@ if (format === 'html') {
   html.push('    <h3>Build Snapshot</h3>');
   html.push('    <div class="container-actions">');
   html.push(`      <span class="chip ${groupChipClass.other}">Version ${esc(currentVersion)}</span>`);
-  html.push(`      <span class="chip color-pair-stone">${forkCommitCount} fork commits</span>`);
+  html.push(`      <span class="chip color-pair-stone">${forkCommitCount} ${snapshotCommitLabel}</span>`);
   html.push(`      <span class="chip color-pair-stone">${commitCount} total commits</span>`);
   html.push('    </div>');
   html.push('  </section>');
@@ -474,7 +606,7 @@ if (format === 'html') {
   const lines = [];
   lines.push('# Changelog');
   lines.push('');
-  lines.push(`> **${currentVersion}** — ${forkCommitCount} fork commits · ${commitCount} total commits · HEAD ${shortSha}`);
+  lines.push(`> **${currentVersion}** — ${forkCommitCount} ${snapshotCommitLabel} · ${commitCount} total commits · HEAD ${shortSha}`);
   lines.push('');
   lines.push('> Only commits unique to this fork are listed. Upstream history is excluded.');
   lines.push('> Generated from conventional commits using `git cherry ' + upstreamRef + ' ' + headRef + '`.');
@@ -538,6 +670,6 @@ console.log(`Generated ${outputPath}`);
 console.log(`Generated ${buildInfoPath}`);
 console.log(`  Format: ${format}`);
 console.log(`  Version: ${currentVersion}`);
-console.log(`  ${forkCommitCount} fork-only commits (out of ${commitCount} total)`);
+console.log(`  ${forkCommitCount} ${snapshotCommitLabel} (out of ${commitCount} total)`);
 console.log(`  Upstream ref: ${upstreamRef}`);
 console.log(`  HEAD: ${shortSha}`);

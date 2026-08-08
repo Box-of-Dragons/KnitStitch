@@ -301,7 +301,7 @@ Do not edit `web/roadmap.html` to change roadmap content — only edit it to cha
 - The script uses `git cherry upstream/main HEAD` to identify commits unique to this fork (by patch ID, so it works even with rebased history).
 - Only commits not in upstream are listed. The upstream `xibyte/jsketcher` history is excluded.
 - Commits are grouped by conventional commit type (Features, Fixes, Interface, Documentation, etc.).
-- The latest version tag on HEAD is shown in the changelog snapshot line.
+- The latest release version on HEAD is shown in the changelog snapshot line.
 - Run `npm run changelog` to regenerate `docs/changelog.md`.
 - The `data-md-src` attribute on `<body>` points to the `main` branch raw URL on GitHub.
 - The changelog is linked in the `SITE_HEADER` nav on all JSketcher pages.
@@ -310,18 +310,19 @@ Do not edit `web/changelog.html` to change changelog content — run `npm run ch
 
 ## Versioning
 
-This fork versions independently from upstream, starting at `v0.1.0`.
+This fork versions releases from Git tags instead of incrementing the version on every commit.
 
-- `v0.1.0` is tagged at the first fork commit (`fd047e3e` — fix PR #219 build), the fork baseline.
-- Each subsequent fork commit bumps the version per conventional commit rules:
-  - `feat:` → minor bump (e.g. `v0.1.0` → `v0.2.0`)
-  - `fix:` → patch bump (e.g. `v0.2.0` → `v0.2.1`)
-  - `BREAKING CHANGE` or `!:` → major bump
-  - everything else (`docs:`, `ui:`, `refactor:`, `chore:`, etc.) → revision increment (4th number, e.g. `v0.2.0.1`)
-- The changelog script (`scripts/generate-changelog.mjs`) computes the current version by walking fork commits from the `v0.1.0` baseline and applying these rules.
-- `package.json` `version` tracks the computed version at HEAD.
-- Follow the Structured Chaos conventional commit rules for version bumps (see `docs/git-rules.md` in the StructuredChaos umbrella repo).
-- The old upstream-era `v1.0.0-dev.1` tag exists in history but is not part of the fork's versioning scheme.
+- Release tags use strict semantic versioning: `vMAJOR.MINOR.PATCH`.
+- `scripts/generate-changelog.mjs` finds the latest reachable release tag and inspects commits since that tag.
+- The highest Conventional Commit signal in that batch decides the next release bump:
+  - `feat:` -> minor bump
+  - `fix:` -> patch bump
+  - `BREAKING CHANGE` or `!:` -> major bump
+  - other commit types do not bump the release version
+- Until the repository has a semver release tag, the script falls back to the legacy commit-based numbering so the displayed version does not jump during migration.
+- `web/js/buildInfo.js` is generated from the release version and is what the site footer displays.
+- Follow the Structured Chaos conventional commit rules for release bumps (see `docs/git-rules.md` in the StructuredChaos umbrella repo).
+- The old upstream-era `v1.0.0-dev.1` tag exists in history but is not part of the fork's release scheme.
 
 ### Prerequisites
 
