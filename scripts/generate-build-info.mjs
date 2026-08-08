@@ -19,7 +19,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 function parseArgs(argv) {
@@ -57,15 +57,6 @@ function git(root, ...args) {
   }
 }
 
-function parseVersion(tagName) {
-  const raw = tagName.trim().replace(/^[vV]/, '');
-  const parts = raw.split('.');
-  if (parts.length < 3) {
-    throw new Error(`Tag '${tagName}' is not a valid version`);
-  }
-  return parts.map((p) => parseInt(p, 10));
-}
-
 function formatVersion(version, revision = 0) {
   if (revision > 0) {
     return `v${version[0]}.${version[1]}.${version[2]}.${revision}`;
@@ -83,6 +74,52 @@ function tryParseTaggedVersion(tagName) {
   const version = parts.map((p) => parseInt(p, 10));
   if (version.length === 3) version.push(0);
   return version;
+}
+
+function parseSemverTag(tagName) {
+  const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(tagName.trim());
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function compareSemver(a, b) {
+  for (let i = 0; i < 3; i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return 0;
+}
+
+function formatSemver(version) {
+  return `v${version[0]}.${version[1]}.${version[2]}`;
+}
+
+function bumpSemver(version, bumpType) {
+  switch (bumpType) {
+    case 'major':
+      return [version[0] + 1, 0, 0];
+    case 'minor':
+      return [version[0], version[1] + 1, 0];
+    case 'patch':
+      return [version[0], version[1], version[2] + 1];
+    default:
+      return version.slice();
+  }
+}
+
+function findLatestReleaseTag(root, headRef) {
+  const output = git(root, 'tag', '--merged', headRef, '--list', 'v*');
+  const tags = [];
+  for (const line of output.split('\n')) {
+    const tag = line.trim();
+    if (tag === '') continue;
+    const version = parseSemverTag(tag);
+    if (!version) continue;
+    tags.push({ tag, version });
+  }
+
+  if (tags.length === 0) return null;
+  tags.sort((a, b) => compareSemver(b.version, a.version));
+  return tags[0];
 }
 
 function getCommitType(subject) {
@@ -195,7 +232,7 @@ function cleanCommitDescription(subject, body) {
     if (/^(Signed-off-by:|Co-authored-by:|Reviewed-by:|Acked-by:)/i.test(trimmed)) {
       continue;
     }
-    let cleaned = trimmed.replace(/^-\s*/, '').replace(/^\*\s*/, '');
+    const cleaned = trimmed.replace(/^-\s*/, '').replace(/^\*\s*/, '');
     current.push(cleaned);
   }
 
@@ -218,6 +255,19 @@ function cleanCommitDescription(subject, body) {
   return null;
 }
 
+function loadAiReleaseNotes(root) {
+  const notesPath = resolve(root, 'release-notes.ai.json');
+  if (!existsSync(notesPath)) return {};
+
+  try {
+    const data = JSON.parse(readFileSync(notesPath, 'utf8'));
+    return data && data.notes && typeof data.notes === 'object' ? data.notes : {};
+  } catch (e) {
+    console.warn(`Ignoring invalid AI release-note cache: ${e.message}`);
+    return {};
+  }
+}
+
 // --- Main ---
 
 const args = parseArgs(process.argv);
@@ -233,23 +283,7 @@ if (!root || !outputPath) {
 // Commit count
 const commitCount = parseInt(git(root, 'rev-list', '--count', 'HEAD').trim(), 10);
 
-// Tags with object hashes
-const tagOutput = git(root, 'tag', '--format=%(objectname)|%(refname:short)');
-const taggedVersions = {};
-for (const line of tagOutput.split('\n')) {
-  if (line.trim() === '') continue;
-  const parts = line.split('|', 2);
-  if (parts.length !== 2) continue;
-  const version = tryParseTaggedVersion(parts[1]);
-  if (version !== null) {
-    taggedVersions[parts[0]] = version;
-  }
-}
-
-// Commit log (oldest first), using record separators
-const logOutput = git(root, 'log', '--pretty=format:%H%x1f%ad%x1f%s%x1f%B%x1e', '--date=short', '--reverse', '--', '.');
-let resolvedVersion = [1, 0, 0, 0];
-let revision = 0;
+const aiReleaseNotes = loadAiReleaseNotes(root);
 const changeGroups = {
   breaking: [],
   feature: [],
@@ -261,66 +295,130 @@ const changeGroups = {
   other: [],
 };
 
-for (const record of logOutput.split('\x1e')) {
-  if (record.trim() === '') continue;
-  const parts = record.split('\x1f', 4);
-  if (parts.length !== 4) continue;
+function parseCommitLog(output) {
+  const commits = [];
+  for (const record of output.split('\x1e')) {
+    if (record.trim() === '') continue;
+    const parts = record.split('\x1f', 4);
+    if (parts.length !== 4) continue;
 
-  const sha = parts[0].trim();
-  const date = parts[1].trim();
-  const subject = parts[2].trim();
-  const body = parts[3];
-
-  if (taggedVersions[sha]) {
-    resolvedVersion = taggedVersions[sha];
-    if (resolvedVersion.length < 4) resolvedVersion.push(0);
-    revision = 0;
-    continue;
+    commits.push({
+      sha: parts[0].trim(),
+      date: parts[1].trim(),
+      subject: parts[2].trim(),
+      body: parts[3],
+    });
   }
+  return commits;
+}
 
-  const commitType = getCommitType(subject);
-  switch (commitType) {
-    case 'major':
-      resolvedVersion = [resolvedVersion[0] + 1, 0, 0, 0];
-      revision = 0;
-      break;
-    case 'minor':
-      resolvedVersion = [resolvedVersion[0], resolvedVersion[1] + 1, 0, 0];
-      revision = 0;
-      break;
-    case 'patch':
-      resolvedVersion = [resolvedVersion[0], resolvedVersion[1], resolvedVersion[2] + 1, 0];
-      revision = 0;
-      break;
-    default:
-      revision++;
-      break;
-  }
+function addChange(commit, version) {
+  if (/^chore\(release-notes\):/i.test(commit.subject)) return;
 
-  const group = getChangelogGroup(subject);
+  const group = getChangelogGroup(commit.subject);
+  const aiNote = aiReleaseNotes[commit.sha] || {};
   changeGroups[group].push({
-    version: formatVersion(resolvedVersion, revision),
-    sha: sha.slice(0, 7),
-    date,
-    subject: humanizeCommitSubject(subject),
-    description: cleanCommitDescription(subject, body),
+    version,
+    sha: commit.sha.slice(0, 7),
+    date: commit.date,
+    subject: aiNote.title || humanizeCommitSubject(commit.subject),
+    description:
+      aiNote.details && aiNote.details.length > 0 ? aiNote.details : cleanCommitDescription(commit.subject, commit.body),
   });
 }
 
-const displayVersion = formatVersion(resolvedVersion, revision);
+let displayVersion;
+let productionVersion;
+let snapshotCommitLabel = 'commits';
+let snapshotCommitCount = commitCount;
+const latestReleaseTag = findLatestReleaseTag(root, 'HEAD');
 
-// Latest tag for production version
-let latestTag = '';
-try {
-  const tagList = git(root, 'tag', '--list', 'v[0-9]*.[0-9]*.[0-9]*', '--sort=-v:refname').trim();
-  if (tagList !== '') {
-    latestTag = tagList.split('\n')[0].trim();
+if (latestReleaseTag) {
+  const logOutput = git(
+    root,
+    'log',
+    `${latestReleaseTag.tag}..HEAD`,
+    '--pretty=format:%H%x1f%ad%x1f%s%x1f%B%x1e',
+    '--date=short',
+    '--reverse',
+    '--',
+    '.',
+  );
+  const releaseCommits = parseCommitLog(logOutput).filter((commit) => !/^chore\(release-notes\):/i.test(commit.subject));
+  let bumpType = 'none';
+
+  for (const commit of releaseCommits) {
+    const commitType = getCommitType(commit.subject);
+    if (commitType === 'major') {
+      bumpType = 'major';
+      break;
+    }
+    if (commitType === 'minor' && bumpType !== 'major') {
+      bumpType = 'minor';
+    } else if (commitType === 'patch' && bumpType === 'none') {
+      bumpType = 'patch';
+    }
   }
-} catch (e) {
-  latestTag = '';
-}
 
-const productionVersion = latestTag !== '' ? formatVersion(parseVersion(latestTag)) : displayVersion;
+  displayVersion = formatSemver(bumpSemver(latestReleaseTag.version, bumpType));
+  productionVersion = latestReleaseTag.tag;
+  snapshotCommitLabel = 'release commits';
+  snapshotCommitCount = releaseCommits.length;
+
+  for (const commit of releaseCommits) {
+    addChange(commit, displayVersion);
+  }
+} else {
+  // Legacy fallback until a v0.1.0 baseline release tag is created on this branch.
+  const tagOutput = git(root, 'tag', '--format=%(objectname)|%(refname:short)');
+  const taggedVersions = {};
+  for (const line of tagOutput.split('\n')) {
+    if (line.trim() === '') continue;
+    const parts = line.split('|', 2);
+    if (parts.length !== 2) continue;
+    const version = tryParseTaggedVersion(parts[1]);
+    if (version !== null) {
+      taggedVersions[parts[0]] = version;
+    }
+  }
+
+  const logOutput = git(root, 'log', '--pretty=format:%H%x1f%ad%x1f%s%x1f%B%x1e', '--date=short', '--reverse', '--', '.');
+  let resolvedVersion = [1, 0, 0, 0];
+  let revision = 0;
+
+  for (const commit of parseCommitLog(logOutput)) {
+    if (taggedVersions[commit.sha]) {
+      resolvedVersion = taggedVersions[commit.sha];
+      if (resolvedVersion.length < 4) resolvedVersion.push(0);
+      revision = 0;
+      continue;
+    }
+
+    const commitType = getCommitType(commit.subject);
+    switch (commitType) {
+      case 'major':
+        resolvedVersion = [resolvedVersion[0] + 1, 0, 0, 0];
+        revision = 0;
+        break;
+      case 'minor':
+        resolvedVersion = [resolvedVersion[0], resolvedVersion[1] + 1, 0, 0];
+        revision = 0;
+        break;
+      case 'patch':
+        resolvedVersion = [resolvedVersion[0], resolvedVersion[1], resolvedVersion[2] + 1, 0];
+        revision = 0;
+        break;
+      default:
+        revision++;
+        break;
+    }
+
+    addChange(commit, formatVersion(resolvedVersion, revision));
+  }
+
+  displayVersion = formatVersion(resolvedVersion, revision);
+  productionVersion = displayVersion;
+}
 
 // Short SHA
 const shortSha = git(root, 'rev-parse', '--short', 'HEAD').trim();
@@ -350,7 +448,9 @@ if (format === 'js') {
   const lines = [];
   lines.push('# Changelog');
   lines.push('');
-  lines.push(`> **Build Snapshot** — Version ${displayVersion} · ${commitCount} commits · ${shortSha}`);
+  lines.push(
+    `> **Build Snapshot** — Version ${displayVersion} · ${snapshotCommitCount} ${snapshotCommitLabel} · ${commitCount} total commits · ${shortSha}`,
+  );
   lines.push('');
   lines.push('> Generated from conventional commits and git tags. The historical');
   lines.push('> changelog from the CraftCMS era is preserved in');
@@ -474,7 +574,8 @@ if (format === 'js') {
   html.push('    <h3>Build Snapshot</h3>');
   html.push('    <div class="container-actions">');
   html.push(`      <span class="chip ${groupChipClass.other}">Version ${esc(displayVersion)}</span>`);
-  html.push(`      <span class="chip color-pair-stone">${commitCount} commits</span>`);
+  html.push(`      <span class="chip color-pair-stone">${snapshotCommitCount} ${snapshotCommitLabel}</span>`);
+  html.push(`      <span class="chip color-pair-stone">${commitCount} total commits</span>`);
   html.push('    </div>');
   html.push('  </section>');
 
@@ -529,7 +630,7 @@ if (format === 'js') {
 
 // Write output
 const outputDir = dirname(outputPath);
-if (outputDir && !await import('node:fs').then(m => m.existsSync(outputDir))) {
+if (outputDir && !existsSync(outputDir)) {
   mkdirSync(outputDir, { recursive: true });
 }
 

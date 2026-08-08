@@ -92,6 +92,7 @@ const DEPLOY_ENV = { ...process.env, PATH: buildPath() };
 // --- Deploy commands ---
 const DEPLOY_COMMANDS = [
   ['git', ['fetch', 'origin', 'master']],
+  ['git', ['fetch', 'origin', '--tags', '--force']],
   ['git', ['reset', '--hard', 'origin/master']],
   ['npm', ['ci']],
   ['npm', ['run', 'build-info']],
