@@ -4,9 +4,8 @@ import { setupOverlayPanel } from './overlayPanelController.js';
 import { setupTemplatePanel } from './templatePanelController.js';
 import { setupZoomController } from './zoomController.js';
 import { setupKeyboardController } from './keyboardController.js';
-import { setupFullscreenController } from './fullscreenController.js';
-import { setupFloatingPanels } from './floatingPanelController.js';
-import { setupFloatingPanelResizer } from './floatingPanelResizer.js';
+import { setupSidebarResizer } from './sidebarResizer.js';
+import { setupPanelAccordions } from './panelAccordion.js';
 
 /**
  * Thin orchestrator that wires up each panel controller and returns the
@@ -23,9 +22,8 @@ export function setupMainUi({ store, sketchService, documentObj = globalThis.doc
   const template = setupTemplatePanel({ store, sketchService, documentObj });
   const zoom = setupZoomController({ store, documentObj });
   setupKeyboardController({ store, sketchService, documentObj });
-  setupFloatingPanels({ documentObj });
-  setupFloatingPanelResizer({ documentObj, windowObj });
-  setupFullscreenController({ documentObj });
+  setupSidebarResizer({ documentObj, windowObj });
+  setupPanelAccordions({ documentObj });
 
   function syncAll() {
     grid.updateGridSidebar();

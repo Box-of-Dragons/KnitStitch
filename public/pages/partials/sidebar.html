@@ -1,35 +1,28 @@
-<!-- Floating panels — workspace-specific content overlays the canvas.
-     Draw tools and constraints live in the tool ribbon (see index.html).
-     Sketch settings and the objects list live here. -->
+<!-- Left-panel accordion sections — workspace-specific content inside the left sidebar -->
 
 <!-- Sketch workspace: Objects list + settings -->
-<div class="floating-panel workspace-panel active" id="panel-sketch">
-  <div class="floating-panel-header">
-    <span class="floating-panel-title">Objects</span>
-    <button class="floating-panel-toggle" title="Collapse">&#x25BE;</button>
-  </div>
-  <div class="floating-panel-resizer"></div>
-  <div class="floating-panel-body">
-    <div id="sketch-constraint-status" class="caption" style="margin:0 0 8px;color:#c0392b;"></div>
-    <ul class="object-list" id="sketch-object-list">
-    </ul>
-    <div class="toggle-group" style="margin-top:8px;">
-      <button class="button button-sm" id="sketch-copy-objects">Copy objects</button>
-      <button class="button button-sm" id="sketch-export-objects">Export</button>
-      <button class="button button-sm" id="sketch-import-objects">Import</button>
-      <input type="file" id="sketch-import-file" accept=".json,application/json" style="display:none;">
+<div class="left-accordion-section active" id="panel-sketch">
+  <div class="left-accordion-body">
+    <div class="container-section--headed">
+      <div class="container-section-header">Objects</div>
+      <div class="container-section-body">
+        <div id="sketch-constraint-status" class="caption" style="margin:0 0 8px;color:#c0392b;"></div>
+        <ul class="object-list" id="sketch-object-list">
+        </ul>
+        <div class="toggle-group" style="margin-top:8px;">
+          <button class="button button-sm" id="sketch-copy-objects">Copy objects</button>
+          <button class="button button-sm" id="sketch-export-objects">Export</button>
+          <button class="button button-sm" id="sketch-import-objects">Import</button>
+          <input type="file" id="sketch-import-file" accept=".json,application/json" style="display:none;">
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Options workspace: Gauge, Finished Size, Hotkeys -->
-<div class="floating-panel workspace-panel" id="panel-options">
-  <div class="floating-panel-header">
-    <span class="floating-panel-title">Options</span>
-    <button class="floating-panel-toggle" title="Collapse">&#x25BE;</button>
-  </div>
-  <div class="floating-panel-resizer"></div>
-  <div class="floating-panel-body">
+<div class="left-accordion-section" id="panel-options">
+  <div class="left-accordion-body">
     <div class="container-section--headed">
       <div class="container-section-header">Gauge (per 4 inches)</div>
       <div class="container-section-body">
@@ -49,7 +42,7 @@
       </div>
     </div>
 
-    <div class="container-section--headed" style="margin-top:14px;">
+    <div class="container-section--headed">
       <div class="container-section-header">Sketch style</div>
       <div class="container-section-body">
         <div class="form-row">
@@ -108,55 +101,57 @@
   </div>
 </div>
 
-<!-- Row Counts workspace -->
-<div class="floating-panel workspace-panel" id="panel-row-counts">
-  <div class="floating-panel-header">
-    <span class="floating-panel-title">Row Counts</span>
-    <button class="floating-panel-toggle" title="Collapse">&#x25BE;</button>
-  </div>
-  <div class="floating-panel-resizer"></div>
-  <div class="floating-panel-body">
-    <ul class="object-list" id="row-counts-list">
-    </ul>
-    <p class="caption" id="row-counts-empty" style="display:none;">No filled cells yet.</p>
+<!-- Overlay workspace -->
+<div class="left-accordion-section" id="panel-overlay">
+  <div class="left-accordion-body">
+    <div class="container-section--headed">
+      <div class="container-section-header">Image Overlay</div>
+      <div class="container-section-body">
+        <div class="form-row" style="margin-bottom:6px;">
+          <input type="text" id="overlay-path" placeholder="No image selected" readonly style="flex:1;">
+          <button class="button button-sm" id="overlay-browse">Browse</button>
+        </div>
+        <div class="form-row" style="margin-bottom:6px;">
+          <button class="button button-sm" id="overlay-clear">Clear</button>
+          <input type="file" id="overlay-file" accept="image/*" style="display:none;">
+        </div>
+        <div class="checkbox-row" style="margin-bottom:6px;">
+          <input type="checkbox" id="overlay-show">
+          <label for="overlay-show">Show overlay</label>
+        </div>
+        <div class="slider-row">
+          <label style="min-width:auto;">Opacity</label>
+          <input type="range" id="overlay-opacity" min="0" max="100" value="50" style="flex:1;">
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Overlay workspace -->
-<div class="floating-panel workspace-panel" id="panel-overlay">
-  <div class="floating-panel-header">
-    <span class="floating-panel-title">Image Overlay</span>
-    <button class="floating-panel-toggle" title="Collapse">&#x25BE;</button>
-  </div>
-  <div class="floating-panel-resizer"></div>
-  <div class="floating-panel-body">
-    <div class="form-row">
-      <input type="text" id="overlay-path" placeholder="No image selected" readonly style="flex:1;">
-      <button class="button button-sm" id="overlay-browse">Browse</button>
-      <button class="button button-sm" id="overlay-clear">Clear</button>
-      <input type="file" id="overlay-file" accept="image/*" style="display:none;">
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="overlay-show">
-      <label for="overlay-show">Show overlay</label>
-    </div>
-    <div class="slider-row" style="margin-top:6px;">
-      <label style="min-width:auto;">Opacity</label>
-      <input type="range" id="overlay-opacity" min="0" max="100" value="50">
+<!-- Row Counts workspace -->
+<div class="left-accordion-section" id="panel-row-counts">
+  <div class="left-accordion-body">
+    <div class="container-section--headed">
+      <div class="container-section-header">Row Counts</div>
+      <div class="container-section-body">
+        <ul class="object-list" id="row-counts-list">
+        </ul>
+        <p class="caption" id="row-counts-empty" style="display:none;">No filled cells yet.</p>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Templates workspace -->
-<div class="floating-panel workspace-panel" id="panel-templates">
-  <div class="floating-panel-header">
-    <span class="floating-panel-title">Templates</span>
-    <button class="floating-panel-toggle" title="Collapse">&#x25BE;</button>
-  </div>
-  <div class="floating-panel-resizer"></div>
-  <div class="floating-panel-body">
-    <p class="caption">Click a template to generate it onto the grid. Generated lines can be manipulated in the Sketch workspace.</p>
-    <div class="toggle-group" id="template-list">
+<div class="left-accordion-section" id="panel-templates">
+  <div class="left-accordion-body">
+    <div class="container-section--headed">
+      <div class="container-section-header">Templates</div>
+      <div class="container-section-body">
+        <p class="caption">Click a template to generate it onto the grid. Generated lines can be manipulated in the Sketch workspace.</p>
+        <div class="toggle-group" id="template-list">
+        </div>
+      </div>
     </div>
 
     <div class="container-section--headed" id="template-measurements-panel" style="display:none;">

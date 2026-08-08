@@ -88,8 +88,9 @@
     <!-- Workspace shell: vertical workspace tabs on the left + canvas on the right -->
     <div class="workspace-layout">
 
-      <!-- Ribbon 1: Workspace tabs — vertical strip on the left -->
+      <!-- Left sidebar: workspace accordion panels -->
       <div class="ribbon-bar ribbon-bar--workspace">
+        <div class="sidebar-resizer" title="Drag to resize"></div>
         <div class="ribbon-modes">
           <button class="workspace-btn active" onclick="setWorkspace('sketch', this)" data-workspace="sketch">
             <span class="icon">&#x270F;</span>
@@ -112,6 +113,9 @@
             <span class="label">Options</span>
           </button>
         </div>
+
+        <!-- Workspace accordion content -->
+        <!-- #include file="partials/sidebar.html" -->
       </div>
 
       <!-- Canvas area — fills the remaining space, touches all edges -->
@@ -128,12 +132,7 @@
           <div class="zoom-divider"></div>
           <button class="zoom-btn" id="zoom-fit" title="Fit to screen">&#x25A1;</button>
           <button class="zoom-btn" id="zoom-reset" title="Reset to 100%">&#x21BB;</button>
-          <div class="zoom-divider"></div>
-          <button class="zoom-btn" id="canvas-fullscreen" title="Fullscreen canvas">&#x26F6;</button>
         </div>
-
-        <!-- Floating panels — workspace-specific content overlays the canvas -->
-        <!-- #include file="partials/sidebar.html" -->
       </div>
 
     </div>
@@ -146,7 +145,7 @@
   <script>
     function setWorkspace(ws, btn) {
       document.querySelectorAll('.workspace-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.workspace-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.left-accordion-section').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('panel-' + ws).classList.add('active');
     }
