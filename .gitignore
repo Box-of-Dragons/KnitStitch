@@ -29,3 +29,7 @@ vite.config.js.timestamp-*.mjs
 
 # generated build metadata
 /public/js/buildInfo.js
+
+# generated release workflow scratch files
+/.github/release-plan.json
+/.github/release-notes.md

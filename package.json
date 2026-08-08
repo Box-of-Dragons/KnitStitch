@@ -10,13 +10,21 @@
     "preview": "vite preview",
     "build-info": "node scripts/generate-build-info.mjs --root=. --output=public/js/buildInfo.js --format=js && node scripts/generate-build-info.mjs --root=. --output=CHANGELOG.md --format=md && node scripts/generate-build-info.mjs --root=. --output=public/pages/changelog-v2.html --format=html",
     "build-changelog": "node scripts/generate-build-info.mjs --root=. --output=CHANGELOG.md --format=md && node scripts/generate-build-info.mjs --root=. --output=public/pages/changelog-v2.html --format=html",
+    "release-plan": "node scripts/release-plan.mjs --root=. --notes=.github/release-notes.md --json=.github/release-plan.json",
+    "release-notes:ai": "node scripts/generate-ai-release-notes.mjs --root=. --output=release-notes.ai.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "vite build && playwright test",
-    "test:e2e:dev": "playwright test"
+    "test:e2e:dev": "playwright test",
+    "lint": "eslint --ext .js,.mjs src scripts unit e2e",
+    "lint:fix": "eslint --ext .js,.mjs --fix src scripts unit e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
+    "eslint": "8.57.0",
+    "prettier": "3.3.3",
     "vite": "^5.0.0",
     "vitest": "^2.1.9"
   },
