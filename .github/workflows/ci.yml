@@ -123,3 +123,14 @@ jobs:
                 prerelease: false,
               });
             }
+
+      - name: Merge dev into master
+        if: github.ref == 'refs/heads/dev' && steps.plan.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B master origin/master
+          git merge --ff-only origin/dev
+          git push origin master
