@@ -1,0 +1,202 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - js-ks
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run check-code
+
+      - name: Unit tests
+        run: |
+          npm run test:theme
+          npm run test:project-names
+          npm run test:project-load-origin
+          npm run test:stages
+          npm run test:timeline
+
+      - name: Build
+        run: npm run build
+
+  release-plan:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.plan.outputs.release_tag }}
+      should_release: ${{ steps.plan.outputs.should_release }}
+      bump_type: ${{ steps.plan.outputs.bump_type }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Plan release
+        id: plan
+        run: |
+          node scripts/release-plan.mjs --root=. --notes=.github/release-notes.md --json=.github/release-plan.json
+          node <<'NODE'
+          const fs = require('node:fs');
+          const plan = JSON.parse(fs.readFileSync('.github/release-plan.json', 'utf8'));
+          const output = process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(output, `release_tag=${plan.releaseTag}\n`);
+          fs.appendFileSync(output, `should_release=${plan.shouldRelease}\n`);
+          fs.appendFileSync(output, `bump_type=${plan.bumpType}\n`);
+          NODE
+
+      - name: Upload release plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-plan
+          path: |
+            .github/release-plan.json
+            .github/release-notes.md
+
+  publish-release:
+    needs: release-plan
+    if: github.ref == 'refs/heads/js-ks' && needs.release-plan.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Recompute release plan
+        run: node scripts/release-plan.mjs --root=. --notes=.github/release-notes.md --json=.github/release-plan.json
+
+      - name: Read release plan
+        id: release
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const plan = JSON.parse(fs.readFileSync('.github/release-plan.json', 'utf8'));
+          const output = process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(output, `release_tag=${plan.releaseTag}\n`);
+          fs.appendFileSync(output, `notes_file=${plan.notesPath}\n`);
+          NODE
+
+      - name: Create tag
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Tag $RELEASE_TAG already exists locally, skipping tag creation."
+          else
+            git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
+            git push origin "$RELEASE_TAG"
+          fi
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          NOTES_FILE: ${{ steps.release.outputs.notes_file }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const tag = process.env.RELEASE_TAG;
+            const notes = fs.readFileSync(process.env.NOTES_FILE, 'utf8');
+            try {
+              await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag,
+              });
+              core.info(`Release ${tag} already exists, skipping create.`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: tag,
+                target_commitish: context.sha,
+                name: tag,
+                body: notes,
+                draft: false,
+                prerelease: false,
+              });
+            }
+
+      - name: Trigger deploy webhook
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          DEPLOY_WEBHOOK_SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ -z "$DEPLOY_WEBHOOK_URL" ] || [ -z "$DEPLOY_WEBHOOK_SECRET" ]; then
+            echo "Deployment webhook secrets are not configured yet; skipping deploy trigger."
+            exit 0
+          fi
+          node <<'NODE'
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+          const payload = JSON.stringify({
+            ref: `refs/heads/${process.env.REF_NAME}`,
+            after: process.env.SHA,
+            repository: { full_name: process.env.REPOSITORY },
+          });
+          const signature = 'sha256=' + crypto
+            .createHmac('sha256', process.env.DEPLOY_WEBHOOK_SECRET)
+            .update(payload)
+            .digest('hex');
+          fs.writeFileSync('.github/deploy-payload.json', payload);
+          fs.writeFileSync('.github/deploy-signature.txt', signature);
+          NODE
+          curl -fsSL \
+            -X POST "$DEPLOY_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-Hub-Signature-256: $(cat .github/deploy-signature.txt)" \
+            --data-binary @.github/deploy-payload.json
