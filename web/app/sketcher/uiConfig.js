@@ -42,5 +42,6 @@ export const sketcherTopToolbarConfig = [
 insertAfter(sketcherTopToolbarConfig, 'Export', '-');
 insertAfter(sketcherTopToolbarConfig, 'PanTool', '-');
 insertAfter(sketcherTopToolbarConfig, 'BezierTool', '-');
+insertAfter(sketcherTopToolbarConfig, 'New', 'Clear');
 
 removeInPlace(sketcherTopToolbarConfig, 'ToggleTerminal');

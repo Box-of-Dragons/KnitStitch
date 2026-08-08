@@ -84,7 +84,7 @@ function tessellateArc(obj, isConstruction) {
   const r = obj.r.get();
   if (r <= 0) return [];
   const cx = obj.c.x, cy = obj.c.y;
-  let startAng = obj.ang1.get();
+  const startAng = obj.ang1.get();
   let endAng = obj.ang2.get();
   // Handle full circle case (a and b coincide)
   if (Math.abs(obj.a.x - obj.b.x) < EPSILON && Math.abs(obj.a.y - obj.b.y) < EPSILON) {

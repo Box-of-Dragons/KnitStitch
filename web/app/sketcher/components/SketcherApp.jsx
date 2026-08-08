@@ -15,6 +15,7 @@ import {ExportDialog} from "./ExportDialog";
 import {SketcherPropertiesView} from "./SketcherPropertiesView";
 import {SketcherDimensionView} from "./SketcherDimensionsView";
 import {SketcherTerminal} from "./TerminalView";
+import {ObjectList} from "./ObjectList";
 
 import {SketcherAppContext} from './SketcherAppContext';
 import {KnittingPanel} from './KnittingPanel';
@@ -41,6 +42,10 @@ export function SketcherApp({applicationContext}) {
       {ReactDOM.createPortal(
         <Scope><SketcherDimensionView /></Scope>,
         document.getElementById('dimension-view')
+      )}
+      {ReactDOM.createPortal(
+        <Scope><ObjectList /></Scope>,
+        document.getElementById('object-list-view')
       )}
       {ReactDOM.createPortal(
         <Scope><SketcherToolbar actions={sketcherRightToolbarConfig} horizontal compact/></Scope>,

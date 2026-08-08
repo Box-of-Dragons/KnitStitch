@@ -39,6 +39,7 @@ function initializeSketcherApplication() {
   constraintsView.node.append(createElement("div", "constraint-list"));
   dock.views['Properties'].node.append(createElement("div", "properties-view"));
   dock.views['Dimensions'].node.append(createElement("div", "dimension-view"));
+  dock.views['Objects'].node.append(createElement("div", "object-list-view"));
 
   loadUIState(dock);
 
@@ -52,6 +53,10 @@ function initializeSketcherApplication() {
 function initNonReactUIParts(context) {
 
   const AppDockViews = [
+    {
+      name: 'Objects',
+      icon: 'list'
+    },
     {
       name: 'Dimensions',
       icon: 'arrows-v'

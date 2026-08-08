@@ -390,7 +390,7 @@ export class Viewer {
       ctx.moveTo(minCol * cellW, y);
       ctx.lineTo(maxCol * cellW, y);
     }
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.stroke();
 
     // Draw the origin row and column with a bolder line
@@ -403,7 +403,7 @@ export class Viewer {
       ctx.moveTo(minCol * cellW, 0);
       ctx.lineTo(maxCol * cellW, 0);
     }
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.lineWidth = lw * 1.5;
     ctx.stroke();
 

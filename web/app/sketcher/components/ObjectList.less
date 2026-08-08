@@ -1,0 +1,68 @@
+@import "~ui/styles/theme.less";
+
+.object-list-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-size: 12px;
+}
+
+.object-list-title {
+  padding: 8px 12px;
+  background: @app-explorer-header-bg;
+  border-bottom: 1px solid @app-explorer-header-border;
+  font-weight: 600;
+  color: @explorer-titlebar-color;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.object-list-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.object-section {
+  margin-bottom: 12px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.object-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.object-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: @app-panel-bg;
+  border: 1px solid @app-panel-border;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  
+  &:hover {
+    background: @app-btn-hover-bg;
+    border-color: @app-btn-hover-border;
+  }
+}
+
+.object-type {
+  font-weight: 500;
+  color: @font-color;
+}
+
+.object-id {
+  font-size: 10px;
+  color: @font-color-minor;
+  font-family: monospace;
+}

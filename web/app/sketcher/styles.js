@@ -1,13 +1,13 @@
 export const Styles = {
   DEFAULT : {
     lineWidth : 2,
-    strokeStyle : "#ffffff",
-    fillStyle : "#000000"
+    strokeStyle : "#000000",
+    fillStyle : "#ffffff"
   },
   VIRTUAL: {
     lineWidth : 2,
-    strokeStyle : "#ffffff88",
-    fillStyle : "#00000088"
+    strokeStyle : "#00000088",
+    fillStyle : "#ffffff88"
   }, 
   SERVICE : {
     lineWidth : 0.3,
@@ -41,31 +41,31 @@ export const Styles = {
 
   DIM : {
     lineWidth : 1,
-    strokeStyle : "#bcffc1",
+    strokeStyle : "#006400",
     fillStyle : "#00FF00"
   },
 
   ANNOTATIONS: {
     lineWidth : 1,
-    strokeStyle : "#101010",
-    fillStyle : "#000000"
+    strokeStyle : "#333333",
+    fillStyle : "#ffffff"
   },
 
   BOUNDS : {
     lineWidth : 2,
-    strokeStyle : "#fff5c3",
-    fillStyle : "#000000"
+    strokeStyle : "#964B00",
+    fillStyle : "#ffffff"
   },
   PAST: {
     lineWidth : 2,
-    strokeStyle : "#fff5c3",
-    fillStyle : "#000000"
+    strokeStyle : "#964B00",
+    fillStyle : "#ffffff"
   },
 
   FUTURE: {
     lineWidth : 2,
     strokeStyle : "#576a85",
-    fillStyle : "#000000"
+    fillStyle : "#ffffff"
   },
 
   FULLY_CONSTRAINED: {
@@ -90,7 +90,7 @@ export const Styles = {
   CONSTRUCTION_OF_OBJECT : {
     lineWidth : 1,
     strokeStyle : "#888888",
-    fillStyle : "#000000"
+    fillStyle : "#ffffff"
   },
   GENERATED: {
     lineWidth : 2,

@@ -37,6 +37,7 @@ import { gunzipSync } from 'node:zlib';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
 const PORT = process.env.WEBHOOK_PORT || 3004;
+const WATCH_BRANCH = process.env.WATCH_BRANCH || 'main';
 
 // --- Load .env ---
 function loadEnv() {
@@ -93,8 +94,8 @@ const DEPLOY_ENV = { ...process.env, PATH: buildPath() };
 // JSketcher builds static output to dist/ via grunt. nginx serves dist/
 // directly as the document root — no Node app process to reload.
 const DEPLOY_COMMANDS = [
-  ['git', ['fetch', 'origin', 'main']],
-  ['git', ['reset', '--hard', 'origin/main']],
+  ['git', ['fetch', 'origin', WATCH_BRANCH]],
+  ['git', ['reset', '--hard', `origin/${WATCH_BRANCH}`]],
   ['npm', ['ci']],
   ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=md', '--output=docs/changelog.md']],
   ['node', ['scripts/generate-changelog.mjs', '--root=.', '--format=html', '--output=web/changelog-fragment.html']],
@@ -199,20 +200,20 @@ const server = createServer((req, res) => {
       return;
     }
 
-    // Only deploy on main branch
-    if (data.ref !== 'refs/heads/main') {
+    // Only deploy on the configured branch.
+    if (data.ref !== `refs/heads/${WATCH_BRANCH}`) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'ignored', reason: 'not main branch' }));
+      res.end(JSON.stringify({ status: 'ignored', reason: `not ${WATCH_BRANCH} branch` }));
       return;
     }
 
     // Run deploy
-    console.log(`[${new Date().toISOString()}] Deploy triggered by push to main`);
+    console.log(`[${new Date().toISOString()}] Deploy triggered by push to ${WATCH_BRANCH}`);
     const result = runDeploy();
     const status = result.status === 'deployed' ? 200 : 500;
     res.writeHead(status, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(result, null, 2));
-    console.log(`[${new Date().toISOString()}] Deploy ${result.status}`);
+    console.log(`[${new Date().toISOString()}] Deploy ${result.status} for ${WATCH_BRANCH}`);
   });
 });
 

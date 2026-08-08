@@ -315,6 +315,7 @@ export function initProjectService(ctx: ApplicationContext, id: string, hints: a
 function safeFileName(name) {
   return String(name || 'jsketcher-project')
     .trim()
+    // eslint-disable-next-line no-control-regex
     .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
     .replace(/\.+$/, '') || 'jsketcher-project';
 }

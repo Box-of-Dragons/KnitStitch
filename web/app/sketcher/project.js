@@ -1,10 +1,68 @@
 
 export const SKETCHER_STORAGE_PREFIX = "TCAD.projects.";
+export const AUTOSAVE_KEY = "TCAD.autosave";
+export const AUTOSAVE_DEBOUNCE_MS = 1000; // Save at most once per second
 
 export class Project {
 
   constructor(viewer) {
     this.viewer = viewer;
+    this.autosaveTimeout = null;
+    this.setupAutosave();
+  }
+
+  setupAutosave() {
+    // Subscribe to object updates to trigger auto-save
+    this.viewer.streams.objectUpdate.attach(() => {
+      this.scheduleAutosave();
+    });
+  }
+
+  scheduleAutosave() {
+    // Clear any pending autosave
+    if (this.autosaveTimeout) {
+      clearTimeout(this.autosaveTimeout);
+    }
+    
+    // Schedule a new autosave with debouncing
+    this.autosaveTimeout = setTimeout(() => {
+      this.autosave();
+    }, AUTOSAVE_DEBOUNCE_MS);
+  }
+
+  autosave() {
+    try {
+      const sketchData = this.viewer.io.serializeSketch();
+      localStorage.setItem(AUTOSAVE_KEY, sketchData);
+      console.log('Autosaved sketch');
+    } catch (e) {
+      console.error('Autosave failed:', e);
+    }
+  }
+
+  loadAutosave() {
+    const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
+    if (autosaveData) {
+      try {
+        this.viewer.historyManager.init(autosaveData);
+        this.viewer.io.loadSketch(autosaveData);
+        this.viewer.repaint();
+        console.log('Loaded autosaved sketch');
+        return true;
+      } catch (e) {
+        console.error('Failed to load autosave:', e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  clearAutosave() {
+    localStorage.removeItem(AUTOSAVE_KEY);
+    if (this.autosaveTimeout) {
+      clearTimeout(this.autosaveTimeout);
+      this.autosaveTimeout = null;
+    }
   }
 
   cloneSketch() {
@@ -46,6 +104,15 @@ export class Project {
   loadFromLocalStorage() {
     const sketchId = this.getSketchId();
     const sketchData = localStorage.getItem(sketchId);
+    
+    // First try to load autosave if no named sketch exists
+    if (!sketchData && sketchId === SKETCHER_STORAGE_PREFIX + "untitled") {
+      if (this.loadAutosave()) {
+        return;
+      }
+    }
+    
+    // Otherwise load the named sketch
     if (sketchData != null) {
       this.viewer.historyManager.init(sketchData);
       this.viewer.io.loadSketch(sketchData);

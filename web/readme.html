@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Roadmap - KnitStitch</title>
+  <title>ReadMe - KnitStitch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
     (function () {
       var host = location.hostname;
       var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
-      var version = 'jsketcher-header-20260731c';
+      var version = 'knitstitch-header-20260808a';
       var liveHref = 'https://misssponto.me.uk/css/shared.css?v=' + version;
       var localHref = 'http://localhost:4000/css/shared.css?v=' + version;
       var link = document.createElement('link');
@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="./css/site-shell.css">
   <link rel="shortcut icon" href="./img/cad/cube96.png">
 </head>
-<body class="page-jsketcher page-jsketcher-doc page-document page-roadmap" data-md-src="https://raw.githubusercontent.com/Box-of-Dragons/KnitStitch/js-ks/docs/roadmap.md">
+<body class="page-knitstitch page-knitstitch-doc page-document page-readme" data-md-src="https://raw.githubusercontent.com/Box-of-Dragons/KnitStitch/js-ks/README.md">
   <script>window.SITE_HEADER = {
     brand: 'KnitStitch',
     nav: [
@@ -64,15 +64,15 @@
         liveHref: '/js-ks/'
       }
     ],
-    github: 'https://github.com/Box-of-Dragons/JSketcher',
-    gitlab: 'https://gitlab.com/structured-chaos/JSketcher'
+    github: 'https://github.com/Box-of-Dragons/KnitStitch',
+    gitlab: 'https://gitlab.com/structured-chaos/KnitStitch'
   };</script>
-  <div id="global-bar" data-active="jsketcher"></div>
+  <div id="global-bar" data-active="knitstitch"></div>
   <script>
     (function () {
       var host = location.hostname;
       var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
-      var version = 'jsketcher-header-20260731c';
+      var version = 'knitstitch-header-20260808a';
 
       function loadSharedScript(file) {
         var loaded = false;
@@ -107,38 +107,13 @@
   <script src="./js/shared-shell-fallback.js" defer></script>
   <div id="site-header"></div>
 
-  <section class="page-subheader">
-    <div class="shell">
-      <div class="page-subheader-inner">
-        <h1>Roadmap</h1>
-      </div>
-    </div>
-  </section>
-
   <main class="shell page-layout page-main">
     <div class="content-main">
       <div class="container">
-        <div class="md-loading" id="md-loading">Loading roadmap…</div>
+        <div class="md-loading" id="md-loading">Loading README…</div>
         <div class="markdown-body" id="md-content"></div>
       </div>
     </div>
-
-    <aside class="sidebar sidebar--sticky">
-      <div class="container-sections">
-        <section class="container-section--headed">
-          <div class="container-section-header">About this page</div>
-          <div class="container-section-body">
-            <div class="body">This content is pulled directly from the GitHub repository so it always matches the latest roadmap.</div>
-          </div>
-        </section>
-        <section class="container-section--headed" id="md-toc-section">
-          <div class="container-section-header">On this page</div>
-          <div class="container-section-body">
-            <nav class="container-actions" id="md-toc" aria-label="Page sections"></nav>
-          </div>
-        </section>
-      </div>
-    </aside>
   </main>
 
   <script>window.SITE_FOOTER = { label: 'KnitStitch', buildInfoSrc: '/js/buildInfo.js' };</script>

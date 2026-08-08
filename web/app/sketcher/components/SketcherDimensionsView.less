@@ -1,0 +1,138 @@
+@import "~ui/styles/theme.less";
+
+.dimensions-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px;
+  overflow: hidden;
+  min-width: 0; // Allows flex child to shrink properly
+}
+
+.dimensions-table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; // Allows flex child to shrink properly
+}
+
+.dimensions-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; // Ensures columns respect width percentages
+}
+
+.dimensions-table thead {
+  position: sticky;
+  top: 0;
+  background: @app-panel-bg;
+  z-index: 1;
+}
+
+.dimensions-table th {
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: @font-color;
+  border-bottom: 1px solid @app-panel-border;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.name-header {
+  width: 40%;
+}
+
+.value-header {
+  width: 50%;
+}
+
+.action-header {
+  width: 10%;
+}
+
+.dimensions-table tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dimensions-table tbody tr:hover {
+  background: @app-btn-hover-bg;
+}
+
+.dimensions-table td {
+  padding: 4px 6px;
+}
+
+.name-cell,
+.value-cell {
+  padding: 4px 6px;
+}
+
+.dimension-input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid @app-panel-border;
+  border-radius: 3px;
+  background: @app-panel-bg;
+  color: @font-color;
+  font-size: 12px;
+  font-family: monospace;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  box-sizing: border-box; // Ensures padding doesn't affect width
+
+  &:focus {
+    border-color: @sketcher-toolbar-focus;
+    background: @app-btn-hover-bg;
+  }
+
+  &::placeholder {
+    color: @font-color-suppressed;
+  }
+}
+
+.action-cell {
+  text-align: center;
+  padding: 4px 2px;
+}
+
+.delete-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: @font-color-minor;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    color: @color-danger;
+    background: rgba(166, 83, 83, 0.1);
+  }
+}
+
+.add-dimension-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 1px solid @app-btn-border;
+  background: @app-btn-bg;
+  color: @app-btn-color;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  width: fit-content; // Button only takes needed width
+  align-self: flex-start; // Button aligns to left
+  white-space: nowrap; // Prevents text wrapping
+
+  &:hover {
+    background: @app-btn-hover-bg;
+    border-color: @app-btn-hover-border;
+  }
+}
