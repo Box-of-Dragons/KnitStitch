@@ -355,5 +355,9 @@ export class TemplateTool {
     addPerpendicular(points[9],  lines[8],  lines[9]);
     addPerpendicular(points[10], lines[9],  lines[10]);
     addPerpendicular(points[19], lines[18], lines[19]);
+
+    // Equal-length notch lines: left and right sides of the heel and toe.
+    addEqual(lines[3], lines[15]);
+    addEqual(lines[6], lines[12]);
   }
 }

@@ -60,7 +60,7 @@ export function onCanvasMouseUp(service, ) {
       service._rebuildObjects(this);
     }
 }
-export function onSelectMouseMove(service, position, modifiers = {}) {
+export function onSelectMouseMove(service, position) {
     if (service._dragPoint && !service._dragPoint.isAnchor) {
       service._dragPoint.x = position.x;
       service._dragPoint.y = position.y;

@@ -254,29 +254,6 @@ function polygonArea(polygon) {
 }
 
 /**
- * Ray-casting point-in-polygon test.
- */
-function pointInPolygon(px, py, poly) {
-  let inside = false;
-  const n = poly.length;
-  for (let i = 0, j = n - 1; i < n; j = i++) {
-    const xi = poly[i].x, yi = poly[i].y;
-    const xj = poly[j].x, yj = poly[j].y;
-    const intersect = (yi > py) !== (yj > py)
-      && px < (xj - xi) * (py - yi) / (yj - yi) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
-function pointInAnyPolygon(px, py, polygons) {
-  for (const poly of polygons) {
-    if (pointInPolygon(px, py, poly)) return true;
-  }
-  return false;
-}
-
-/**
  * Produces a rotation- and direction-independent signature for a cycle so
  * duplicate detections of the same polygon can be skipped.
  */

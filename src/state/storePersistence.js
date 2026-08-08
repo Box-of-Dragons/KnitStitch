@@ -232,7 +232,6 @@ export class StorePersistence {
       constraint.isSelected = !!raw.isSelected;
       return constraint;
     });
-    const constraintById = new Map(constraints.map((c) => [c.id, c]));
 
     // Circles
     const rawCircles = Array.isArray(savedSketch.circles) ? savedSketch.circles : [];

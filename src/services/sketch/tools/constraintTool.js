@@ -401,6 +401,8 @@ export class ConstraintTool {
       }
     };
 
+    snap();
+
     return this._commit('Add coincident constraint', constraint, position);
   }
 }

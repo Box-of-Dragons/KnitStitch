@@ -29,9 +29,8 @@ if (typeof window !== 'undefined') {
 
 const mainUi = setupMainUi({ store, sketchService });
 
-let appStage = null;
 if (document.getElementById('konva-stage')) {
-  appStage = new AppStage('konva-stage', store, sketchService);
+  new AppStage('konva-stage', store, sketchService);
 }
 
 mainUi.recalculateSize();

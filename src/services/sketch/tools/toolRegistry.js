@@ -86,7 +86,7 @@ export class ToolRegistry {
         this._lineTool.onLineMouseMove(position, modifiers);
         break;
       case SketchTool.Select:
-        this.service._onSelectMouseMove(position, modifiers);
+        this.service._onSelectMouseMove(position);
         break;
       case SketchTool.Dimension:
         this.service._setSnapCandidate(this.service._findNearestPoint(position, modifiers.snapEnabled !== false));

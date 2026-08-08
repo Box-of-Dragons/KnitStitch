@@ -150,14 +150,14 @@ export class SlvsAdapter {
     // Driving dimensions
     for (const d of sketch.dimensions) {
       if (!d.isConstrained) continue;
-      const h = this._addDimensionConstraint(d, true);
+      const h = this._addDimensionConstraint(d);
       if (h && d.id != null) {
         this.handleToObject.set(h.h, { kind: 'dimension', id: d.id, obj: d });
       }
     }
 
     if (options.proposedDimension) {
-      this._addDimensionConstraint(options.proposedDimension, false);
+      this._addDimensionConstraint(options.proposedDimension);
     }
   }
 
@@ -184,7 +184,7 @@ export class SlvsAdapter {
     this.yAxisLine = slvs.addLine2D(g, originH, yP, wp);
   }
 
-  _addDimensionConstraint(d, storeHandle) {
+  _addDimensionConstraint(d) {
     const slvs = this.slvs;
     const g = this.g;
     const wp = this.wp;
@@ -332,7 +332,6 @@ export class SlvsAdapter {
       // the free-move points as dragged, so the solver prefers to move
       // only the free-move points to satisfy the new constraint.
       for (const [ptId, h] of this.pointHandles) {
-        const pt = freeMovePoints.values().next().value;
         // Check if this point is in the freeMove set by comparing ids
         let isFree = false;
         for (const fp of freeMovePoints) {

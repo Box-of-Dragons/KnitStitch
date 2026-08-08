@@ -3,7 +3,7 @@ import { SlvsAdapter } from './solver/slvsAdapter.js';
 import { ToolRegistry } from './tools/toolRegistry.js';
 import { HistoryManager } from './state/historyManager.js';
 import { nearestPoint, findSharedPoint } from '../../utils/geometry.js';
-import { ConstraintSubMode, SNAP_RADIUS, SketchObjectKind, SketchTool } from './constants.js';
+import { SNAP_RADIUS, SketchTool } from './constants.js';
 import { removeOrphanPoint } from './state/sketchCleanup.js';
 import { syncSketchStateToStore, rebuildSketchObjects, flushSketchArrays, setPreviewLine, setSnapCandidate } from './state/sketchStoreSync.js';
 import { seedIdCountersFromSketch, assignConstraintIds } from './state/sketchIdManager.js';
@@ -128,8 +128,8 @@ export class SketchService {
     return onCanvasMouseUp(this);
   }
 
-  _onSelectMouseMove(position, modifiers = {}) {
-    return onSelectMouseMove(this, position, modifiers);
+  _onSelectMouseMove(position) {
+    return onSelectMouseMove(this, position);
   }
 
   ensureOriginAnchor() {
@@ -484,6 +484,7 @@ export class SketchService {
     this._slvsInitPromise = this._slvsAdapter.init()
       .then(() => { this._slvsInitPromise = null; })
       .catch((e) => {
+        // eslint-disable-next-line no-console
         console.error('SlvsAdapter init failed', e);
         this._slvsAdapter = null;
         this._slvsInitPromise = null;
