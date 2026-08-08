@@ -8,7 +8,7 @@ Use the Structured Chaos Conventional Commit rules. Common JSketcher scopes are 
 
 This fork uses StructuredChaos `css/shared.css`, `js/global-bar.js`, and `js/site-header.js` for public chrome. Keep `web/css/site-shell.css` layout-only; do not restyle the global bar, title header, nav, project links, or collapse tab in this repo.
 
-The app index is the 3D CAD page. The old standalone `sketcher.html` 2D entry has been removed from this fork. Local dev runs on `http://localhost:3001`; production is static `dist/` output, not a Node app.
+The public KnitStitch entry is the 2D sketcher page. The 3D CAD front still exists in the repo as upstream reference material, but it is not the default site surface. Local dev runs on `http://localhost:3001`; production is static `dist/` output, not a Node app.
 
 ## VPS Deploy via GitHub Webhook
 

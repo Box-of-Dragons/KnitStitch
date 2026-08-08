@@ -2,9 +2,9 @@ JSketcher
 ===========
 ![JSketcher Logo](./web/img/JSketcher-logo.svg)
 
-JSketcher is a **parametric** 3D CAD modeler written in pure JavaScript.
+KnitStitch is a **parametric** 2D sketching and constraint UI written in pure JavaScript, built from the JSketcher codebase.
 
-This is the **Structured Chaos** fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher), hosted at [jsketcher.misssponto.me.uk](https://jsketcher.misssponto.me.uk/). It serves the 3D CAD app at `/`; the old standalone `sketcher.html` 2D entry has been removed from this fork.
+This is the **Structured Chaos** fork of [xibyte/jsketcher](https://github.com/xibyte/jsketcher), hosted at [knitstitch.misssponto.me.uk](https://knitstitch.misssponto.me.uk/). The public site serves the 2D sketcher app at `/`; the 3D CAD front remains in the repo but is no longer the default KnitStitch surface.
 
 The public pages use the shared Structured Chaos chrome (`css/shared.css`, `global-bar.js`, `site-header.js`). See [AGENTS.md](./AGENTS.md) and [docs/maintainer-notes.md](./docs/maintainer-notes.md) for fork-specific conventions and the runtime shape.
 
@@ -18,15 +18,15 @@ The public pages use the shared Structured Chaos chrome (`css/shared.css`, `glob
 Current Status
 ==============
 
-JSketcher is a parametric 3d modeler employing a 2D constraint solver for sketches and the feature/history metaphor to build models. The 2D constraint solver is completely written in javascript/typescript and is used inside the 3D CAD workflow. Originally developed by xibyte to make models for 3d printing. Today JSketcher provides a rich set of tools for visualizing, selecting/interacting with 3D geometry, tracking and storing model history all built on the foundation of the sketch constraint engine and employing OpenCascade for solid modeling operations. 
+KnitStitch keeps the JSketcher sketch constraint engine and the feature/history workflow, but the public experience is focused on 2D sketching and pattern work. The codebase still contains the broader CAD/3D engine where it is needed for shared geometry and import/export operations, but that front end is no longer the main entry point for this fork.
 
 Major Components and features
 ==============
 * Geometric Constraint Solver. This is a most crucial component which allows to solve a system of geometric constraints applied to a sketch. 
   See below the list of supported constraints.
-* Sketch constraint tools for designing 2d profiles inside the 3D CAD workflow.      
-* 3D Boolean engine. OpenCascade is used to perform booleans on BREP objects.
-* Feature History. Accumulates features builds a 3d model step by step. A compare step is employed to propagate edge/face IDs forward to provide a stable and robust model. 
+* Sketch constraint tools for designing 2D profiles in the public KnitStitch UI.
+* Geometry engine support remains available for import/export and shared modeling logic.
+* Feature history remains available for sketch-based workflows and downstream geometry operations.
 * Export to **STL**, **DWG** and **SVG** formats
 * Saving projects in the browser locale storage
 * Repository of dimensions. For example if there is a line length constraint applied, it's not necessary to hardcode some length value. 
@@ -37,8 +37,8 @@ Major Components and features
 
 This modeler is already used for:
 
-* Designing of 3d models to get them 3d-printed. 3D models are based on parametric 2d sketches. All models can be exported as an STL file and 3d-printed after.     
-* Creating of 2d parametric sketches which could be exported to DWG or SVG format.   
+* Designing 2D parametric sketches which can be exported to DWG or SVG format.
+* Using the sketch engine as the front end for KnitStitch's pattern work.
 
 Supported Constraints
 =====================

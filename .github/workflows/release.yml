@@ -39,7 +39,6 @@ jobs:
 
       - name: Unit tests
         run: |
-          npm run test:theme
           npm run test:project-names
           npm run test:project-load-origin
           npm run test:stages

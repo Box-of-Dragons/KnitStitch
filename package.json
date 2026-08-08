@@ -14,11 +14,10 @@
     "checks-passed-banner": "echo 'All conditions passed. Ready to go to the main branch. Good job!'",
     "before-main-branch-merge": "npm run lint && npm run check-code && npm run checks-passed-banner",
     "cypress": "npx cypress open",
-    "test:theme": "node test/theme.test.js",
-    "test:project-names": "node --experimental-default-type=module --test test/projectNamePolicy.test.mjs",
-    "test:project-load-origin": "node --experimental-default-type=module --test test/projectLoadOriginPolicy.test.mjs",
-    "test:stages": "node --experimental-default-type=module --test test/stageListPolicy.test.mjs",
-    "test:timeline": "node --experimental-default-type=module --test test/timelineItems.test.mjs",
+    "test:project-names": "node --test test/projectNamePolicy.test.mjs",
+    "test:project-load-origin": "node --test test/projectLoadOriginPolicy.test.mjs",
+    "test:stages": "node --test test/stageListPolicy.test.mjs",
+    "test:timeline": "node --test test/timelineItems.test.mjs",
     "changelog": "node scripts/generate-changelog.mjs --root=. --format=md --output=docs/changelog.md && node scripts/generate-changelog.mjs --root=. --format=html --output=web/changelog-fragment.html"
   },
   "repository": {

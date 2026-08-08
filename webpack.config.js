@@ -15,7 +15,6 @@ module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: {
-    index: ['babel-polyfill', './web/app/index'],
     sketcher: ['babel-polyfill', './web/app/sketcher']
   },
   output: {

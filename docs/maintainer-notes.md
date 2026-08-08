@@ -3,15 +3,16 @@
 This file is a practical map for working on this fork. It records where the main systems live, how recent UI/theme changes are wired, and the conventions that are easy to miss when moving around the codebase.
 
 For a full top-down architecture overview (subsystems, data flow, how everything interlinks), see [architecture.md](./architecture.md). For code style baselines (formatting, naming, functions, classes, streams, operations, actions, views), see [code-style.md](./code-style.md). For the workbench/feature author guide, see [index.md](./index.md).
+For the KnitStitch-only removal backlog, see [cleanup-backlog.md](./cleanup-backlog.md).
 
 ## Runtime Shape
 
-JSketcher is a browser-only CAD app. There is no application server in normal use.
+KnitStitch is a browser-only 2D sketching app built from the JSketcher codebase. The 3D CAD front remains in the repo for reference and reuse, but it is not the public default surface. There is no application server in normal use.
 
-- `web/app/index.js` starts the full CAD app.
-- `web/index.html` is the CAD app entry page.
-- The old standalone `web/sketcher.html` 2D page has been removed from this fork.
-- `webpack.config.js` builds the `index` entry into `dist/static/index.bundle.js`.
+- `web/app/sketcher.js` starts the public KnitStitch app.
+- `web/index.html` is the public app entry page.
+- `web/sketcher.html` is retained as an alternate entry for the same 2D UI.
+- `webpack.config.js` builds the `sketcher` entry into `dist/static/sketcher.bundle.js`.
 - `web/` is also served as static content by webpack-dev-server.
 - OpenCascade functionality is provided through `jsketcher-occ-engine` and browser-loaded wasm assets.
 - Local development runs on `http://localhost:3001`.
@@ -25,6 +26,7 @@ The public pages use the shared Structured Chaos chrome.
 - The loader uses `http://localhost:4000` in local development and `https://misssponto.me.uk` in production.
 - `web/css/site-shell.css` must stay layout-only for JSketcher app/content sizing. Do not restyle the global bar, title header, nav, project links, or collapse tab there.
 - `web/js/shared-shell-fallback.js` only renders matching shared-class fallback markup when the shared scripts fail to load.
+- The public header/nav for KnitStitch should point at the 2D sketcher experience, not the old 3D front.
 - If static output is edited manually, mirror shell changes into the matching files under `dist/`.
 
 ## Application Startup
@@ -159,8 +161,6 @@ The theme system is CSS-custom-property based.
 - `modules/ui/styles/theme-light.less` defines the light override under `body.theme-light`.
 - `modules/ui/styles/global/index.less` imports both theme files.
 - `modules/ui/styles/theme.ts` exposes runtime CSS variable reads to JavaScript.
-- `test/theme.test.js` checks that dark/light variables stay structurally aligned.
-
 Theme persistence:
 
 - `web/app/cad/actions/coreActions.js` defines `ToggleTheme`.
@@ -251,7 +251,6 @@ Useful commands:
 
 ```bash
 npm start
-node test/theme.test.js
 node ./node_modules/eslint/bin/eslint.js web/app modules
 node ./node_modules/typescript/bin/tsc --noEmit
 node ./node_modules/webpack/bin/webpack.js --config webpack.config.js --progress --profile

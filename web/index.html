@@ -1,17 +1,21 @@
+<!doctype html>
+<meta charset=utf-8>
 <html>
 <head>
-  <title>KnitStitch CAD / Part Designer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>KnitStitch Sketcher 2D</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  <link rel="shortcut icon" href="img/tgn.png" />
+  <link rel="stylesheet" href="css/toolkit.css">
+  <link rel="stylesheet" href="/lib-assets/font-awesome/css/font-awesome.min.css">
   <script>
     (function () {
       var host = location.hostname;
       var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
-      var version = 'jsketcher-header-20260731c';
+      var version = 'knitstitch-sketcher-20260801a';
       var liveHref = 'https://misssponto.me.uk/css/shared.css?v=' + version;
       var localHref = 'http://localhost:4000/css/shared.css?v=' + version;
       var link = document.createElement('link');
@@ -31,13 +35,10 @@
       if (isLocal) window.setTimeout(useLiveFallback, 1200);
     })();
   </script>
-  <link rel="stylesheet" href="./css/site-shell.css">
-  <link rel="stylesheet" href="./lib-assets/font-awesome/css/font-awesome.min.css?modeler">
-  <link rel="shortcut icon" href="./img/cad/cube96.png" />
-  <script src="./lib/pnltri.js"></script>
-  <script src="./lib/verb.js"></script>
+  <script src="lib/verb.js"></script>
+  <script src="static/sketcher.bundle.js"></script>
 </head>
-<body class="page-jsketcher page-jsketcher-cad">
+<body class="small-typography theme-light page-knitstitch page-knitstitch-sketcher">
   <script>window.SITE_HEADER = {
     brand: 'KnitStitch',
     nav: [
@@ -67,15 +68,15 @@
         liveHref: '/js-ks/'
       }
     ],
-    github: 'https://github.com/Box-of-Dragons/JSketcher',
-    gitlab: 'https://gitlab.com/structured-chaos/JSketcher'
+    github: 'https://github.com/Box-of-Dragons/KnitStitch',
+    gitlab: 'https://gitlab.com/structured-chaos/KnitStitch'
   };</script>
-  <div id="global-bar" data-active="jsketcher"></div>
+  <div id="global-bar" data-active="knitstitch"></div>
   <script>
     (function () {
       var host = location.hostname;
       var isLocal = host === 'localhost' || host === '127.0.0.1' || host.indexOf('.ddev.site') !== -1;
-      var version = 'jsketcher-header-20260731c';
+      var version = 'knitstitch-sketcher-20260801a';
 
       function loadSharedScript(file) {
         var loaded = false;
@@ -107,13 +108,63 @@
       loadSharedScript('site-footer.js');
     })();
   </script>
-  <script src="./js/shared-shell-fallback.js" defer></script>
   <div id="site-header"></div>
   <a id="downloader" style="display: none;" ></a>
-  <input id="uploader" style="display: none;" type="file">
-  <div id="app" class="jsketcher-app"></div>
-  <script>window.SITE_FOOTER = { label: 'KnitStitch', buildInfoSrc: '/js/buildInfo.js' };</script>
+  <div id="sketcher-app" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+  <div style="width: 100%; flex: 1; display: flex; min-height: 0;">
+
+    <div id="dock" class="panel b-right scroll" style="width: 245px; height: 100%; flex-shrink: 0;">
+      <div id="knitting-panel"></div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+      <div class="panel b-bot" style="width: 100%; display: flex; justify-content: flex-start; flex-shrink: 0;">
+        <div style="display: flex" id="top-toolbar"></div>
+      </div>
+      <div class="panel b-bot" style="width: 100%; display: flex; justify-content: flex-start; flex-shrink: 0;">
+        <div id="right-toolbar" style="display: flex; flex-direction: row;"></div>
+      </div>
+      <div id="viewer-container" style="background: var(--work-area-color); overflow: hidden; flex: 1; position: relative; min-height: 0;">
+        <div id="react-controls"></div>
+        <div class="tool-hint" style="position: absolute; bottom: 5px; left: 5px;"></div>
+        <div class="status-item coordinates-info" style="position: absolute; bottom: 5px; right: 5px; font-size: 11px; color: var(--app-status-item-color, #6b4513); pointer-events: none;">0.000:0.000</div>
+        <canvas width="300" height="300" id="viewer"></canvas>
+      </div>
+      <div id="status" class="panel b-top" style="width: 100%; height:22px; flex-shrink: 0;">
+        <div class="button-group" style="float: left">
+        </div>
+        <div class="status-item tool-info"></div>
+      </div>
+    </div>
+
+  </div>
+  </div><!-- /#sketcher-app -->
+
+  <div style="width: 0; height: 0" id="global-windows">
+  </div>
+
+
+  <div id="commands" class="win" style="display: none; height: 200px; width: 700px;">
+    <div class="tool-caption" >COMMANDS</div>
+    <div class="content panel" style="padding: 0;">
+      <div class='terminal-output-area scroll'>
+        <div class='terminal-pusher'></div>
+        <div class='terminal-output'></div>
+      </div>
+      <div class='terminal-input'>
+        <input type="text" placeholder="(type a command)"/>
+      </div>
+    </div>
+  </div>
+
+  <div id="constrFilter" class="win" style="display: none; height: 300px;width:170px;">
+    <div class="tool-caption" >CONSTRAINT&nbsp;FILTER</div>
+    <div class="content panel scroll" style="padding: 0;">
+    </div>
+  </div>
+
+  <script>window.SITE_FOOTER = { label: 'KnitStitch' };</script>
   <div id="site-footer"></div>
-  <script src="./static/index.bundle.js"></script>
+
+  <!--<div id="log" style="position:absolute; width: 500px; height: 300px; top:500px; pxleft:0; overflow: scroll;background-color: salmon;">-->
 </body>
 </html>
