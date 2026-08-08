@@ -131,7 +131,7 @@ test.describe('Sketch constraints — core and over-constraint', () => {
     await page.getByRole('button', { name: 'Dimension' }).click();
     await clickStage(page, box, { x: 0, y: 0 });
     await clickStage(page, box, { x: 80, y: 0 });
-    let editInput = page.locator('#dim-edit-input');
+    const editInput = page.locator('#dim-edit-input');
     await expect(editInput).toBeVisible();
     await editInput.fill('80');
     await editInput.press('Enter');

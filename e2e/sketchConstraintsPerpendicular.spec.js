@@ -179,7 +179,6 @@ test.describe('Sketch constraints — perpendicular', () => {
     let state = await page.evaluate(() => {
       const sketch = window.__knitstitchStore?.state?.sketch;
       const points = sketch?.points ?? [];
-      const lines = sketch?.lines ?? [];
       // point 0 = top-left, point 19 = top-right
       const p0 = points[0];
       const p1 = points[1];   // below p0 on left edge

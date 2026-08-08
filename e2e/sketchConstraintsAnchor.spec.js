@@ -60,7 +60,7 @@ test.describe('Sketch constraints — anchor behavior', () => {
 
   test('Horizontal constraint does not move anchored endpoint', async ({ page }) => {
     const testName = 'Horizontal_constraint_does_not_move_anchored_endpoint';
-    const box = await openSketch(page);
+    await openSketch(page);
     await screenshotStep(page, testName, '01_after_open');
 
     // Draw a non-horizontal line with one endpoint anchored at the origin
@@ -188,7 +188,7 @@ test.describe('Sketch constraints — anchor behavior', () => {
 
   test('Equal constraint with coincident at all corners does not move anchor', async ({ page }) => {
     const testName = 'Equal_constraint_with_coincident_at_all_corners';
-    const box = await openSketch(page);
+    await openSketch(page);
     await screenshotStep(page, testName, '01_after_open');
 
     // Build a triangle where ALL 3 corners have coincident constraints
