@@ -423,7 +423,7 @@ export function runSandbox(ctx: ApplicationContext) {
 
 
 
-    let oldNodes = new Set<any>();
+    const oldNodes = new Set<any>();
 
     let delta = -5
     function simulate() {
