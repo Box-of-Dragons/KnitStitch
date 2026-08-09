@@ -11,6 +11,18 @@
             "url": "http://localhost:5173",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "vite: dev (if not running)"
+        },
+        {
+            "name": "Launch KnitStitch Desktop",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\electron.cmd",
+            "args": [
+                "."
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "preLaunchTask": "desktop: build"
         }
     ]
 }

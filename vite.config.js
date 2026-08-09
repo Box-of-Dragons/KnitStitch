@@ -2,6 +2,7 @@
 import { resolve, dirname, isAbsolute } from 'node:path';
 import { readFileSync, rmSync, mkdirSync, renameSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 
@@ -79,34 +80,45 @@ function organisePages() {
   };
 }
 
-export default {
-  base: '/',
-  root: resolve(projectRoot, 'public/pages'),
-  publicDir: resolve(projectRoot, 'public'),
-  server: { fs: { allow: [projectRoot] } },
-  resolve: {
-    alias: {
-      '/src': resolve(projectRoot, 'src'),
-    },
-  },
-  plugins: [htmlIncludes(), organisePages()],
-  build: {
-    outDir: resolve(projectRoot, 'dist'),
-    emptyOutDir: true,
-    assetsInlineLimit: 0, // Keep Konva as external chunk
-    rollupOptions: {
-      input: {
-        main: resolve(projectRoot, 'public/pages/index.html'),
-        readme: resolve(projectRoot, 'public/pages/readme.html'),
-        roadmap: resolve(projectRoot, 'public/pages/roadmap.html'),
-        changelog: resolve(projectRoot, 'public/pages/changelog.html'),
-        smallScreenWarning: resolve(projectRoot, 'public/pages/small-screen-warning.html'),
+export default defineConfig(({ mode }) => {
+  const isDesktop = mode === 'desktop';
+  const root = isDesktop
+    ? resolve(projectRoot, 'public/pages/desktop')
+    : resolve(projectRoot, 'public/pages');
+
+  return {
+    base: isDesktop ? './' : '/',
+    root,
+    publicDir: resolve(projectRoot, 'public'),
+    server: { fs: { allow: [projectRoot] } },
+    resolve: {
+      alias: {
+        '/src': resolve(projectRoot, 'src'),
       },
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name][extname]'
-      }
-    }
-  }
-};
+    },
+    plugins: isDesktop ? [] : [htmlIncludes(), organisePages()],
+    build: {
+      outDir: resolve(projectRoot, isDesktop ? 'dist-desktop' : 'dist'),
+      emptyOutDir: true,
+      assetsInlineLimit: 0, // Keep Konva as external chunk
+      rollupOptions: {
+        input: isDesktop
+          ? {
+              main: resolve(projectRoot, 'public/pages/desktop/index.html'),
+            }
+          : {
+              main: resolve(projectRoot, 'public/pages/index.html'),
+              readme: resolve(projectRoot, 'public/pages/readme.html'),
+              roadmap: resolve(projectRoot, 'public/pages/roadmap.html'),
+              changelog: resolve(projectRoot, 'public/pages/changelog.html'),
+              smallScreenWarning: resolve(projectRoot, 'public/pages/small-screen-warning.html'),
+            },
+        output: {
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/[name][extname]',
+        },
+      },
+    },
+  };
+});

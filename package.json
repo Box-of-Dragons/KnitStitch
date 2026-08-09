@@ -1,12 +1,19 @@
 {
   "name": "knitstitch",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "KnitStitch Grid - a web-based knitting pattern design tool (Konva.js)",
   "license": "GPL-3.0-or-later",
   "type": "module",
+  "main": "electron/main.mjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:web": "vite build --mode web",
+    "build:desktop": "vite build --mode desktop",
+    "run:desktop": "npm run build:desktop && electron .",
+    "electron:dev": "npm run build:desktop && electron .",
+    "electron:portable": "npm run build:desktop && electron-builder --win portable",
+    "electron:dist": "npm run build:desktop && electron-builder",
     "preview": "vite preview",
     "build-info": "node scripts/generate-build-info.mjs --root=. --output=public/js/buildInfo.js --format=js && node scripts/generate-build-info.mjs --root=. --output=CHANGELOG.md --format=md && node scripts/generate-build-info.mjs --root=. --output=public/pages/changelog-v2.html --format=html",
     "build-changelog": "node scripts/generate-build-info.mjs --root=. --output=CHANGELOG.md --format=md && node scripts/generate-build-info.mjs --root=. --output=public/pages/changelog-v2.html --format=html",
@@ -23,6 +30,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
     "eslint": "8.57.0",
     "prettier": "3.3.3",
     "vite": "^5.0.0",
@@ -30,5 +39,31 @@
   },
   "dependencies": {
     "konva": "^9.2.0"
+  },
+  "build": {
+    "appId": "uk.me.misssponto.knitstitch",
+    "productName": "KnitStitch Grid",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**",
+      "dist-desktop/**",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "portable": {
+      "artifactName": "KnitStitch-Portable-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

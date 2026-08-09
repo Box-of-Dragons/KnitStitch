@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+dist-desktop/
+release/
 
 # Playwright / test artifacts
 test-results/
@@ -33,3 +35,4 @@ vite.config.js.timestamp-*.mjs
 # generated release workflow scratch files
 /.github/release-plan.json
 /.github/release-notes.md
+.npm-cache/
