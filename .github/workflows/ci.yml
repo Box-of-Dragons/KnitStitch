@@ -65,6 +65,10 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.plan.outputs.release_tag }}
+      should_release: ${{ steps.plan.outputs.should_release }}
+      notes_path: ${{ steps.plan.outputs.notes_path }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -159,3 +163,32 @@ jobs:
           git checkout -B master origin/master
           git merge --ff-only origin/dev
           git push origin master
+
+  desktop-release:
+    needs: release
+    if: github.event_name == 'push' && github.actor != 'github-actions[bot]' && needs.release.outputs.should_release == 'true'
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop package
+        run: npm run electron:portable
+
+      - name: Upload desktop release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.release_tag }}
+          files: release/KnitStitch-Portable-*.exe
+          fail_on_unmatched_files: true
