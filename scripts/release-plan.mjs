@@ -255,6 +255,11 @@ if (!shouldRelease) {
   }
 }
 
+notes.push('---');
+notes.push('');
+notes.push(`_Reworded for readability from ${commits.length} commits by openrouter/free_`);
+notes.push('');
+
 mkdirSync(dirname(notesPath), { recursive: true });
 writeFileSync(notesPath, notes.join('\n'), 'utf8');
 

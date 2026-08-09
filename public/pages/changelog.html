@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
   <script>(function(){var h=location.hostname;var l=h==='localhost'||h==='127.0.0.1'||h.indexOf('.ddev.site')!==-1;var b=(l?'http://localhost:4000':'https://misssponto.me.uk');document.write('<link rel="stylesheet" href="'+b+'/css/shared.css">');})();</script>
   <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/web-shell.css">
 </head>
 <body class="page-document page-changelog">
 
@@ -32,19 +33,19 @@
       <div class="container">
         <!-- Tab bar -->
         <div class="tab-bar" role="tablist">
-          <button class="tab-btn active" role="tab" data-tab="v2" aria-selected="true">v2</button>
-          <button class="tab-btn" role="tab" data-tab="v1" aria-selected="false">v1</button>
+          <button class="tab-btn active" role="tab" data-tab="v2" aria-selected="true">Releases</button>
+          <button class="tab-btn" role="tab" data-tab="v1" aria-selected="false">Archive</button>
         </div>
 
-        <!-- v2 tab — generated from KnitStitch git history -->
+        <!-- v2 tab — generated from GitHub Releases and git tags -->
         <div class="tab-panel active" id="tab-v2" role="tabpanel">
-          <div class="changelog-loading" id="v2-loading">Loading v2 changelog…</div>
+          <div class="changelog-loading" id="v2-loading">Loading releases…</div>
           <div id="v2-content"></div>
         </div>
 
-        <!-- v1 tab — historical CraftCMS era changelog -->
+        <!-- v1 tab — historical CraftCMS era archive -->
         <div class="tab-panel" id="tab-v1" role="tabpanel">
-          <div class="changelog-loading" id="v1-loading">Loading v1 changelog…</div>
+          <div class="changelog-loading" id="v1-loading">Loading archive…</div>
           <div id="v1-content"></div>
         </div>
       </div>
@@ -55,7 +56,7 @@
           <section class="container-section--headed">
             <div class="container-section-header">About this log</div>
             <div class="container-section-body">
-              <div class="body">This page is generated from conventional commits and git tags during the build step. The latest build snapshot, production version, commit count, and recent commits grouped into simple readable sections.</div>
+              <div class="body">The changelog is generated from the repository's git tags and GitHub Releases. The old CraftCMS (v1) history is in the Archive tab.</div>
             </div>
           </section>
           <div class="changelog-types-sidebar" id="changelog-types-sidebar"></div>

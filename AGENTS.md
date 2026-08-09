@@ -28,8 +28,8 @@ npm install
 npm run dev      # Vite dev server at http://localhost:5173
 npm run build    # Production build to dist/
 npm run preview  # Serve the built dist/ locally
-npm run build-info       # Generate src/buildInfo.js + CHANGELOG.md from git history
-npm run build-changelog  # Generate just CHANGELOG.md
+npm run build-info       # Generate public/js/buildInfo.js + CHANGELOG.md from GitHub Releases
+npm run build-changelog  # Generate just CHANGELOG.md and the HTML changelog
 ```
 
 When the account backend is introduced, document its local start command,
@@ -37,25 +37,24 @@ database setup, environment variables, and same-origin `/api` proxy here.
 
 ## Versioning and Changelog
 
-This project uses Conventional Commits to drive automatic versioning and
-changelog generation, ported from the BoxOfDragons `GenerateBuildInfo.php` script.
+This project uses git tags and GitHub Releases as the source of truth for
+published versions and the public changelog. The build step fetches published
+GitHub Releases and supplements them with local semver tags (v0.1.0–v0.7.0)
+that don't have a release page.
 
-- `scripts/generate-build-info.mjs` - Node.js build info generator. Reads git
-  tags and conventional commit messages to derive a version. Supports
-  `--format=js` (outputs `window.BUILD_INFO` object), `--format=md` (outputs
-  markdown changelog), and `--format=html` (outputs HTML changelog fragment).
-  Run via `npm run build-info` or `npm run build-changelog`.
-- `src/buildInfo.js` - generated JS file exposing `window.BUILD_INFO` with
+- `scripts/generate-build-info.mjs` - Node.js build info + changelog generator.
+  Reads GitHub Releases, local git tags, and the current commit for build
+  metadata. Supports `--format=js` (outputs `window.BUILD_INFO` object),
+  `--format=md` (outputs markdown changelog), and `--format=html` (outputs HTML
+  changelog fragment). Run via `npm run build-info` or `npm run build-changelog`.
+- `public/js/buildInfo.js` - generated JS file exposing `window.BUILD_INFO` with
   version, production version, commit SHA, and commit count
-- `CHANGELOG.md` - generated markdown changelog grouped by change type
-  (breaking, feature, fix, docs, refactor, test, chore, other)
-- `public/changelog-v2.html` - generated HTML changelog fragment for the
-  changelog page, produced from KnitStitch's own git log
-- `public/changelog-v1.html` - historical changelog from the Craft CMS era,
-  preserved as an HTML fragment for the v1 tab. The going-forward changelog is
-  generated from KnitStitch's own git log.
-- `pages/changelog.html` - changelog page with v1/v2 tabs, separated layout
-  (global header, page header, content area, footer)
+- `CHANGELOG.md` - generated release-based markdown changelog
+- `public/pages/changelog-v2.html` - generated HTML changelog fragment for the
+  changelog page, produced from git tags and GitHub Releases
+- `public/pages/changelog-v1.html` - historical Craft CMS era changelog,
+  preserved as an HTML fragment for the Archive tab
+- `pages/changelog.html` - changelog page with two tabs: Releases and Archive
 
 ## Architecture
 

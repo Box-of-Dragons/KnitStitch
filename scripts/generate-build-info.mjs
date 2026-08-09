@@ -1,25 +1,33 @@
 /**
- * generate-build-info.mjs — Node.js build info generator.
+ * generate-build-info.mjs — Node.js build info + changelog generator.
  *
- * Ported from CraftCMS scripts/GenerateBuildInfo.php.
- *   - Reads git tags and commit history
- *   - Derives a version from conventional commit messages (feat:, fix:, BREAKING CHANGE)
- *   - Non-feat/fix commits increment the revision (4th number)
- *   - Outputs a JS file (window.BUILD_INFO), markdown changelog, or HTML changelog fragment
+ * Builds the release list from the repository's GitHub Releases plus local
+ * semver git tags that don't have a published release (e.g. the v0.1.0–v0.7.0
+ * guesstimated tags). Tag bodies are generated from the conventional commits
+ * between the previous tag and the current tag.
+ *
+ * Outputs:
+ *   - public/js/buildInfo.js  (window.BUILD_INFO)
+ *   - CHANGELOG.md            (release-based markdown changelog)
+ *   - public/pages/changelog-v2.html (HTML changelog fragment)
  *
  * Usage:
- *   node scripts/generate-build-info.mjs --root=. --output=src/buildInfo.js --format=js
+ *   node scripts/generate-build-info.mjs --root=. --output=public/js/buildInfo.js --format=js
  *   node scripts/generate-build-info.mjs --root=. --output=CHANGELOG.md --format=md
  *   node scripts/generate-build-info.mjs --root=. --output=public/pages/changelog-v2.html --format=html
  *
  * Parameters:
  *   --root     Repository root path (required)
  *   --output   Output file path (required)
- *   --format   Output format: "js" or "md" (default: js)
+ *   --format   Output format: js, md, html (default: js)
+ *   --repo     GitHub owner/repo (default: parsed from git remote origin)
+ *
+ * Environment:
+ *   GITHUB_TOKEN  Optional token for private repositories.
  */
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 function parseArgs(argv) {
@@ -27,19 +35,19 @@ function parseArgs(argv) {
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     if (arg.startsWith('--')) {
-    const eq = arg.indexOf('=');
-    if (eq !== -1) {
-      args[arg.slice(2, eq)] = arg.slice(eq + 1);
-    } else {
-      const key = arg.slice(2);
-      const next = argv[i + 1];
-      if (next && !next.startsWith('--')) {
-        args[key] = next;
-        i++;
+      const eq = arg.indexOf('=');
+      if (eq !== -1) {
+        args[arg.slice(2, eq)] = arg.slice(eq + 1);
       } else {
-        args[key] = true;
+        const key = arg.slice(2);
+        const next = argv[i + 1];
+        if (next && !next.startsWith('--')) {
+          args[key] = next;
+          i++;
+        } else {
+          args[key] = true;
+        }
       }
-    }
     }
   }
   return args;
@@ -57,76 +65,77 @@ function git(root, ...args) {
   }
 }
 
-function formatVersion(version, revision = 0) {
-  if (revision > 0) {
-    return `v${version[0]}.${version[1]}.${version[2]}.${revision}`;
-  }
-  return `v${version[0]}.${version[1]}.${version[2]}`;
-}
-
-function tryParseTaggedVersion(tagName) {
-  const raw = tagName.trim().replace(/^[vV]/, '');
-  const parts = raw.split('.');
-  if (parts.length < 3) return null;
-  for (const p of parts) {
-    if (!/^\d+$/.test(p)) return null;
-  }
-  const version = parts.map((p) => parseInt(p, 10));
-  if (version.length === 3) version.push(0);
-  return version;
-}
-
-function parseSemverTag(tagName) {
-  const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(tagName.trim());
+function parseRemoteUrl(url) {
+  const match = /github\.com[:/]([^/]+)\/([^/\s.]+(?:\.git)?)/.exec(url);
   if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
+  return {
+    owner: match[1],
+    repo: match[2].replace(/\.git$/, ''),
+  };
 }
 
-function compareSemver(a, b) {
-  for (let i = 0; i < 3; i++) {
-    if (a[i] !== b[i]) return a[i] - b[i];
+function getRepoSlug(root, args) {
+  if (args.repo) {
+    const [owner, repo] = args.repo.split('/');
+    if (!owner || !repo) throw new Error('Use --repo=owner/repo');
+    return { owner, repo };
   }
-  return 0;
+  const remote = git(root, 'remote', 'get-url', 'origin').trim();
+  const parsed = parseRemoteUrl(remote);
+  if (!parsed) throw new Error(`Could not parse GitHub remote: ${remote}. Use --repo=owner/repo`);
+  return parsed;
 }
 
-function formatSemver(version) {
-  return `v${version[0]}.${version[1]}.${version[2]}`;
-}
+async function fetchGitHubReleases(owner, repo, token) {
+  const releases = [];
+  let page = 1;
+  let more = true;
 
-function bumpSemver(version, bumpType) {
-  switch (bumpType) {
-    case 'major':
-      return [version[0] + 1, 0, 0];
-    case 'minor':
-      return [version[0], version[1] + 1, 0];
-    case 'patch':
-      return [version[0], version[1], version[2] + 1];
-    default:
-      return version.slice();
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'knitstitch-build-info',
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  while (more) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/releases?per_page=100&page=${page}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
+    const pageData = await res.json();
+    if (Array.isArray(pageData) && pageData.length > 0) {
+      releases.push(...pageData);
+    }
+    if (!Array.isArray(pageData) || pageData.length < 100) {
+      more = false;
+    } else {
+      page++;
+    }
   }
+
+  return releases
+    .filter((r) => !r.draft)
+    .map((r) => ({ ...r, source: 'github' }));
 }
 
-function findLatestReleaseTag(root, headRef) {
-  const output = git(root, 'tag', '--merged', headRef, '--list', 'v*');
+function getLocalTags(root) {
+  const output = git(
+    root,
+    'for-each-ref',
+    '--sort=creatordate',
+    '--format',
+    '%(refname:short)|%(objectname)|%(creatordate:iso)',
+    'refs/tags/v*',
+  );
+
   const tags = [];
   for (const line of output.split('\n')) {
-    const tag = line.trim();
-    if (tag === '') continue;
-    const version = parseSemverTag(tag);
-    if (!version) continue;
-    tags.push({ tag, version });
+    if (line.trim() === '') continue;
+    const parts = line.split('|', 3);
+    if (parts.length !== 3) continue;
+    tags.push({ tag: parts[0], sha: parts[1], published_at: parts[2] });
   }
-
-  if (tags.length === 0) return null;
-  tags.sort((a, b) => compareSemver(b.version, a.version));
-  return tags[0];
-}
-
-function getCommitType(subject) {
-  if (/BREAKING CHANGE|!:/i.test(subject)) return 'major';
-  if (/^feat(\([^)]+\))?:/i.test(subject)) return 'minor';
-  if (/^fix(\([^)]+\))?:/i.test(subject)) return 'patch';
-  return 'none';
+  return tags;
 }
 
 function getChangelogGroup(subject) {
@@ -141,8 +150,7 @@ function getChangelogGroup(subject) {
 }
 
 function humanizeCommitSubject(subject) {
-  let summary = subject.replace(/^(?:[a-z]+(?:\([^)]+\))?!?:\s*|BREAKING CHANGE:?\s*)/i, '');
-  summary = summary.trim();
+  const summary = subject.replace(/^(?:[a-z]+(?:\([^)]+\))?!?:\s*|BREAKING CHANGE:?\s*)/i, '').trim();
   if (summary === '') return subject;
   return summary.charAt(0).toUpperCase() + summary.slice(1);
 }
@@ -153,7 +161,6 @@ function cleanCommitDescription(subject, body) {
 
   const lines = body.split(/\r?\n/);
 
-  // Detect bullet-style body lines
   let hasBullets = false;
   for (const line of lines) {
     const trimmed = line.trim();
@@ -216,7 +223,6 @@ function cleanCommitDescription(subject, body) {
     return bullets.length > 0 ? bullets : null;
   }
 
-  // Paragraph-style body
   const paragraphs = [];
   let current = [];
 
@@ -255,46 +261,6 @@ function cleanCommitDescription(subject, body) {
   return null;
 }
 
-function loadAiReleaseNotes(root) {
-  const notesPath = resolve(root, 'release-notes.ai.json');
-  if (!existsSync(notesPath)) return {};
-
-  try {
-    const data = JSON.parse(readFileSync(notesPath, 'utf8'));
-    return data && data.notes && typeof data.notes === 'object' ? data.notes : {};
-  } catch (e) {
-    console.warn(`Ignoring invalid AI release-note cache: ${e.message}`);
-    return {};
-  }
-}
-
-// --- Main ---
-
-const args = parseArgs(process.argv);
-const root = args.root ? resolve(args.root) : null;
-const outputPath = args.output ? resolve(args.output) : null;
-const format = args.format || 'js';
-
-if (!root || !outputPath) {
-  console.error('Usage: node scripts/generate-build-info.mjs --root=. --output=src/buildInfo.js --format=js');
-  process.exit(1);
-}
-
-// Commit count
-const commitCount = parseInt(git(root, 'rev-list', '--count', 'HEAD').trim(), 10);
-
-const aiReleaseNotes = loadAiReleaseNotes(root);
-const changeGroups = {
-  breaking: [],
-  feature: [],
-  fix: [],
-  docs: [],
-  refactor: [],
-  test: [],
-  chore: [],
-  other: [],
-};
-
 function parseCommitLog(output) {
   const commits = [];
   for (const record of output.split('\x1e')) {
@@ -312,312 +278,403 @@ function parseCommitLog(output) {
   return commits;
 }
 
-function addChange(commit, version) {
-  if (/^chore\(release-notes\):/i.test(commit.subject)) return;
+const GROUP_LABELS = {
+  breaking: 'Breaking Changes',
+  feature: 'Features',
+  fix: 'Fixes',
+  docs: 'Documentation',
+  refactor: 'Refactors',
+  test: 'Tests',
+  chore: 'Maintenance',
+  other: 'Other Changes',
+};
 
-  const group = getChangelogGroup(commit.subject);
-  const aiNote = aiReleaseNotes[commit.sha] || {};
-  changeGroups[group].push({
-    version,
-    sha: commit.sha.slice(0, 7),
-    date: commit.date,
-    subject: aiNote.title || humanizeCommitSubject(commit.subject),
-    description:
-      aiNote.details && aiNote.details.length > 0 ? aiNote.details : cleanCommitDescription(commit.subject, commit.body),
-  });
-}
+const GROUP_ORDER = ['breaking', 'feature', 'fix', 'docs', 'refactor', 'test', 'chore', 'other'];
 
-let displayVersion;
-let productionVersion;
-let snapshotCommitLabel = 'commits';
-let snapshotCommitCount = commitCount;
-const latestReleaseTag = findLatestReleaseTag(root, 'HEAD');
-
-if (latestReleaseTag) {
-  const logOutput = git(
+function generateTagBody(root, tag, prevTag) {
+  const range = prevTag ? `${prevTag}..${tag}` : tag;
+  const output = git(
     root,
     'log',
-    `${latestReleaseTag.tag}..HEAD`,
+    range,
     '--pretty=format:%H%x1f%ad%x1f%s%x1f%B%x1e',
     '--date=short',
     '--reverse',
     '--',
     '.',
   );
-  const releaseCommits = parseCommitLog(logOutput).filter((commit) => !/^chore\(release-notes\):/i.test(commit.subject));
-  let bumpType = 'none';
 
-  for (const commit of releaseCommits) {
-    const commitType = getCommitType(commit.subject);
-    if (commitType === 'major') {
-      bumpType = 'major';
-      break;
-    }
-    if (commitType === 'minor' && bumpType !== 'major') {
-      bumpType = 'minor';
-    } else if (commitType === 'patch' && bumpType === 'none') {
-      bumpType = 'patch';
-    }
+  const commits = parseCommitLog(output).filter(
+    (commit) => !/^chore\(release-notes\):/i.test(commit.subject),
+  );
+
+  const groups = Object.fromEntries(GROUP_ORDER.map((group) => [group, []]));
+  for (const commit of commits) {
+    const group = getChangelogGroup(commit.subject);
+    groups[group].push({
+      subject: humanizeCommitSubject(commit.subject),
+      description: cleanCommitDescription(commit.subject, commit.body),
+    });
   }
 
-  displayVersion = formatSemver(bumpSemver(latestReleaseTag.version, bumpType));
-  productionVersion = latestReleaseTag.tag;
-  snapshotCommitLabel = 'release commits';
-  snapshotCommitCount = releaseCommits.length;
+  const lines = [];
+  for (const group of GROUP_ORDER) {
+    const items = groups[group];
+    if (items.length === 0) continue;
 
-  for (const commit of releaseCommits) {
-    addChange(commit, displayVersion);
-  }
-} else {
-  // Legacy fallback until a v0.1.0 baseline release tag is created on this branch.
-  const tagOutput = git(root, 'tag', '--format=%(objectname)|%(refname:short)');
-  const taggedVersions = {};
-  for (const line of tagOutput.split('\n')) {
-    if (line.trim() === '') continue;
-    const parts = line.split('|', 2);
-    if (parts.length !== 2) continue;
-    const version = tryParseTaggedVersion(parts[1]);
-    if (version !== null) {
-      taggedVersions[parts[0]] = version;
+    lines.push(`## ${GROUP_LABELS[group]}`);
+    lines.push('');
+
+    for (const item of items) {
+      lines.push(`- ${item.subject}`);
+      if (item.description) {
+        if (Array.isArray(item.description)) {
+          for (const detail of item.description) {
+            lines.push(`  - ${detail}`);
+          }
+        } else {
+          lines.push(`  - ${item.description}`);
+        }
+      }
     }
+
+    lines.push('');
   }
 
-  const logOutput = git(root, 'log', '--pretty=format:%H%x1f%ad%x1f%s%x1f%B%x1e', '--date=short', '--reverse', '--', '.');
-  let resolvedVersion = [1, 0, 0, 0];
-  let revision = 0;
+  return lines.join('\n');
+}
 
-  for (const commit of parseCommitLog(logOutput)) {
-    if (taggedVersions[commit.sha]) {
-      resolvedVersion = taggedVersions[commit.sha];
-      if (resolvedVersion.length < 4) resolvedVersion.push(0);
-      revision = 0;
+function buildAllReleases(root, owner, repo, githubReleases) {
+  const githubByTag = Object.fromEntries(githubReleases.map((r) => [r.tag_name, r]));
+  const localTags = getLocalTags(root);
+  const releases = [];
+
+  for (let i = 0; i < localTags.length; i++) {
+    const { tag, published_at } = localTags[i];
+    if (githubByTag[tag]) {
+      releases.push(githubByTag[tag]);
       continue;
     }
 
-    const commitType = getCommitType(commit.subject);
-    switch (commitType) {
-      case 'major':
-        resolvedVersion = [resolvedVersion[0] + 1, 0, 0, 0];
-        revision = 0;
-        break;
-      case 'minor':
-        resolvedVersion = [resolvedVersion[0], resolvedVersion[1] + 1, 0, 0];
-        revision = 0;
-        break;
-      case 'patch':
-        resolvedVersion = [resolvedVersion[0], resolvedVersion[1], resolvedVersion[2] + 1, 0];
-        revision = 0;
-        break;
-      default:
-        revision++;
-        break;
-    }
-
-    addChange(commit, formatVersion(resolvedVersion, revision));
+    const prevTag = i > 0 ? localTags[i - 1].tag : null;
+    const body = generateTagBody(root, tag, prevTag);
+    releases.push({
+      tag_name: tag,
+      name: tag,
+      published_at,
+      html_url: `https://github.com/${owner}/${repo}/tree/${tag}`,
+      body,
+      prerelease: false,
+      draft: false,
+    });
   }
 
-  displayVersion = formatVersion(resolvedVersion, revision);
-  productionVersion = displayVersion;
+  for (const release of githubReleases) {
+    if (!localTags.some((t) => t.tag === release.tag_name)) {
+      releases.push(release);
+    }
+  }
+
+  releases.sort((a, b) => {
+    const dateDiff = new Date(b.published_at) - new Date(a.published_at);
+    if (dateDiff !== 0) return dateDiff;
+    return (b.tag_name || '').localeCompare(a.tag_name || '');
+  });
+
+  return releases;
 }
 
-// Short SHA
+function formatDate(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toISOString().slice(0, 10);
+  } catch {
+    return iso;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function inlineHtml(text) {
+  return text
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+}
+
+function mdToHtml(md) {
+  const lines = md.split(/\r?\n/);
+  const html = [];
+  const listStack = [];
+  let inPara = false;
+
+  function flushParagraph() {
+    if (!inPara) return;
+    html.push('</p>');
+    inPara = false;
+  }
+
+  function closeLists(targetDepth = 0) {
+    while (listStack.length > targetDepth) {
+      const list = listStack.pop();
+      html.push(`</li></${list.type}>`);
+    }
+  }
+
+  function listDepthFromIndent(indent) {
+    return Math.max(1, Math.floor(indent / 2) + 1);
+  }
+
+  for (const raw of lines) {
+    const line = raw.replace(/\r$/, '');
+
+    const hMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (hMatch) {
+      flushParagraph();
+      closeLists(0);
+      const tag = `h${hMatch[1].length + 2}`;
+      html.push(`<${tag}>${inlineHtml(escapeHtml(hMatch[2].trim()))}</${tag}>`);
+      continue;
+    }
+
+    const ulMatch = line.match(/^(\s*)[-*]\s+(.*)$/);
+    const olMatch = line.match(/^(\s*)\d+\.\s+(.*)$/);
+    if (ulMatch || olMatch) {
+      flushParagraph();
+      const isUl = !!ulMatch;
+      const rawIndent = isUl ? ulMatch[1].length : olMatch[1].length;
+      const text = isUl ? ulMatch[2] : olMatch[2];
+      const type = isUl ? 'ul' : 'ol';
+      const depth = listDepthFromIndent(rawIndent);
+
+      if (listStack.length < depth) {
+        while (listStack.length < depth) {
+          html.push(`<${type}>`);
+          listStack.push({ type });
+        }
+      } else if (listStack.length > depth) {
+        while (listStack.length > depth) {
+          const list = listStack.pop();
+          html.push(`</li></${list.type}>`);
+        }
+        if (listStack.length > 0 && listStack[listStack.length - 1].type !== type) {
+          const list = listStack.pop();
+          html.push(`</li></${list.type}>`);
+          html.push(`<${type}>`);
+          listStack.push({ type });
+        } else {
+          html.push('</li>');
+        }
+      } else {
+        if (listStack.length > 0 && listStack[listStack.length - 1].type !== type) {
+          const list = listStack.pop();
+          html.push(`</li></${list.type}>`);
+          html.push(`<${type}>`);
+          listStack.push({ type });
+        } else if (listStack.length > 0) {
+          html.push('</li>');
+        }
+      }
+      html.push(`<li>${inlineHtml(escapeHtml(text.trim()))}`);
+      continue;
+    }
+
+    if (line.trim() === '') {
+      flushParagraph();
+      continue;
+    }
+
+    if (!inPara) {
+      html.push('<p>');
+      inPara = true;
+    } else {
+      html.push(' ');
+    }
+    html.push(inlineHtml(escapeHtml(line.trim())));
+  }
+
+  flushParagraph();
+  closeLists(0);
+  return html.join('');
+}
+
+function stripFirstTitle(body, tag) {
+  const lines = body.split(/\r?\n/);
+  const firstNonEmpty = lines.findIndex((l) => l.trim() !== '');
+  if (firstNonEmpty === -1) return body;
+
+  const m = lines[firstNonEmpty].match(/^#\s+(.+)$/);
+  if (!m) return body;
+
+  const title = m[1].trim().toLowerCase().replace(/^v/, '');
+  const tagNorm = tag.toLowerCase().replace(/^v/, '');
+  if (title !== tagNorm) return body;
+
+  const rest = lines.slice(firstNonEmpty + 1);
+  const nextNonEmpty = rest.findIndex((l) => l.trim() !== '');
+  if (nextNonEmpty === -1) return '';
+  return rest.slice(nextNonEmpty).join('\n');
+}
+
+const INTRO_TITLE = 'Versioning note';
+
+function buildIntroText() {
+  return [
+    `The KnitStitch version number and this changelog are now generated from the repository's git tags and GitHub Releases.`,
+    `From here on, the release line is starting back at **v0.1.0** so versions can grow cleanly.`,
+    `The older CraftCMS (v1) history is preserved in the Archive tab.`,
+  ].join(' ');
+}
+
+function buildIntroHtml() {
+  const text = buildIntroText();
+  return `<p>${inlineHtml(escapeHtml(text))}</p>`;
+}
+
+function buildIntroMd() {
+  return buildIntroText();
+}
+
+// --- Main ---
+
+const args = parseArgs(process.argv);
+const root = args.root ? resolve(args.root) : null;
+const outputPath = args.output ? resolve(args.output) : null;
+const format = args.format || 'js';
+
+if (!root || !outputPath) {
+  console.error('Usage: node scripts/generate-build-info.mjs --root=. --output=... --format=js');
+  process.exit(1);
+}
+
+const { owner, repo } = getRepoSlug(root, args);
+const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+const githubReleases = await fetchGitHubReleases(owner, repo, token);
+const releases = buildAllReleases(root, owner, repo, githubReleases);
+
+const latestRelease = releases[0] || null;
+const displayVersion = latestRelease ? latestRelease.tag_name : 'v0.1.0';
+const productionVersion = displayVersion;
+const releaseDate = latestRelease ? formatDate(latestRelease.published_at) : '';
+const releaseUrl = latestRelease ? latestRelease.html_url : '';
+
+const commitCount = parseInt(git(root, 'rev-list', '--count', 'HEAD').trim(), 10);
 const shortSha = git(root, 'rev-parse', '--short', 'HEAD').trim();
 
-// Generate output
 let content;
+
 if (format === 'js') {
   content = `window.BUILD_INFO = {
   version: "${displayVersion}",
   productionVersion: "${productionVersion}",
   commit: "${shortSha}",
-  commitCount: "${commitCount}"
+  commitCount: "${commitCount}",
+  releaseDate: "${releaseDate}",
+  releaseUrl: "${releaseUrl}"
 };
 `;
 } else if (format === 'md') {
-  const groupLabels = {
-    breaking: 'Breaking Changes',
-    feature: 'Features',
-    fix: 'Fixes',
-    docs: 'Documentation',
-    refactor: 'Refactors',
-    test: 'Tests',
-    chore: 'Maintenance',
-    other: 'Other Changes',
-  };
-
   const lines = [];
   lines.push('# Changelog');
   lines.push('');
-  lines.push(
-    `> **Build Snapshot** — Version ${displayVersion} · ${snapshotCommitCount} ${snapshotCommitLabel} · ${commitCount} total commits · ${shortSha}`,
-  );
-  lines.push('');
-  lines.push('> Generated from conventional commits and git tags. The historical');
-  lines.push('> changelog from the CraftCMS era is preserved in');
-  lines.push('> `docs/craftcms-changelog-history.twig`.');
+  if (latestRelease) {
+    lines.push(
+      `> **Release-based changelog** — Version ${displayVersion} · published ${releaseDate} · ${commitCount} commits · ${shortSha}`,
+    );
+  } else {
+    lines.push(
+      `> **Release-based changelog** — Baseline v0.1.0 · ${commitCount} commits · ${shortSha}`,
+    );
+  }
+  lines.push('>');
+  lines.push(`> ${buildIntroMd()}`);
   lines.push('');
   lines.push('---');
   lines.push('');
 
-  for (const [groupKey, groupLabel] of Object.entries(groupLabels)) {
-    const items = changeGroups[groupKey];
-    if (!items || items.length === 0) continue;
-
-    lines.push(`## ${groupLabel}`);
+  if (releases.length === 0) {
+    lines.push('No releases have been published yet. The first release will be **v0.1.0**.');
     lines.push('');
+  }
 
-    for (const item of [...items].reverse()) {
-      lines.push(`### ${item.subject}`);
+  for (const release of releases) {
+    const tag = release.tag_name;
+    const date = formatDate(release.published_at);
+    const pre = release.prerelease ? ' (pre-release)' : '';
+    const url = release.html_url;
+    lines.push(`## ${tag}${pre}`);
+    lines.push('');
+    lines.push(`Published ${date} — [View on GitHub](${url})`);
+    lines.push('');
+    const body = stripFirstTitle(release.body || 'No release notes.', tag);
+    if (body.trim()) {
+      lines.push(body);
       lines.push('');
-      lines.push(`**${item.version}** · \`${item.sha}\` · ${item.date}`);
-      lines.push('');
-      if (item.description) {
-        if (Array.isArray(item.description)) {
-          for (const bullet of item.description) {
-            lines.push(`- ${bullet}`);
-          }
-        } else {
-          lines.push(item.description);
-        }
-        lines.push('');
-      }
     }
   }
 
   content = lines.join('\n');
 } else if (format === 'html') {
-  const groupLabels = {
-    breaking: 'Breaking Changes',
-    feature: 'Features',
-    fix: 'Fixes',
-    docs: 'Documentation',
-    refactor: 'Refactors',
-    test: 'Tests',
-    chore: 'Maintenance',
-    other: 'Other Changes',
-  };
-
-  const groupChipClass = {
-    breaking: 'color-pair-red',
-    feature: 'color-pair-gold',
-    fix: 'color-pair-sage',
-    docs: 'color-pair-sky',
-    refactor: 'color-pair-stone',
-    test: 'color-pair-plum',
-    chore: 'color-pair-olive',
-    other: 'color-pair-ink',
-  };
-
-  const esc = (s) =>
-    String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-
-  // Collect unique versions in descending order (newest first)
-  const allVersions = new Set();
-  for (const items of Object.values(changeGroups)) {
-    for (const item of items) {
-      allVersions.add(item.version);
-    }
-  }
-  const sortedVersions = [...allVersions].sort((a, b) => {
-    const pa = a.replace(/^v/, '').split('.').map(Number);
-    const pb = b.replace(/^v/, '').split('.').map(Number);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-      const va = pa[i] || 0;
-      const vb = pb[i] || 0;
-      if (va !== vb) return vb - va;
-    }
-    return 0;
-  });
-
+  const esc = escapeHtml;
   const html = [];
 
-  // --- Sidebar blocks (moved into the sidebar via JS on the page) ---
-  // Change Types as a headed panel
   html.push('<div class="changelog-types" data-version="v2">');
   html.push('  <div class="container-section--headed">');
   html.push('    <div class="container-section-header">Change Types</div>');
   html.push('    <div class="container-section-body">');
   html.push('      <nav class="container-actions" aria-label="Changelog sections">');
-  for (const [groupKey, groupLabel] of Object.entries(groupLabels)) {
-    const items = changeGroups[groupKey];
-    if (!items || items.length === 0) continue;
-    html.push(`        <a class="chip ${groupChipClass[groupKey]}" href="#${groupKey}-changes">${groupLabel}</a>`);
-  }
+  html.push(`        <a class="chip color-pair-ink" href="#versioning-note">Versioning note</a>`);
   html.push('      </nav>');
   html.push('    </div>');
   html.push('  </div>');
   html.push('</div>');
 
-  // Versions list as a headed panel
   html.push('<div class="changelog-versions" data-version="v2">');
   html.push('  <div class="container-section--headed">');
   html.push('    <div class="container-section-header">Versions</div>');
   html.push('    <div class="container-section-body">');
   html.push('      <ul class="list">');
-  for (const version of sortedVersions) {
-    html.push(`        <li><a href="#${esc(version)}"><span class="caption">${esc(version)}</span></a></li>`);
+  for (const release of releases) {
+    html.push(`        <li><a href="#release-${esc(release.tag_name)}"><span class="caption">${esc(release.tag_name)}</span></a></li>`);
   }
   html.push('      </ul>');
   html.push('    </div>');
   html.push('  </div>');
   html.push('</div>');
 
-  // --- Main content: Build Snapshot + change sections ---
   html.push('<div class="container-sections">');
 
-  // Build snapshot panel
-  html.push('  <section class="panel panel--padded">');
-  html.push('    <h3>Build Snapshot</h3>');
-  html.push('    <div class="container-actions">');
-  html.push(`      <span class="chip ${groupChipClass.other}">Version ${esc(displayVersion)}</span>`);
-  html.push(`      <span class="chip color-pair-stone">${snapshotCommitCount} ${snapshotCommitLabel}</span>`);
-  html.push(`      <span class="chip color-pair-stone">${commitCount} total commits</span>`);
-  html.push('    </div>');
+  html.push('  <section class="panel panel--padded" id="versioning-note">');
+  html.push(`    <h3>${esc(INTRO_TITLE)}</h3>`);
+  html.push(`    <div class="body">${buildIntroHtml()}</div>`);
   html.push('  </section>');
 
-  // Each group
-  for (const [groupKey, groupLabel] of Object.entries(groupLabels)) {
-    const items = changeGroups[groupKey];
-    if (!items || items.length === 0) continue;
+  if (releases.length === 0) {
+    html.push('  <section class="panel panel--padded">');
+    html.push('    <h3>No releases yet</h3>');
+    html.push(`    <div class="body"><p>No releases have been published yet. The first release will be <strong>v0.1.0</strong>.</p></div>`);
+    html.push('  </section>');
+  }
 
-    html.push(`  <section class="panel panel--padded" id="${groupKey}-changes">`);
-    html.push(`    <h4>${esc(groupLabel)}</h4>`);
-    html.push('    <ul class="list">');
-
-    // Track which versions have already been anchored so only the first
-    // entry for each version gets an id that the sidebar can link to.
-    const anchoredVersions = new Set();
-
-    for (const item of [...items].reverse()) {
-      const liId = !anchoredVersions.has(item.version) ? ` id="${esc(item.version)}"` : '';
-      if (liId) anchoredVersions.add(item.version);
-      html.push(`      <li${liId}>`);
-      html.push('        <div class="container-content">');
-      html.push('          <div class="container-actions">');
-      html.push(`          <span class="chip ${groupChipClass[groupKey]}">${esc(groupLabel)}</span>`);
-      html.push(`            <span class="caption">${esc(item.version)} - ${esc(item.sha)} - ${esc(item.date)}</span>`);
-      html.push('          </div>');
-      html.push(`          <h5>${esc(item.subject)}</h5>`);
-      if (item.description) {
-        html.push('          <ul>');
-        if (Array.isArray(item.description)) {
-          for (const bullet of item.description) {
-            html.push(`            <li>${esc(bullet)}</li>`);
-          }
-        } else {
-          html.push(`            <li>${esc(item.description)}</li>`);
-        }
-        html.push('          </ul>');
-      }
-      html.push('        </div>');
-      html.push('      </li>');
-    }
-
-    html.push('    </ul>');
+  for (const release of releases) {
+    const tag = release.tag_name;
+    const title = release.name && release.name.trim() ? release.name : tag;
+    const preChip = release.prerelease ? '<span class="chip color-pair-plum">pre-release</span>' : '';
+    html.push(`  <section class="panel panel--padded" id="release-${esc(tag)}">`);
+    html.push(`    <h3>${esc(title)}${preChip ? ' ' + preChip : ''}</h3>`);
+    html.push('    <div class="container-actions">');
+    html.push(`      <span class="chip color-pair-stone">Published ${esc(formatDate(release.published_at))}</span>`);
+    html.push(`      <a class="chip color-pair-sky" href="${esc(release.html_url)}">View on GitHub</a>`);
+    html.push('    </div>');
+    const body = stripFirstTitle(release.body || 'No release notes.', tag);
+    html.push(`    <div class="release-body body">${mdToHtml(body)}</div>`);
     html.push('  </section>');
   }
 

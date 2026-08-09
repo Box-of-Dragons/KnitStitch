@@ -3,7 +3,7 @@
     <div class="container-section-header">Change Types</div>
     <div class="container-section-body">
       <nav class="container-actions" aria-label="Changelog sections">
-        <a class="chip color-pair-olive" href="#chore-changes">Maintenance</a>
+        <a class="chip color-pair-ink" href="#versioning-note">Versioning note</a>
       </nav>
     </div>
   </div>
@@ -13,32 +13,94 @@
     <div class="container-section-header">Versions</div>
     <div class="container-section-body">
       <ul class="list">
-        <li><a href="#v0.7.0"><span class="caption">v0.7.0</span></a></li>
+        <li><a href="#release-v0.8.1"><span class="caption">v0.8.1</span></a></li>
+        <li><a href="#release-v0.8.0"><span class="caption">v0.8.0</span></a></li>
+        <li><a href="#release-v0.7.0"><span class="caption">v0.7.0</span></a></li>
+        <li><a href="#release-v0.6.0"><span class="caption">v0.6.0</span></a></li>
+        <li><a href="#release-v0.5.0"><span class="caption">v0.5.0</span></a></li>
+        <li><a href="#release-v0.4.0"><span class="caption">v0.4.0</span></a></li>
+        <li><a href="#release-v0.3.0"><span class="caption">v0.3.0</span></a></li>
+        <li><a href="#release-v0.2.0"><span class="caption">v0.2.0</span></a></li>
+        <li><a href="#release-v0.1.0"><span class="caption">v0.1.0</span></a></li>
       </ul>
     </div>
   </div>
 </div>
 <div class="container-sections">
-  <section class="panel panel--padded">
-    <h3>Build Snapshot</h3>
-    <div class="container-actions">
-      <span class="chip color-pair-ink">Version v0.7.0</span>
-      <span class="chip color-pair-stone">1 release commits</span>
-      <span class="chip color-pair-stone">52 total commits</span>
-    </div>
+  <section class="panel panel--padded" id="versioning-note">
+    <h3>Versioning note</h3>
+    <div class="body"><p>The KnitStitch version number and this changelog are now generated from the repository's git tags and GitHub Releases. From here on, the release line is starting back at <strong>v0.1.0</strong> so versions can grow cleanly. The older CraftCMS (v1) history is preserved in the Archive tab.</p></div>
   </section>
-  <section class="panel panel--padded" id="chore-changes">
-    <h4>Maintenance</h4>
-    <ul class="list">
-      <li id="v0.7.0">
-        <div class="container-content">
-          <div class="container-actions">
-          <span class="chip color-pair-olive">Maintenance</span>
-            <span class="caption">v0.7.0 - ab80ae3 - 2026-08-02</span>
-          </div>
-          <h5>Stop tracking generated build info</h5>
-        </div>
-      </li>
-    </ul>
+  <section class="panel panel--padded" id="release-v0.8.1">
+    <h3>v0.8.1</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-09</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/releases/tag/v0.8.1">View on GitHub</a>
+    </div>
+    <div class="release-body body"><p>Changes since v0.8.0.</p><h4>Fixes</h4><ul><li>Guard SolveSpace circle sync and reuse rectangle corners</li></ul><h4>Tests</h4><ul><li>Sketching Stability Improvements<ul><li>Fixed an issue where manual drawing rectangles were incorrectly offset.</li></ul></li></ul><h4>Other Changes</h4><ul><li>Merge dev into master after release and trigger deploy</li><li>Always merge dev into master after dev push</li><li>Add unit and e2e test jobs before release</li><li>Install Playwright browsers before e2e tests</li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.8.0">
+    <h3>v0.8.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/releases/tag/v0.8.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><p>Changes since v0.7.0.</p><h4>Features</h4><ul><li>New sidebar accordion layout with resizable panels and color scheme<ul><li>Panels can be expanded or collapsed, and the sidebar width can be adjusted.</li></ul></li></ul><h4>Tests</h4><ul><li>Updated end-to-end test constraints</li></ul><h4>Maintenance</h4><ul><li>Stop tracking generated build info</li><li>Improved development workflow</li><li>Updated sketch service and state handling</li><li>Updated build scripts and changelog generation</li></ul><h4>Other Changes</h4><ul><li>Added automated build and test workflow</li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.7.0">
+    <h3>v0.7.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.7.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Add floating panel and fullscreen controls<ul><li>Add floating panel collapse/resize controllers with localStorage persistence</li><li>Add canvas fullscreen controller with toggle/restore</li><li>Update header, footer, sidebar, index, and app styles</li><li>Add disabled global login link placeholder</li></ul></li><li>Use shared site header from root site<ul><li>replace hardcoded header HTML with site-header.js loader</li><li>header.html now injects global-bar.js and site-header.js from the root Structured Chaos site (localhost:4000 in dev, misssponto.me.uk in prod)</li><li>set window.SITE_HEADER config (brand, nav, GitHub/GitLab links)</li><li>placeholder divs for global-bar and site-header</li></ul></li><li>Load shared.css from root site on all pages<ul><li>add inline loader script to all 5 page HTML files that injects css/shared.css from the root site (localhost:4000 in dev, misssponto.me.uk in prod) before app.css</li><li>shared.css provides design tokens, base styles, typography, and all shared components (global bar, site header, panels, chips, etc.)</li></ul></li><li>Use shared site footer</li></ul><h4>Fixes</h4><ul><li>Correct bezier stroke method<ul><li>Also refreshes AGENTS.md git conventions and removes the duplicated docs/agents/git-rules.md.</li></ul></li></ul><h4>Documentation</h4><ul><li>Add acknowledgements section to README<ul><li>credit Devin, Codex, SolveSpace, and Better Auth (planned)</li></ul></li><li>Update GitHub URLs to PascalCase</li><li>Note app.css loads after shared.css from root site</li><li>Remove Craft CMS references after BoD migration<ul><li>remove &quot;no longer embedded in Craft CMS&quot; (no longer relevant)</li><li>rename &quot;CraftCMS GenerateBuildInfo.php&quot; to &quot;BoxOfDragons GenerateBuildInfo.php&quot;</li><li>normalize &quot;CraftCMS era&quot; to &quot;Craft CMS era&quot; (historical context)</li></ul></li></ul><h4>Refactors</h4><ul><li>Move shared styles to shared.css, keep only overrides<ul><li>remove design tokens, base styles, typography, layout primitives, and all shared components (global bar, site header, navigation, panels, chips, color pairs, buttons, forms, lists, gallery, footer, responsive breakpoints) — now in css/shared.css from the root site</li><li>keep only KnitStitch-specific styles: theme color overrides (gold primary), layout overrides (scroll-margin-top, panel border-radius), body-class active nav state, and app layout (canvas, ribbon, workspace, floating panels, tool ribbon, object list, dimension overlay, color picker, small-screen warning, boot loading overlay)</li></ul></li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.6.0">
+    <h3>v0.6.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.6.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Add resizable panel layout with drag handles<ul><li>add panelResizer.js for drag-to-resize between cards</li><li>add CSS for resizable panel grid layout</li><li>wire resizer into mainUi boot sequence</li></ul></li><li>Add small-screen warning page and redirect guard<ul><li>add standalone warning page at /small-screen-warning.html for phone-sized viewports</li><li>inline guard in index.html &lt;head&gt; redirects &lt;=768px viewports before the editor or WASM solver loads</li><li>warning page's Continue button sets a sessionStorage bypass so users can proceed after acknowledging</li><li>register the new page as a Vite entry and in the organisePages move list</li><li>add Responsive / Mobile Support section to roadmap; mark warning page item as shipped</li></ul></li></ul><h4>Fixes</h4><ul><li>Restore panel resizing after helper refactor<ul><li>Use the renamed ratio normalizer in pointer-move handling and cover the complete drag-ratio transformation with regression tests.</li></ul></li></ul><h4>Documentation</h4><ul><li>Mark sketchLayer refactor as complete on roadmap</li><li>Reconcile shipped features and auth plans</li></ul><h4>Refactors</h4><ul><li>Replace rectangle persistence with bézier persistence<ul><li>stop saving/loading sketch.rectangles</li><li>save/load sketch.beziers with control point reconnection</li></ul></li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.5.0">
+    <h3>v0.5.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.5.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Migrate sketch solving to SolveSpace WASM</li><li>Use exact polygon coverage for symmetric cell fills</li><li>Add directional increase and decrease instructions</li><li>Make sketch fill threshold configurable</li><li>Add bézier curve tool for smooth armhole shaping<ul><li>four-click workflow: start, control1, control2, end</li><li>curves flatten into 24 segments for fill and row-count calculations</li><li>full selection, deletion, persistence, and undo/redo support</li><li>add Bézier button to the sidebar shape tools</li></ul></li><li>Add pattern import/export with replace and merge modes<ul><li>serialize sketch state to JSON pattern files</li><li>import supports replace (overwrite) and merge (remap ids and append)</li><li>add export and import buttons to the sketch panel</li></ul></li></ul><h4>Fixes</h4><ul><li>Handle gzip-compressed webhook payloads from GitHub<ul><li>GitHub sends webhooks with Content-Encoding: gzip for larger payloads. The signature is computed on the raw compressed bytes, so decompression must happen after signature verification. Also collect raw Buffer chunks instead of concatenating strings to avoid corrupting binary gzip data.</li></ul></li><li>Handle form-urlencoded webhook payloads from GitHub<ul><li>GitHub webhooks can be configured with Content-Type application/x-www-form-urlencoded, which wraps the JSON payload in a payload= form field. Parse the form field and URL-decode the JSON after signature verification. Also handle the gzip case on the raw bytes before form parsing.</li></ul></li><li>Drop /pages/ prefix from nav and changelog fragment URLs</li><li>Offset icons beside constrained geometry</li><li>Rebuild hydrated objects and resolve source imports</li></ul><h4>Documentation</h4><ul><li>Update solver migration roadmap and AGENTS notes</li></ul><h4>Refactors</h4><ul><li>Align v1/v2 fragments and add version anchors<ul><li>add version anchor IDs to first li per version in generator</li><li>wrap single-string descriptions in ul/li instead of p</li><li>add v1 sidebar blocks (Change Types + Versions) with data-version</li><li>fix sidebar block show/hide on tab switch</li><li>align v1 style to match v2 (heading levels, labels, text)</li><li>remove build snapshot description sentence</li><li>update aria-label to Changelog sections</li></ul></li><li>Split sketchLayer into focused render and event modules<ul><li>extract entity rendering into sketchEntityRenderer.js</li><li>extract preview rendering into sketchPreviewRenderer.js</li><li>extract hit testing into sketchHitTest.js</li><li>extract stage event setup into sketchStageEvents.js</li><li>include bézier rendering and hit testing in the new modules</li><li>flatten bézier segments in gridLayer for closed-shape fill</li></ul></li><li>Convert rectangle to individual lines with corner-to-corner workflow<ul><li>corner-to-corner workflow replaces center-outward</li><li>center point snaps to nearby existing points (e.g. origin anchor)</li><li>diagonal construction lines keep center alive via midpoint constraints</li><li>deleting both diagonals reclaims center point via orphan cleanup</li><li>each edge is independently selectable and deletable</li><li>remove rectangle composite from persistence, snapshot, selection, and deletion</li></ul></li></ul><h4>Tests</h4><ul><li>Wait for solver readiness and add circle/rectangle/parallel specs</li><li>Remove dead dofAnalyzer/overconstraintChecker tests and stub solver in undo tests</li></ul><h4>Maintenance</h4><ul><li>Reorganise static pages and partials under public/pages<ul><li>Move index.html, changelog pages, changelog fragments, and partials into public/pages so Vite's publicDir and htmlIncludes plugin serve them consistently.</li></ul></li><li>Split SolveSpace WASM runtime into .js and .wasm<ul><li>Replace the single-file base64-embedded slvs.js with a separate slvs.wasm binary so the browser can stream and instantiate it.</li></ul></li></ul><h4>Other Changes</h4><ul><li>Align type scale, chip, panel, and list styles with CraftCMS<ul><li>reduce type-body to 14px and type-subtitle to 13px</li><li>change chip to inline-flex with 12px border-radius</li><li>update panel padding and add margin-bottom</li><li>add list styling with border-top separators in panel--padded</li><li>widen page-layout sidebar column to 340px</li><li>adjust sticky sidebar top offset to 129px</li><li>remove subtitle and container-content scoped styles</li><li>add changelog sidebar block and version scroll CSS</li><li>add tab-bar, tab-btn, and tab-panel CSS</li></ul></li><li>Update sidebar, header, and index markup for new page layout</li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.4.0">
+    <h3>v0.4.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.4.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Add build-time HTML includes via Vite plugin<ul><li>add htmlIncludes() Vite plugin for HTML include directives</li><li>create partials/header.html, footer.html, sidebar.html</li><li>refactor index.html to use includes instead of inline header/footer</li><li>add page-home body class for nav active state</li></ul></li></ul><h4>Documentation</h4><ul><li>Document WASM solver loading and mitigations<ul><li>Record the root cause (SINGLE_FILE=1 base64 embed forcing synchronous decode + non-streaming instantiate), the lazy-load mitigations shipped here, and the approaches tried and rejected (requestIdleCallback, listening:false on grid/overlay layers, E2E flakiness) so future sessions don't re-investigate the freeze in circles.</li></ul></li></ul><h4>Tests</h4><ul><li>Wait for lazy solver load in sketch helpers<ul><li>The solver no longer loads eagerly at boot, so automated tests that click through constraint/dimension steps in milliseconds race ahead of the async WASM load. Explicitly trigger ensureSolver() and wait for ready in openSketch() to keep constraint-dependent assertions deterministic.</li></ul></li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.3.0">
+    <h3>v0.3.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.3.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Add changelog page with v1/v2 tabs<ul><li>Add pages/changelog.html with separated layout (global header, page header, content area, footer) and v1/v2 tab switching</li><li>Add --format=html to generate-build-info.mjs for HTML changelog fragments</li><li>Fix artificial line breaks in captions (trim git log fields) and word-wrapped paragraph lines becoming separate bullets</li><li>Generate public/changelog-v2.html from KnitStitch git history</li><li>Copy CraftCMS changelog history to public/changelog-v1.html with caption line breaks fixed</li><li>Add CSS for chips, color-pairs, panels, lists, and tab bar</li><li>Add pages/changelog.html as second Vite build entry</li><li>Update nav link from /CHANGELOG.md to /pages/changelog.html</li><li>Update build-info scripts to also generate HTML changelog</li></ul></li><li>Add GitHub webhook for VPS auto-deploy<ul><li>Add webhook.php adapted from CraftCMS webhook (same HMAC-SHA256 signature verification) but with npm ci + npm run build instead of composer install</li><li>Add .env.example with GITHUB_WEBHOOK_SECRET template</li><li>Add .env to .gitignore, fix corrupted .gitignore encoding</li><li>Update AGENTS.md with VPS deploy section, SSH setup steps, and architecture entries for webhook.php, .env.example, pages/</li><li>Update README.md with deployment note</li></ul></li><li>Add boot loading overlay for solver initialization<ul><li>Shown from first paint until the SolveSpace WASM solver finishes loading so the page reads as &quot;loading&quot; instead of &quot;crashed&quot; during the main-thread block. The spinner uses a transform-only CSS animation so it keeps visibly spinning even while the main thread is busy.</li></ul></li></ul><h4>Fixes</h4><ul><li>Defer solver load and drop canvas hit-test reads<ul><li>The page was sluggish and triggered recurring HTML5 canvas permission prompts. Two root causes: the ~6 MB SolveSpace WASM bundle was instantiated eagerly at boot (a long main-thread block), and Konva's pixel-based hit detection called getImageData() on every pointer event (prompting per-canvas privacy permissions in browsers like LibreWolf).</li><li>load the solver lazily via ensureSolver() (idempotent, memoized) instead of in the SketchService constructor; main.js no longer blocks boot on it, and tool selection / solve attempts trigger it as a fallback</li><li>set grid and sketch layers to listening:false and route pointer events through the app's own geometry hit testing (nearestPoint/nearestLine) instead of Konva's hit canvas, eliminating the getImageData() reads that caused the repeated prompts</li></ul></li></ul><h4>Documentation</h4><ul><li>Rewrite git-rules for KnitStitch project<ul><li>replace Craft CMS references with Node.js tooling</li><li>update scopes to match project areas (sketch, solver, grid, etc.)</li><li>add style commit type, update examples</li></ul></li></ul><h4>Refactors</h4><ul><li>Remove dead native solver code<ul><li>delete 7 native solver modules and 4 unit tests (2275 lines)</li><li>remove solverBackend flag, native fallback branches, enforce* calls</li><li>adapter solve() distinguishes user-drag from reconverge semantics</li><li>accept RESULT_REDUNDANT_OKAY, restore anchor positions in writeBack</li><li>keep perpendicularFeasibility, dofAnalyzer, overconstraintChecker</li></ul></li><li>Replace PHP webhook with Node.js webhook server<ul><li>Replace webhook.php with scripts/webhook-server.mjs (no external dependencies, uses only Node.js built-ins)</li><li>Add ecosystem.config.cjs for PM2 process management</li><li>Update .env.example to reference webhook-server.mjs</li><li>Update AGENTS.md with Node.js webhook setup instructions (PM2, nginx proxy, ecosystem config)</li><li>Update README.md deploy note</li><li>nginx on the KnitStitch subdomain is a static/Node site with no PHP processing, so the PHP webhook returned 405. The Node.js server runs on 127.0.0.1:3001 with nginx proxying /webhook to it.</li></ul></li></ul><h4>Other Changes</h4><ul><li>Update app styles and index.html</li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.2.0">
+    <h3>v0.2.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.2.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Features</h4><ul><li>Integrate SolveSpace WASM constraint solver<ul><li>Replace the hand-rolled gradient-descent solver with SolveSpace's Newton's-method solver, compiled to WebAssembly. Shipped behind a solverBackend feature flag ('native' | 'slvs') so the existing solver stays available as a fallback.</li><li>The SolveSpace solver is built from a fork of solvespace/solvespace (XanthiaJo/SolverWasm) which already includes embind JS bindings and a CMake slvs-wasm target. The built slvs.js (6 MB, single-file with embedded WASM) is committed as a static asset in public/wasm/.</li><li>Key pieces:</li><li>bridges KnitStitch's sketch model (points, lines, constraints, dimensions in pixels) to SolveSpace entities. Uses a uniform scale (X-axis stitch scale) for both axes to preserve angles despite the non-square grid.</li><li>sketchService._solve: single dispatch point that routes to the SLVS adapter when the flag is set, otherwise falls through to the existing native solver path.</li><li>all three dual-solver branches replaced with service._solve() calls.</li><li>solverBackend flag added to sketch state, currently set to 'slvs'.</li><li>SolveSpace is GPL-3.0-or-later, so KnitStitch adopts GPL-3.0-or-later accordingly (LICENSE added, package.json updated).</li></ul></li></ul><h4>Maintenance</h4><ul><li>Add VS Code workspace config and build tooling<ul><li>Add VS Code launch/tasks config, the build-info generator script, generated buildInfo.js, CHANGELOG.md, and the historical CraftCMS changelog reference.</li></ul></li></ul></div>
+  </section>
+  <section class="panel panel--padded" id="release-v0.1.0">
+    <h3>v0.1.0</h3>
+    <div class="container-actions">
+      <span class="chip color-pair-stone">Published 2026-08-08</span>
+      <a class="chip color-pair-sky" href="https://github.com/Box-of-Dragons/KnitStitch/tree/v0.1.0">View on GitHub</a>
+    </div>
+    <div class="release-body body"><h4>Breaking Changes</h4><ul><li>Initialize standalone KnitStitch Grid app<ul><li>extract app from CraftCMS into standalone Vite project</li><li>serve from own subdomain (www.knitstitch.misssponto.me.uk)</li><li>standalone index.html with simple header, no Craft partials</li><li>extract CSS into public/css/app.css with design tokens and components</li><li>update test configs for Vite dev server (no DDEV/CraftCMS needed)</li><li>93 unit tests passing, Playwright E2E auto-starts dev server</li><li>KnitStitch is now a standalone app, no longer embedded in CraftCMS.</li></ul></li></ul></div>
   </section>
 </div>

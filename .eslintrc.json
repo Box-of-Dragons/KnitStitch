@@ -23,7 +23,8 @@
     "afterEach": "readonly",
     "beforeAll": "readonly",
     "afterAll": "readonly",
-    "page": "readonly"
+    "page": "readonly",
+    "fetch": "readonly"
   },
   "rules": {
     "no-var": "error",
