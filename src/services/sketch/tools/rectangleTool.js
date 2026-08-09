@@ -51,14 +51,16 @@ export class RectangleTool {
       return;
     }
 
-    // Second click: commit the rectangle with the opposite corner.
-    const dx = Math.abs(position.x - this.pendingCorner.x);
-    const dy = Math.abs(position.y - this.pendingCorner.y);
+    // Second click: resolve and commit the opposite corner.
+    const cornerB = this._resolveOrCreatePoint(position, snapEnabled);
+    const dx = Math.abs(cornerB.x - this.pendingCorner.x);
+    const dy = Math.abs(cornerB.y - this.pendingCorner.y);
     if (dx < 2 || dy < 2) {
+      this.service._removeOrphanPoint(cornerB);
       this.cancel();
       return;
     }
-    this._commitRectangle(this.pendingCorner, position);
+    this._commitRectangle(this.pendingCorner, cornerB);
     this.pendingCorner = null;
     this._clearPreview();
   }
@@ -121,9 +123,20 @@ export class RectangleTool {
     const minY = Math.min(cornerA.y, cornerB.y);
     const maxY = Math.max(cornerA.y, cornerB.y);
 
-    const tl = this._createPoint({ x: minX, y: minY });
+    // Reuse the clicked corner points instead of creating duplicates at the
+    // same locations. A and B are the two opposite corners, so one is the
+    // top-left and the other is the bottom-right (depending on drag direction).
+    const tl = (cornerA.x === minX && cornerA.y === minY)
+      ? cornerA
+      : (cornerB.x === minX && cornerB.y === minY)
+        ? cornerB
+        : this._createPoint({ x: minX, y: minY });
+    const br = (cornerA.x === maxX && cornerA.y === maxY)
+      ? cornerA
+      : (cornerB.x === maxX && cornerB.y === maxY)
+        ? cornerB
+        : this._createPoint({ x: maxX, y: maxY });
     const tr = this._createPoint({ x: maxX, y: minY });
-    const br = this._createPoint({ x: maxX, y: maxY });
     const bl = this._createPoint({ x: minX, y: maxY });
 
     // Edge lines: top, right, bottom, left

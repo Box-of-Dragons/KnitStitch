@@ -28,6 +28,24 @@ export function deleteSelected(service, ) {
       service._removeOrphanPoint(point);
     }
 
+    // Final pass: any point no longer referenced by a line, dimension,
+    // constraint, or bezier is now an orphan and can be removed.
+    const allPoints = [...sketch.points];
+    for (const point of allPoints) {
+      service._removeOrphanPoint(point);
+    }
+
+    // Drop any constraints/dimensions/circles/lines that now reference
+    // removed points.
+    const pointSet = new Set(sketch.points);
+    sketch.constraints = sketch.constraints.filter((c) =>
+      (!c.pointA || pointSet.has(c.pointA)) && (!c.pointB || pointSet.has(c.pointB)),
+    );
+    sketch.dimensions = sketch.dimensions.filter((d) =>
+      pointSet.has(d.a) && pointSet.has(d.b),
+    );
+    sketch.circles = (sketch.circles || []).filter((c) => pointSet.has(c.center));
+
     service._selectedPoints.clear();
     service._selectedLines.clear();
     service._setSnapCandidate(null);

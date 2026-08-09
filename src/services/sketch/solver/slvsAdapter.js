@@ -122,12 +122,21 @@ export class SlvsAdapter {
     }
 
     // Circles → slvs.addCircle (needs a normal + distance entity for radius)
+    // Guard these calls: the packaged slvs.js build may not expose or support
+    // addCircle/addDistance, in which case it aborts the whole WASM runtime.
     for (const c of sketch.circles || []) {
       const centerH = this.pointHandles.get(c.center.id);
       if (!centerH || !this.normal2d) continue;
-      const radiusH = this.slvs.addDistance(this.g, this.pxToSolver(c.radius), this.wp);
-      const circleH = this.slvs.addCircle(this.g, this.normal2d, centerH, radiusH, this.wp);
-      this.circleHandles.set(c.id, { circle: circleH, radius: radiusH });
+      try {
+        if (typeof this.slvs.addDistance !== 'function' || typeof this.slvs.addCircle !== 'function') {
+          continue;
+        }
+        const radiusH = this.slvs.addDistance(this.g, this.pxToSolver(c.radius), this.wp);
+        const circleH = this.slvs.addCircle(this.g, this.normal2d, centerH, radiusH, this.wp);
+        this.circleHandles.set(c.id, { circle: circleH, radius: radiusH });
+      } catch {
+        // ignore: solver build doesn't support circles yet
+      }
     }
 
     // Constraints → mapped per type

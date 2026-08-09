@@ -53,13 +53,10 @@ export function deleteSketchSelection({ sketch, selectedPoints, selectedLines })
   if (sketch.constraints.length > 0) {
     sketch.constraints = sketch.constraints.filter((constraint) => {
       if (constraint?.isSelected) return false;
-      const usesRemovedPoint =
-        (constraint?.pointA && removedPoints.has(constraint.pointA))
-        || (constraint?.pointB && removedPoints.has(constraint.pointB));
       const usesRemovedLine =
         (constraint?.lineA && linesToRemove.has(constraint.lineA))
         || (constraint?.lineB && linesToRemove.has(constraint.lineB));
-      return !usesRemovedLine && !usesRemovedPoint;
+      return !usesRemovedLine;
     });
   }
 
