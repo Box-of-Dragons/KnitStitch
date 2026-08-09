@@ -5,7 +5,7 @@
 const STORAGE_KEY = 'knitstitch.sidebar-width';
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 600;
-const DEFAULT_WIDTH = 240;
+const DEFAULT_WIDTH = 320;
 const PROPERTY_NAME = '--sidebar-width';
 
 export function setupSidebarResizer({
@@ -42,6 +42,10 @@ export function setupSidebarResizer({
     if (!handle) return;
 
     e.preventDefault();
+    try {
+      handle.setPointerCapture(e.pointerId);
+    } catch { /* ignore */ }
+
     handle.classList.add('is-active');
     const startX = e.clientX;
     const sidebar = handle.closest('.ribbon-bar--workspace');
@@ -55,13 +59,15 @@ export function setupSidebarResizer({
 
     function onPointerUp() {
       handle.classList.remove('is-active');
-      documentObj.removeEventListener('pointermove', onPointerMove);
-      documentObj.removeEventListener('pointerup', onPointerUp);
+      handle.removeEventListener('pointermove', onPointerMove);
+      handle.removeEventListener('pointerup', onPointerUp);
+      handle.removeEventListener('pointercancel', onPointerUp);
       documentObj.body.classList.remove('is-panel-resizing');
     }
 
-    documentObj.addEventListener('pointermove', onPointerMove);
-    documentObj.addEventListener('pointerup', onPointerUp);
+    handle.addEventListener('pointermove', onPointerMove);
+    handle.addEventListener('pointerup', onPointerUp);
+    handle.addEventListener('pointercancel', onPointerUp);
     documentObj.body.classList.add('is-panel-resizing');
   }
 

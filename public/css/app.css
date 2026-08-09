@@ -215,7 +215,7 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
-  width: var(--sidebar-width, 240px);
+  width: var(--sidebar-width, 320px);
   min-width: 180px;
   max-width: 600px;
   padding: 0;
@@ -233,12 +233,13 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 2px;
+  width: 6px;
   height: 100%;
   cursor: col-resize;
   z-index: 250;
   background: transparent;
   transition: box-shadow 0.1s;
+  touch-action: none;
 }
 
 .sidebar-resizer:hover,
