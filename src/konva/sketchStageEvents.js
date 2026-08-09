@@ -21,14 +21,28 @@
 export function setupSketchStageEvents(stage, store, service, hitTest) {
   const stageContent = stage.content;
 
-  const onNativeMouseMove = (event) => {
+  const isDragging = () => Boolean(
+    service._dragPoint || service._dragLine || service._dragCircle,
+  );
+
+  const onDocumentMouseMove = (event) => {
+    // Keep an active drag alive even if the cursor crosses the canvas edge.
+    // Outside a drag, only canvas moves should update tool previews.
+    if (!isDragging() && !stageContent.contains(event.target)) return;
     stage.setPointersPositions(event);
     handlePointerMove(stage, event);
   };
-  stageContent.addEventListener('mousemove', onNativeMouseMove);
+  const onDocumentMouseUp = () => {
+    if (!store.get('sketch.isActive') || !isDragging()) return;
+    service.onCanvasMouseUp();
+    document.body.style.cursor = 'default';
+  };
+  document.addEventListener('mousemove', onDocumentMouseMove);
+  document.addEventListener('mouseup', onDocumentMouseUp);
 
   stage.on('click tap', (e) => {
     if (!store.get('sketch.isActive') || store.get('cellFillEnabled')) return;
+    if (e.evt instanceof MouseEvent && e.evt.button !== 0) return;
     const pos = stage.getRelativePointerPosition();
     if (!pos) return;
     const target = hitTest(pos);
@@ -73,13 +87,7 @@ export function setupSketchStageEvents(stage, store, service, hitTest) {
       service.selectConstraint(target.constraint, e.evt.ctrlKey);
       return;
     }
-    service.onCanvasMouseDown(pos, { snapEnabled: !e.evt.ctrlKey });
-  });
-
-  stage.on('mouseup', () => {
-    if (!store.get('sketch.isActive')) return;
-    service.onCanvasMouseUp();
-    document.body.style.cursor = 'default';
+    service.onCanvasMouseDown(pos, { snapEnabled: !e.evt.ctrlKey, target });
   });
 
   // Right-click cancels current action and returns to Select tool
@@ -100,7 +108,8 @@ export function setupSketchStageEvents(stage, store, service, hitTest) {
 
   return {
     destroy() {
-      stageContent.removeEventListener('mousemove', onNativeMouseMove);
+      document.removeEventListener('mousemove', onDocumentMouseMove);
+      document.removeEventListener('mouseup', onDocumentMouseUp);
     },
   };
 }

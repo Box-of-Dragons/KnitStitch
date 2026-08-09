@@ -1,5 +1,5 @@
 export function deleteSketchSelection({ sketch, selectedPoints, selectedLines }) {
-  const removedPoints = new Set(selectedPoints);
+  const removedPoints = new Set([...selectedPoints].filter((p) => !p.isOrigin));
   const linesToRemove = new Set(selectedLines);
 
   // Collect circles to remove (selected or whose center is a removed point)

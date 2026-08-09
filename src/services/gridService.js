@@ -77,6 +77,8 @@ export function getCombinedBoundingBox(filledCells, sketchFilled) {
 }
 
 export function updateCellSizing(store, stitchesPer4Inches, rowsPer4Inches) {
-    store.set('cellWidthPx', Math.max(1, stitchesPer4Inches));
-    store.set('cellHeightPx', Math.max(1, rowsPer4Inches));
+    const stitches = Math.max(1, stitchesPer4Inches);
+    const rows = Math.max(1, rowsPer4Inches);
+    store.set('cellWidthPx', stitches);
+    store.set('cellHeightPx', Math.max(1, (stitches * stitches) / rows));
 }

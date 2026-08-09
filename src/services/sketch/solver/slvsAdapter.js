@@ -325,7 +325,7 @@ export class SlvsAdapter {
    *   during a reconverge (e.g. the point in a midpoint constraint). All
    *   other non-anchor points will be marked as dragged (prefer to stay).
    */
-  solve(draggedPoints, freeMovePoints = null, calculateFaileds = false) {
+  solve(draggedPoints, freeMovePoints = null, calculateFaileds = false, draggedCircles = null) {
     if (draggedPoints && draggedPoints.size > 0) {
       // User drag: mark dragged points as preferring to stay at mouse pos.
       for (const pt of draggedPoints) {
@@ -355,6 +355,13 @@ export class SlvsAdapter {
       // the solver distributes movement minimally.
       for (const h of this.pointHandles.values()) {
         this.slvs.markDragged(h);
+      }
+    }
+    if (draggedCircles && draggedCircles.size > 0) {
+      for (const circle of draggedCircles) {
+        const handles = this.circleHandles.get(circle.id);
+        if (!handles?.radius) continue;
+        this.slvs.setParamValue(handles.radius.param[0], this.pxToSolver(circle.radius));
       }
     }
     return this.slvs.solveSketch(this.g, calculateFaileds);
@@ -476,9 +483,14 @@ export class SlvsAdapter {
    * @param {Set} draggedPoints - user-dragged points (or empty set for reconverge)
    * @param {Set|null} freeMovePoints - for reconverge: points to move freely
    */
-  solveAndWriteBack(sketch, draggedPoints, freeMovePoints = null) {
+  solveAndWriteBack(sketch, draggedPoints, freeMovePoints = null, draggedCircles = null) {
     this.syncFromSketch(sketch);
-    const result = this.solve(draggedPoints?.size > 0 ? draggedPoints : null, freeMovePoints);
+    const result = this.solve(
+      draggedPoints?.size > 0 ? draggedPoints : null,
+      freeMovePoints,
+      false,
+      draggedCircles?.size > 0 ? draggedCircles : null,
+    );
     // Accept both OKAY and REDUNDANT_OKAY — the latter means the system
     // is solvable but has redundant constraints (e.g. two ways to specify
     // the same distance). The solution is still valid.

@@ -37,8 +37,15 @@ export function setupMainUi({ store, sketchService, documentObj = globalThis.doc
   // Cross-panel subscription: sketch line changes trigger recalculation
   // and grid sidebar update (sketch fills affect the grid display).
   store.subscribe((path) => {
-    if (path === 'sketch.lines' || path === 'sketch.isActive') {
-      grid.recalculateSize();
+    if (
+      path === 'sketch.lines'
+      || path === 'sketch.beziers'
+      || path === 'sketch.circles'
+      || path === 'sketch.points'
+      || path === 'sketch.isDragging'
+      || path === 'sketch.isActive'
+    ) {
+      if (!store.get('sketch.isDragging')) grid.scheduleRecalculateSize();
       grid.updateGridSidebar();
     }
   });

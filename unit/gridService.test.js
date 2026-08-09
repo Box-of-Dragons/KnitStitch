@@ -81,7 +81,7 @@ describe('GridService', () => {
       const store = makeStore();
       updateCellSizing(store, 24, 32);
       expect(store.get('cellWidthPx')).toBe(24);
-      expect(store.get('cellHeightPx')).toBe(32);
+      expect(store.get('cellHeightPx')).toBe(18);
     });
 
     it('should clamp to minimum of 1', () => {

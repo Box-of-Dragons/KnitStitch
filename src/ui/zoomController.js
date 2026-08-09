@@ -5,7 +5,7 @@ import {
   zoomAt,
   zoomCentered,
 } from '../services/zoomService.js';
-import { computeFilledCellsFromSketch } from '../services/sketch/fill/closedShapeFill.js';
+import { computeFilledCellsForSketch } from '../services/sketch/fill/closedShapeFill.js';
 import { getCombinedBoundingBox } from '../services/gridService.js';
 import { collectRefs, bindIfPresent } from './uiUtils.js';
 
@@ -48,8 +48,8 @@ export function setupZoomController({ store, documentObj = globalThis.document }
     const cellW = store.get('cellWidthPx');
     const cellH = store.get('cellHeightPx');
     const filledCells = store.get('filledCells');
-    const sketchFilled = computeFilledCellsFromSketch(
-      store.get('sketch.lines'),
+    const sketchFilled = computeFilledCellsForSketch(
+      store.state.sketch,
       cellW,
       cellH,
       store.get('fillThreshold'),

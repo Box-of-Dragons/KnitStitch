@@ -52,6 +52,7 @@ export class SketchLayer {
     this.layer = new Konva.Layer({ name: 'sketchLayer', listening: false });
     this._overlay = new SketchOverlay(store);
     this._events = null;
+    this._renderFrame = null;
     this._unsubscribe = store.subscribe((path) => this._onStoreChange(path));
   }
 
@@ -70,16 +71,25 @@ export class SketchLayer {
     this._unsubscribe();
     this._events?.destroy();
     this._overlay.destroy();
+    if (this._renderFrame !== null) cancelAnimationFrame(this._renderFrame);
     this.layer.destroy();
   }
 
   _onStoreChange(path) {
     if (RENDER_TRIGGERS.has(path)) {
-      this._render();
+      this._scheduleRender();
     }
     if (path === 'sketch.cursorMessage') {
       this._overlay.showCursorMessage(this.store.get('sketch.cursorMessage'), this.layer.getStage());
     }
+  }
+
+  _scheduleRender() {
+    if (this._renderFrame !== null) return;
+    this._renderFrame = requestAnimationFrame(() => {
+      this._renderFrame = null;
+      this._render();
+    });
   }
 
   _render() {

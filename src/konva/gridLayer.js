@@ -1,6 +1,6 @@
 import Konva from 'konva';
 import { toggleCell } from '../services/gridService.js';
-import { computeFilledCellsFromSketch } from '../services/sketch/fill/closedShapeFill.js';
+import { buildSketchFillSegments, computeFilledCellsForSketch } from '../services/sketch/fill/closedShapeFill.js';
 
 const FILL_COLOR = '#ca9b52';
 const GRID_PADDING = 2; // extra cells rendered beyond viewport edges
@@ -18,14 +18,15 @@ export class GridLayer {
     this.layer.add(this._imageNode);
     this._unsubscribe = store.subscribe((path) => this._onStoreChange(path));
 
-    // Cache for sketch-derived filled cells. Only recomputed when sketch.lines
-    // changes — pan/zoom redraws reuse the cached set.
+    // Cache for sketch-derived filled cells. Only recomputed when sketch
+    // geometry changes; pan/zoom redraws reuse the cached set.
     this._sketchFilledCache = null;
     this._sketchFilledKey = null;
 
     // Throttle state for pan/zoom redraws
     this._panRedrawPending = false;
     this._lastPanRedraw = 0;
+    this._geometryRedrawPending = false;
 
     this._drawGrid();
   }
@@ -54,24 +55,40 @@ export class GridLayer {
   }
 
   _onStoreChange(path) {
-    if (
-      path === 'cellWidthPx' ||
-      path === 'cellHeightPx' ||
-      path === 'filledCells' ||
-      path === 'fillThreshold' ||
-      path === 'sketch.lines' ||
-      path === 'sketch.isActive' ||
-      path === 'cellFillEnabled'
-    ) {
-      // Content changed — redraw immediately
+    if (path === 'sketch.isDragging') {
       this._sketchFilledCache = null;
-      this._drawGrid();
-    } else if (
-      path === 'zoomLevel' ||
-      path === 'panOffsetX' ||
-      path === 'panOffsetY'
+      if (!this.store.get('sketch.isDragging')) {
+        // The drag loop intentionally skips expensive fill work. Rebuild it
+        // synchronously on release so the grid cannot retain the old shape
+        // until some unrelated click triggers another store change.
+        this._drawGrid();
+      }
+      return;
+    }
+
+    if (
+      path === 'cellWidthPx'
+      || path === 'cellHeightPx'
+      || path === 'filledCells'
+      || path === 'fillThreshold'
+      || path === 'sketch.lines'
+      || path === 'sketch.beziers'
+      || path === 'sketch.circles'
+      || path === 'sketch.points'
+      || path === 'sketch.isActive'
+      || path === 'cellFillEnabled'
     ) {
-      // Viewport changed — throttle to avoid redrawing on every mousemove pixel
+      // Geometry is updated for every pointer move. Rebuilding the grid and
+      // its fill raster synchronously here starves the next pointer event.
+      this._sketchFilledCache = null;
+      if (this.store.get('sketch.isDragging')) return;
+      this._scheduleGeometryRedraw();
+    } else if (
+      path === 'zoomLevel'
+      || path === 'panOffsetX'
+      || path === 'panOffsetY'
+    ) {
+      // Viewport changed - throttle to avoid redrawing on every mousemove pixel
       this._schedulePanRedraw();
     }
   }
@@ -92,6 +109,16 @@ export class GridLayer {
         this._drawGrid();
       }, delay);
     }
+  }
+
+  _scheduleGeometryRedraw() {
+    if (this._geometryRedrawPending) return;
+    this._geometryRedrawPending = true;
+    requestAnimationFrame(() => {
+      this._geometryRedrawPending = false;
+      if (this.store.get('sketch.isDragging')) return;
+      this._drawGrid();
+    });
   }
 
   /**
@@ -132,44 +159,34 @@ export class GridLayer {
 
   /**
    * Returns the cached sketch-filled cells, recomputing only when
-   * sketch.lines has changed since the last call.
+   * sketch geometry has changed since the last call.
    */
   _getSketchFilled() {
-    const lines = this.store.get('sketch.lines');
-    const beziers = this.store.get('sketch.beziers') || [];
-    // Flatten Béziers into line segments so they participate in closed-shape
-    // detection and cell-fill calculations alongside regular sketch lines.
-    const bezierSegments = [];
-    for (const b of beziers) {
-      const { start, control1, control2, end } = b;
-      const segs = 24;
-      let prevX = start.x, prevY = start.y;
-      for (let i = 1; i <= segs; i++) {
-        const t = i / segs;
-        const mt = 1 - t;
-        const x = mt * mt * mt * start.x + 3 * mt * mt * t * control1.x + 3 * mt * t * t * control2.x + t * t * t * end.x;
-        const y = mt * mt * mt * start.y + 3 * mt * mt * t * control1.y + 3 * mt * t * t * control2.y + t * t * t * end.y;
-        bezierSegments.push({ start: { x: prevX, y: prevY }, end: { x, y }, isConstruction: false });
-        prevX = x;
-        prevY = y;
-      }
-    }
-    const allLines = [...(lines || []), ...bezierSegments];
-    // Use line count + a fingerprint of line endpoints so that moving
-    // a point (without adding/removing lines) invalidates the cache.
+    const sketch = this.store.state.sketch || {};
     const fillThreshold = this.store.get('fillThreshold');
-    let key = `threshold:${fillThreshold}`;
-    if (allLines.length > 0) {
-      let h = allLines.length;
-      for (const l of allLines) {
-        h = h * 31 + (Math.round(l.start.x) + Math.round(l.start.y) * 7 + Math.round(l.end.x) * 13 + Math.round(l.end.y) * 17);
+    const segments = buildSketchFillSegments(sketch);
+    let key = `threshold:${fillThreshold}:segments:${segments.length}`;
+
+    if (segments.length > 0) {
+      let h = segments.length;
+      for (const segment of segments) {
+        // Keep this a 32-bit hash. Letting the value grow without bound
+        // loses low-order coordinate changes to floating-point precision,
+        // which can preserve an old fill after a geometry update.
+        h = Math.imul(h, 31) + (
+          Math.round(segment.start.x)
+          + Math.round(segment.start.y) * 7
+          + Math.round(segment.end.x) * 13
+          + Math.round(segment.end.y) * 17
+        );
       }
-      key = String(h);
+      key = `${fillThreshold}:${h}`;
     }
+
     if (this._sketchFilledKey !== key || this._sketchFilledCache === null) {
       const cellW = this.store.get('cellWidthPx');
       const cellH = this.store.get('cellHeightPx');
-      this._sketchFilledCache = computeFilledCellsFromSketch(allLines, cellW, cellH, this.store.get('fillThreshold'));
+      this._sketchFilledCache = computeFilledCellsForSketch(sketch, cellW, cellH, fillThreshold);
       this._sketchFilledKey = key;
     }
     return this._sketchFilledCache;
@@ -213,7 +230,7 @@ export class GridLayer {
       }
     }
 
-    // Draw all grid lines as a single path — one stroke() call
+    // Draw all grid lines as a single path - one stroke() call
     ctx.beginPath();
     for (let c = 0; c <= cols; c++) {
       const x = c * cellW;
@@ -250,7 +267,6 @@ export class GridLayer {
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
-
 
     this._imageNode.width(w);
     this._imageNode.height(h);

@@ -1,6 +1,6 @@
 import { SketchTool } from '../services/sketch/sketchService.js';
 import { collectRefs, bindIfPresent, toggleActive } from './uiUtils.js';
-import { computeFilledCellsFromSketch } from '../services/sketch/fill/closedShapeFill.js';
+import { computeFilledCellsForSketch } from '../services/sketch/fill/closedShapeFill.js';
 import { buildRowInstructions } from '../services/rowCountService.js';
 import { setupSketchImportExport } from './sketchImportExport.js';
 
@@ -54,7 +54,7 @@ const OBJECT_ICONS = {
 export function setupSketchPanel({ store, sketchService, documentObj = globalThis.document }) {
   const refs = collectRefs(documentObj, REF_IDS);
 
-  function updateSketchSidebar() {
+  function updateSketchSidebar({ updateConstraintStatus = true } = {}) {
     const sketch = store.state.sketch;
     if (refs.sketchColorSelect) refs.sketchColorSelect.value = sketch.strokeColor;
     if (refs.sketchThicknessSlider) refs.sketchThicknessSlider.value = sketch.strokeThickness;
@@ -106,7 +106,7 @@ export function setupSketchPanel({ store, sketchService, documentObj = globalThi
       ).join('');
     }
 
-    if (refs.sketchConstraintStatus) {
+    if (refs.sketchConstraintStatus && updateConstraintStatus) {
       const analysis = sketchService._slvsAdapter?.ready
         ? sketchService._slvsAdapter.analyze(store.state.sketch)
         : { dof: 0, status: 'under', issues: [] };
@@ -213,8 +213,8 @@ export function setupSketchPanel({ store, sketchService, documentObj = globalThi
   function updateRowCountsSidebar() {
     const filledCells = store.state.filledCells || new Set();
     const sketch = store.state.sketch;
-    const sketchFilled = computeFilledCellsFromSketch(
-      sketch.lines,
+    const sketchFilled = computeFilledCellsForSketch(
+      sketch,
       store.state.cellWidthPx,
       store.state.cellHeightPx,
       store.state.fillThreshold,
@@ -242,11 +242,37 @@ export function setupSketchPanel({ store, sketchService, documentObj = globalThi
 
   // Store subscription
   store.subscribe((path) => {
-    if (path.startsWith('sketch.')) {
-      updateSketchSidebar();
+    if (store.get('sketch.isDragging') && (
+      path === 'sketch.points'
+      || path === 'sketch.lines'
+      || path === 'sketch.circles'
+      || path === 'sketch.beziers'
+      || path === 'sketch.dimensions'
+      || path === 'sketch.constraints'
+    )) {
+      return;
     }
-    if (path === 'filledCells' || path === 'sketch.lines' || path === 'cellWidthPx' || path === 'cellHeightPx' || path === 'fillThreshold') {
-      updateRowCountsSidebar();
+    if (path.startsWith('sketch.')) {
+      // `analyze()` rebuilds and solves the entire SolveSpace sketch. It is
+      // diagnostic UI, not part of rendering, so never run it per mousemove.
+      const updateConstraintStatus = path === 'sketch.constraints'
+        || path === 'sketch.dimensions'
+        || path === 'sketch.activeTool'
+        || path === 'sketch.isActive';
+      updateSketchSidebar({ updateConstraintStatus });
+    }
+    if (
+      path === 'filledCells'
+      || path === 'sketch.lines'
+      || path === 'sketch.beziers'
+      || path === 'sketch.circles'
+      || path === 'sketch.points'
+      || path === 'sketch.isDragging'
+      || path === 'cellWidthPx'
+      || path === 'cellHeightPx'
+      || path === 'fillThreshold'
+    ) {
+      if (!store.get('sketch.isDragging')) updateRowCountsSidebar();
     }
   });
 

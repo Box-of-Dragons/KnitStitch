@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildSketchFillSegments,
+  computeFilledCellsForSketch,
   computeFilledCellsFromSketch,
   findClosedPolygons,
 } from '../src/services/sketch/fill/closedShapeFill.js';
@@ -252,5 +254,35 @@ describe('computeFilledCellsFromSketch', () => {
       line(10, 90, 10, 10, true),
     ];
     expect(computeFilledCellsFromSketch(lines, cellW, cellH).size).toBe(0);
+  });
+});
+
+describe('computeFilledCellsForSketch', () => {
+  it('fills cells for circle entities', () => {
+    const sketch = {
+      lines: [],
+      beziers: [],
+      circles: [
+        {
+          center: { x: 50, y: 50 },
+          radius: 30,
+        },
+      ],
+    };
+
+    const filled = computeFilledCellsForSketch(sketch, 10, 10, 0.3);
+
+    expect(filled.size).toBeGreaterThan(0);
+    expect(filled.has('5,5')).toBe(true);
+  });
+
+  it('converts circles into closed segment loops', () => {
+    const segments = buildSketchFillSegments({
+      circles: [{ center: { x: 0, y: 0 }, radius: 20 }],
+    });
+
+    expect(segments.length).toBeGreaterThan(8);
+    expect(segments[0].start.x).toBeCloseTo(segments[segments.length - 1].end.x, 6);
+    expect(segments[0].start.y).toBeCloseTo(segments[segments.length - 1].end.y, 6);
   });
 });

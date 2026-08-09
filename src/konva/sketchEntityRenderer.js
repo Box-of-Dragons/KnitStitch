@@ -160,14 +160,8 @@ function attachPointInteractions(shape, pt, { isSelectTool, getStage, service })
     });
   });
 
-  if (!isSelectTool) return;
-
-  shape.on('mouseenter', () => { document.body.style.cursor = 'grab'; });
-  shape.on('mouseleave', () => { document.body.style.cursor = 'default'; });
-  shape.on('mousedown', (e) => {
-    e.cancelBubble = true;
-    document.body.style.cursor = 'grabbing';
-    const pos = { x: pt.x, y: pt.y };
-    service.startDrag(pos, { snapEnabled: !e.evt.ctrlKey });
-  });
+  // Dragging is deliberately owned by the stage-level handler. Rebuilding
+  // Konva entities during a drag destroys this shape, so shape-level drag
+  // listeners can leave an active drag detached from its visual entity.
+  void isSelectTool;
 }

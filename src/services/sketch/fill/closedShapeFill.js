@@ -11,6 +11,69 @@
  */
 
 const EPSILON = 0.01;
+const BEZIER_SEGMENTS = 24;
+const CIRCLE_SEGMENTS = 48;
+
+/**
+ * Convert sketch entities into boundary line segments that can participate in
+ * closed-shape detection and cell-fill calculations.
+ *
+ * @param {{ lines?: any[], beziers?: any[], circles?: any[] }} sketch
+ * @returns {Array<{start:{x:number,y:number},end:{x:number,y:number},isConstruction?:boolean}>}
+ */
+export function buildSketchFillSegments(sketch = {}) {
+  const segments = [...(sketch.lines || [])];
+
+  for (const bezier of sketch.beziers || []) {
+    const { start, control1, control2, end } = bezier;
+    let prevX = start.x;
+    let prevY = start.y;
+    for (let i = 1; i <= BEZIER_SEGMENTS; i++) {
+      const t = i / BEZIER_SEGMENTS;
+      const mt = 1 - t;
+      const x = mt * mt * mt * start.x + 3 * mt * mt * t * control1.x + 3 * mt * t * t * control2.x + t * t * t * end.x;
+      const y = mt * mt * mt * start.y + 3 * mt * mt * t * control1.y + 3 * mt * t * t * control2.y + t * t * t * end.y;
+      segments.push({
+        start: { x: prevX, y: prevY },
+        end: { x, y },
+        isConstruction: false,
+      });
+      prevX = x;
+      prevY = y;
+    }
+  }
+
+  for (const circle of sketch.circles || []) {
+    const { center, radius } = circle;
+    if (!center || !(radius > 0)) continue;
+    let prev = pointOnCircle(center, radius, 0);
+    for (let i = 1; i <= CIRCLE_SEGMENTS; i++) {
+      const next = pointOnCircle(center, radius, (Math.PI * 2 * i) / CIRCLE_SEGMENTS);
+      segments.push({
+        start: prev,
+        end: next,
+        isConstruction: false,
+      });
+      prev = next;
+    }
+  }
+
+  return segments;
+}
+
+/**
+ * Compute sketch-derived filled cells from the full sketch entity set rather
+ * than only straight lines.
+ *
+ * @param {{ lines?: any[], beziers?: any[], circles?: any[] }} sketch
+ * @param {number} cellW
+ * @param {number} cellH
+ * @param {number} fillThreshold
+ * @returns {Set<string>}
+ */
+export function computeFilledCellsForSketch(sketch, cellW, cellH, fillThreshold = 0.5) {
+  return computeFilledCellsFromSketch(buildSketchFillSegments(sketch), cellW, cellH, fillThreshold);
+}
 
 /**
  * Compute the set of grid cell keys ("r,c") that should be filled because they
@@ -276,4 +339,11 @@ function signature(keys) {
 
 function round(v) {
   return Math.round(v / EPSILON) * EPSILON;
+}
+
+function pointOnCircle(center, radius, angle) {
+  return {
+    x: center.x + Math.cos(angle) * radius,
+    y: center.y + Math.sin(angle) * radius,
+  };
 }

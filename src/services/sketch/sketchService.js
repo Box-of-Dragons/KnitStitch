@@ -38,6 +38,11 @@ export class SketchService {
     this._constraintPendingPoint = null;
     this._selectedPoints = new Set();
     this._selectedLines = new Set();
+    this._dragCircle = null;
+    this._dragStartPointer = null;
+    this._dragHasMoved = false;
+    this._dragCircleStartPos = null;
+    this._dragCircleStartRadius = null;
     this._suppressNextClick = false;
     this._slvsAdapter = null;
     this._slvsInitPromise = null;
@@ -500,13 +505,13 @@ export class SketchService {
    * @param {Set} movedPoints - points directly manipulated by the user
    * @returns {number|null} result code or iteration count
    */
-  _solve(sketch, movedPoints) {
+  _solve(sketch, movedPoints, draggedCircles = null) {
     if (!this._slvsAdapter?.ready) {
       // Trigger the lazy load so future drags solve; this drag is unsolved.
       this.ensureSolver();
       return null;
     }
-    return this._slvsAdapter.solveAndWriteBack(sketch, movedPoints);
+    return this._slvsAdapter.solveAndWriteBack(sketch, movedPoints, null, draggedCircles);
   }
 
   _setPreviewLine(line) {

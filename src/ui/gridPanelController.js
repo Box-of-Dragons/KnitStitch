@@ -2,7 +2,7 @@ import { GaugeSettings } from '../models/gaugeSettings.js';
 import { PatternDimensions } from '../models/patternDimensions.js';
 import { FinishedSizeCalculator } from '../services/finishedSizeCalculator.js';
 import { updateCellSizing, getCombinedBoundingBox } from '../services/gridService.js';
-import { computeFilledCellsFromSketch } from '../services/sketch/fill/closedShapeFill.js';
+import { computeFilledCellsForSketch } from '../services/sketch/fill/closedShapeFill.js';
 import { collectRefs, bindIfPresent } from './uiUtils.js';
 
 const REF_IDS = {
@@ -20,6 +20,7 @@ const REF_IDS = {
 export function setupGridPanel({ store, documentObj = globalThis.document }) {
   const refs = collectRefs(documentObj, REF_IDS);
   const calc = new FinishedSizeCalculator();
+  let geometryRecalculatePending = false;
 
   function updateGridSidebar() {
     const gs = store.get('stitchesPer4Inches');
@@ -43,8 +44,8 @@ export function setupGridPanel({ store, documentObj = globalThis.document }) {
     const cw = store.get('cellWidthPx');
     const ch = store.get('cellHeightPx');
     const filledCells = store.get('filledCells');
-    const sketchFilled = computeFilledCellsFromSketch(
-      store.get('sketch.lines'),
+    const sketchFilled = computeFilledCellsForSketch(
+      store.state.sketch,
       cw,
       ch,
       store.get('fillThreshold'),
@@ -57,6 +58,15 @@ export function setupGridPanel({ store, documentObj = globalThis.document }) {
     store.set('finishedWidth', Math.round(result.widthInches * 100) / 100);
     store.set('finishedHeight', Math.round(result.heightInches * 100) / 100);
     updateCellSizing(store, gauge.stitchesPer4Inches, gauge.rowsPer4Inches);
+  }
+
+  function scheduleRecalculateSize() {
+    if (geometryRecalculatePending) return;
+    geometryRecalculatePending = true;
+    requestAnimationFrame(() => {
+      geometryRecalculatePending = false;
+      recalculateSize();
+    });
   }
 
   // Event bindings
@@ -85,17 +95,32 @@ export function setupGridPanel({ store, documentObj = globalThis.document }) {
       path === 'cellWidthPx' ||
       path === 'cellHeightPx' ||
       path === 'fillThreshold' ||
+      path === 'sketch.lines' ||
+      path === 'sketch.beziers' ||
+      path === 'sketch.circles' ||
+      path === 'sketch.points' ||
+      path === 'sketch.isDragging' ||
       path === 'stitchesPer4Inches' ||
       path === 'rowsPer4Inches' ||
       path === 'finishedWidth' ||
       path === 'finishedHeight'
     ) {
-      if (path === 'filledCells' || path === 'cellWidthPx' || path === 'cellHeightPx' || path === 'fillThreshold') {
-        recalculateSize();
+      if (
+        path === 'filledCells'
+        || path === 'cellWidthPx'
+        || path === 'cellHeightPx'
+        || path === 'fillThreshold'
+        || path === 'sketch.lines'
+        || path === 'sketch.beziers'
+        || path === 'sketch.circles'
+        || path === 'sketch.points'
+        || path === 'sketch.isDragging'
+      ) {
+        if (!store.get('sketch.isDragging')) scheduleRecalculateSize();
       }
       updateGridSidebar();
     }
   });
 
-  return { updateGridSidebar, recalculateSize };
+  return { updateGridSidebar, recalculateSize, scheduleRecalculateSize };
 }

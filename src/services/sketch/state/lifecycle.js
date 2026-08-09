@@ -70,12 +70,12 @@ export function clear(service, ) {
     service.store.set('sketch.beziers', []);
 }
 export function cancelCurrentLine(service, ) {
+    service.store.set('sketch.isDragging', false);
     service._lineTool.cancel();
     if (service._circleTool) service._circleTool.cancel();
     if (service._rectangleTool) service._rectangleTool.cancel();
     if (service._bezierTool) service._bezierTool.cancel();
     if (service._dimPendingA) {
-      service._removeOrphanPoint(service._dimPendingA);
       service._dimPendingA = null;
       service.clearSelection();
     }

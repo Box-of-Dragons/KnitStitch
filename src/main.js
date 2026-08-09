@@ -5,10 +5,11 @@ import { Store } from './state/store.js';
 import { StorePersistence } from './state/storePersistence.js';
 import { SketchService } from './services/sketch/sketchService.js';
 import { setupMainUi } from './ui/mainUi.js';
-import { computeFilledCellsFromSketch } from './services/sketch/fill/closedShapeFill.js';
+import { computeFilledCellsForSketch, computeFilledCellsFromSketch } from './services/sketch/fill/closedShapeFill.js';
 import { SketchPoint } from './models/sketch/sketchPoint.js';
 import { SketchLine } from './models/sketch/sketchLine.js';
 import { SketchConstraint } from './models/sketch/sketchConstraint.js';
+import { IS_DESKTOP } from './config/runtime.js';
 
 const store = new Store();
 const persistence = new StorePersistence(store);
@@ -24,6 +25,7 @@ if (typeof window !== 'undefined') {
   window.__knitstitchStore = store;
   window.__knitstitchSketchService = sketchService;
   window.__knitstitchComputeFilledCellsFromSketch = computeFilledCellsFromSketch;
+  window.__knitstitchComputeFilledCellsForSketch = computeFilledCellsForSketch;
   window.__knitstitchModules = { SketchPoint, SketchLine, SketchConstraint };
 }
 
@@ -53,9 +55,10 @@ if (typeof document !== 'undefined') {
   };
   const waitForSharedHeaderPaint = () => new Promise((resolve) => {
     const paintThenResolve = () => requestAnimationFrame(() => requestAnimationFrame(resolve));
+    const hasHeaderPlaceholders = () => document.getElementById('global-bar') || document.getElementById('site-header');
     const hasRenderedHeader = () => document.querySelector('.global-bar') && document.querySelector('.site-header');
 
-    if (hasRenderedHeader()) {
+    if (IS_DESKTOP || !hasHeaderPlaceholders() || hasRenderedHeader()) {
       paintThenResolve();
       return;
     }

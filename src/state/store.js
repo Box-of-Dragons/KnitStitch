@@ -29,6 +29,7 @@ class Store {
       sketch: {
         isActive: true,
         activeTool: 'Select',   // 'Select' | 'Line' | 'Dimension' | 'Constraint'
+        isDragging: false,
         constraintSubMode: null, // 'Perpendicular' | 'Midpoint'
         strokeColor: DEFAULT_STROKE_COLOR,
         strokeThickness: DEFAULT_STROKE_THICKNESS,
