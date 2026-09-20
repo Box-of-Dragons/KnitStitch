@@ -17,6 +17,9 @@ jobs:
     with:
       release-branch: master
       project-description: KnitStitch, a knitting pattern design web app
+    permissions:
+      contents: write
+      pull-requests: write
     secrets: inherit
 
   desktop-release:
