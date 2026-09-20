@@ -2,7 +2,7 @@ name: Release
 
 # Releases are always manual — Actions → Release → Run workflow.
 # All release policy lives in the shared workflow (StructuredChaos docs/git-rules.md);
-# this file only carries the KnitStitch-specific follow-on jobs.
+# this file only carries the KnitStitch-specific follow-on job.
 
 on:
   workflow_dispatch:
@@ -47,12 +47,3 @@ jobs:
           tag_name: ${{ needs.release.outputs.release_tag }}
           files: release/KnitStitch-Portable-*.exe
           fail_on_unmatched_files: true
-
-  # Deploy after release — the shared workflow has already merged dev→master.
-  deploy:
-    needs: release
-    if: always() && !failure() && !cancelled()
-    uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-deploy.yml@master
-    with:
-      branch: master
-    secrets: inherit
