@@ -18,11 +18,14 @@ jobs:
       project-description: KnitStitch, a knitting pattern design web app
     secrets: inherit
 
-  sync-master:
-    if: github.ref == 'refs/heads/dev'
+  # dev work reaches protected master only through a PR merge.
+  sync:
+    name: Sync release branch
     needs: release
+    if: always() && github.ref_name == 'dev' && !failure() && !cancelled()
     permissions:
       contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -30,15 +33,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Merge dev into master
+      - name: Merge dev into master via pull request
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B master origin/master
-          git merge --ff-only origin/dev
-          git push origin master
+          git fetch origin master dev
+          if [ "$(git rev-list --count origin/master..origin/dev)" -eq 0 ]; then
+            echo "master already contains dev."
+            exit 0
+          fi
+          gh pr create --base master --head dev \
+            --title "chore(release): merge dev into master" \
+            --body "Automated release sync." || true
+          gh pr merge --merge dev || { sleep 5; gh pr merge --merge dev; }
 
   desktop-release:
     needs: release
@@ -69,9 +76,9 @@ jobs:
           files: release/KnitStitch-Portable-*.exe
           fail_on_unmatched_files: true
 
-  # Deploy after sync-master so the VPS always resets to the merged master.
+  # Deploy after sync so the VPS always resets to the merged master.
   deploy:
-    needs: [release, sync-master]
+    needs: [release, sync]
     if: always() && !failure() && !cancelled()
     uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-deploy.yml@master
     with:
