@@ -15,8 +15,7 @@ jobs:
   release:
     uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-release.yml@master
     with:
-      node-version: '20'
-      prepare-command: npm ci && npm run release-notes:ai
+      project-description: KnitStitch, a knitting pattern design web app
     secrets: inherit
 
   sync-master:
