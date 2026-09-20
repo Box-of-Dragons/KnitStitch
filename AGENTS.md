@@ -346,48 +346,11 @@ Common scopes used in this project:
 
 This repo uses `style` (not `ui`) for the no-logic-change styling commit type. Scopes are not enforced — use whatever best describes the area of change.
 
-## VPS Deploy via GitHub Webhook
+## Deploy
 
-The VPS auto-deploys when GitHub receives a push to `master`.
+Deploys run as part of the manual **Release** workflow (Actions → Release → Run workflow): it tags the release, creates the GitHub Release, fast-forwards `master` when run from `dev`, then SSHes to the VPS — `git fetch` + `git reset --hard origin/master`, then `scripts/deploy.sh` (`npm ci`, `npm run build-info`, `npm run build`). nginx serves `dist/` as the docroot.
 
-`scripts/webhook-server.mjs` is a small Node.js HTTP server (no external
-dependencies) that:
-
-1. Verifies the GitHub HMAC-SHA256 signature using `GITHUB_WEBHOOK_SECRET` from `.env`
-2. Checks that the push is to `refs/heads/master`
-3. Runs `git fetch origin master` + `git reset --hard origin/master`
-4. Runs `npm ci` to install dependencies
-5. Runs `npm run build-info` to regenerate build info + changelogs
-6. Runs `npm run build` to produce `dist/`
-
-The web server (nginx) serves the `dist/` directory as the document root and
-proxies `/webhook` to the Node.js webhook server on `127.0.0.1:3001`.
-
-### Setup
-
-1. Copy `.env.example` to `.env` on the VPS and set `GITHUB_WEBHOOK_SECRET`
-2. Install PM2 globally and start the webhook server:
-   ```bash
-   npm install -g pm2
-   pm2 start ecosystem.config.cjs
-   pm2 save
-   pm2 startup   # follow printed instructions to enable boot-time startup
-   ```
-3. Add nginx proxy for the webhook (in the site config):
-   ```nginx
-   location /webhook {
-     proxy_pass http://127.0.0.1:3001;
-     proxy_set_header X-Forwarded-For $remote_addr;
-   }
-   ```
-4. In GitHub repo settings → Webhooks → Add webhook:
-   - Payload URL: `https://www.knitstitch.misssponto.me.uk/webhook`
-   - Content type: `application/json`
-   - Secret: same value as `GITHUB_WEBHOOK_SECRET`
-   - Events: Just the push event
-5. Ensure the VPS repo has the GitHub remote configured and SSH keys set up
-6. Ensure Node.js (with npm) is installed on the VPS (via nvm or system package)
-7. Point the web server document root to `dist/`
+Pushes no longer deploy — the GitHub webhook was removed. `scripts/webhook-server.mjs`, `ecosystem.config.cjs`, and the `knitstitch-webhook` PM2 process on the VPS are legacy and can be decommissioned.
 
 ### Manual deploy (fallback)
 
@@ -395,10 +358,9 @@ SSH into the VPS and run:
 
 ```bash
 cd ~/htdocs/knitstitch
-git pull origin master
-npm ci
-npm run build-info
-npm run build
+git fetch origin master
+git reset --hard origin/master
+bash scripts/deploy.sh
 ```
 
 ## Local Artifacts

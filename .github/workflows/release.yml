@@ -69,3 +69,12 @@ jobs:
           tag_name: ${{ needs.release.outputs.release_tag }}
           files: release/KnitStitch-Portable-*.exe
           fail_on_unmatched_files: true
+
+  # Deploy after sync-master so the VPS always resets to the merged master.
+  deploy:
+    needs: [release, sync-master]
+    if: always() && !failure() && !cancelled()
+    uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-deploy.yml@master
+    with:
+      branch: master
+    secrets: inherit
