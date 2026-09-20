@@ -14,6 +14,8 @@ concurrency:
 jobs:
   release:
     uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-release.yml@master
+    permissions:
+      contents: write
     with:
       project-description: KnitStitch, a knitting pattern design web app
     secrets: inherit
