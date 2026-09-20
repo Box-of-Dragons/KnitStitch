@@ -1,0 +1,71 @@
+name: Release
+
+# Releases are always manual — Actions → Release → Run workflow.
+# All release policy lives in the shared workflow (StructuredChaos docs/git-rules.md);
+# this file only carries the KnitStitch-specific follow-on jobs.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    uses: Box-of-Dragons/StructuredChaos/.github/workflows/family-release.yml@master
+    with:
+      node-version: '20'
+      prepare-command: npm ci && npm run release-notes:ai
+    secrets: inherit
+
+  sync-master:
+    if: github.ref == 'refs/heads/dev'
+    needs: release
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge dev into master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B master origin/master
+          git merge --ff-only origin/dev
+          git push origin master
+
+  desktop-release:
+    needs: release
+    if: needs.release.outputs.should_release == 'true'
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop package
+        run: npm run electron:portable
+
+      - name: Upload desktop release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.release_tag }}
+          files: release/KnitStitch-Portable-*.exe
+          fail_on_unmatched_files: true
