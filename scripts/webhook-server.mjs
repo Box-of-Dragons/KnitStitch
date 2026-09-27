@@ -19,7 +19,7 @@
  *          proxy_set_header X-Forwarded-For $remote_addr;
  *        }
  *   4. In GitHub repo settings → Webhooks → Add webhook:
- *        - Payload URL: https://www.knitstitch.misssponto.me.uk/webhook
+ *        - Payload URL: https://www.knitstitch.structuredchaos.dev/webhook
  *        - Content type: application/json
  *        - Secret: same value as GITHUB_WEBHOOK_SECRET
  *        - Events: Just the push event

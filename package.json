@@ -39,7 +39,7 @@
     "konva": "^9.2.0"
   },
   "build": {
-    "appId": "uk.me.misssponto.knitstitch",
+    "appId": "dev.structuredchaos.knitstitch",
     "productName": "KnitStitch Grid",
     "directories": {
       "output": "release"
