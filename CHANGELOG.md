@@ -69,11 +69,11 @@ Published 2026-08-08 — [View on GitHub](https://github.com/Box-of-Dragons/Knit
   - Add disabled global login link placeholder
 - Use shared site header from root site
   - replace hardcoded header HTML with site-header.js loader
-  - header.html now injects global-bar.js and site-header.js from the root Structured Chaos site (localhost:4000 in dev, misssponto.me.uk in prod)
+  - header.html now injects global-bar.js and site-header.js from the root Structured Chaos site (localhost:4000 in dev, structuredchaos.dev in prod)
   - set window.SITE_HEADER config (brand, nav, GitHub/GitLab links)
   - placeholder divs for global-bar and site-header
 - Load shared.css from root site on all pages
-  - add inline loader script to all 5 page HTML files that injects css/shared.css from the root site (localhost:4000 in dev, misssponto.me.uk in prod) before app.css
+  - add inline loader script to all 5 page HTML files that injects css/shared.css from the root site (localhost:4000 in dev, structuredchaos.dev in prod) before app.css
   - shared.css provides design tokens, base styles, typography, and all shared components (global bar, site header, panels, chips, etc.)
 - Use shared site footer
 
@@ -333,7 +333,7 @@ Published 2026-08-08 — [View on GitHub](https://github.com/Box-of-Dragons/Knit
 
 - Initialize standalone KnitStitch Grid app
   - extract app from CraftCMS into standalone Vite project
-  - serve from own subdomain (www.knitstitch.misssponto.me.uk)
+  - serve from own subdomain (www.knitstitch.structuredchaos.dev)
   - standalone index.html with simple header, no Craft partials
   - extract CSS into public/css/app.css with design tokens and components
   - update test configs for Vite dev server (no DDEV/CraftCMS needed)

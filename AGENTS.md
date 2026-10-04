@@ -357,7 +357,7 @@ Pushes no longer deploy — the GitHub webhook was removed. `scripts/webhook-ser
 SSH into the VPS and run:
 
 ```bash
-cd ~/htdocs/knitstitch
+cd /home/sc-knitstitch/htdocs/knitstitch.structuredchaos.dev
 git fetch origin master
 git reset --hard origin/master
 bash scripts/deploy.sh
